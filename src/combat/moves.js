@@ -248,6 +248,37 @@ export const MOVES = {
   hantu_candles: { anim: 'none', telegraph: true, candles: 5, startup: 20, active: 2, recovery: 30, step: 0, hit: null, shake: 4 },
   hantu_notes: { anim: 'none', telegraph: true, shoot: 'uang_kertas', startup: 16, active: 2, recovery: 26, step: 0, hit: null },
 
+  // Stage 4 — Jalan Raya Demo
+  provokasi: { anim: 'throwPose', telegraph: true, summon: ['massa'], startup: 20, active: 2, recovery: 24, step: 0, hit: null },
+  buzzer_spam: { anim: 'none', shoot: 'spam', startup: 14, active: 2, recovery: 20, step: 0, hit: null },
+  truk_semprot: { anim: 'none', telegraph: true, shoot: 'semprotan', startup: 22, active: 2, recovery: 16, step: 0, hit: null },
+  truk_tabrak: {
+    anim: 'none', telegraph: true, lunge: 240, dizzyAfter: 1.8, startup: 44, active: 90, recovery: 4, step: 0,
+    damage: 15, push: 220, launch: 250, knockdown: true, hit: { x: 30, w: 30, z: 0, h: 50, depth: 18 }, sfx: 'horn', shake: 5,
+  },
+  truk_preman: { anim: 'none', telegraph: true, summon: ['preman_bayaran', 'preman_bayaran'], startup: 20, active: 2, recovery: 30, step: 0, hit: null },
+
+  // Stage 5 — Gedung Pejabat
+  koper_l1: {
+    anim: 'palm', weapon: true, startup: 12, active: 4, recovery: 18, step: 6,
+    damage: 7, push: 90, stun: 20, hit: { x: 6, w: 32, z: 24, h: 20, depth: 9 }, sfx: 'whoosh',
+  },
+  makelar_heal: { anim: 'throwPose', heal: 20, startup: 24, active: 2, recovery: 20, step: 0, hit: null },
+  jaksa_denda: { anim: 'throwPose', telegraph: true, shoot: 'kertas_denda', startup: 16, active: 2, recovery: 22, step: 0, hit: null },
+  pejabat_duit: { anim: 'throwPose', shoot: 'duit', startup: 14, active: 2, recovery: 16, step: 0, hit: null },
+  pejabat_slam: {
+    anim: 'sweep', telegraph: true, dizzyAfter: 1.6, startup: 26, active: 6, recovery: 10, step: 18,
+    damage: 15, push: 190, launch: 230, knockdown: true, hit: { x: -10, w: 60, z: 0, h: 30, depth: 18 }, sfx: 'whooshBig', shake: 5,
+  },
+  pejabat_ajudan: { anim: 'throwPose', telegraph: true, summon: ['ajudan'], startup: 20, active: 2, recovery: 26, step: 0, hit: null },
+  kala_slam: {
+    anim: 'none', telegraph: true, dizzyAfter: 1.7, startup: 34, active: 6, recovery: 10, step: 0,
+    damage: 18, push: 210, launch: 260, knockdown: true, hit: { x: 10, w: 90, z: 0, h: 40, depth: 24 }, sfx: 'whooshBig', shake: 8,
+  },
+  kala_breath: { anim: 'none', telegraph: true, shoot: 'napas_kala', startup: 24, active: 2, recovery: 20, step: 0, hit: null },
+  kala_eclipse: { anim: 'none', telegraph: true, darkness: 6, candles: 4, startup: 30, active: 2, recovery: 30, step: 0, hit: null, shake: 6 },
+  kala_fire: { anim: 'none', telegraph: true, spawnFire: 6, startup: 28, active: 2, recovery: 26, step: 0, hit: null },
+
   fire_burn: { damage: 5, push: 70, stun: 14, hitstop: 0.04, shake: 1 },
 };
 

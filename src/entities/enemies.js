@@ -195,6 +195,102 @@ export const ENEMIES = {
     ],
     score: 15000, drops: { uang: 1, bukti: 1 }, look: PREMAN_LOOK,
   },
+  // ---- Stage 4: Jalan Raya Demo ----
+  preman_bayaran: {
+    id: 'preman_bayaran', nameKey: 'enemy_preman_bayaran', maxHp: 42, walkX: 66, walkY: 42,
+    light: ['preman_l1'], heavy: 'preman_heavy', ai: 'brawler', reach: 36,
+    score: 300, drops: { koin: 0.6, bukti: 0.1 },
+    look: { ...PREMAN_LOOK, top: '#1e1e22', clothLight: '#3a3a40', pants: '#34405e', headgear: 'bandana', bandana: '#e0b252' },
+  },
+  massa: {
+    id: 'massa', nameKey: 'enemy_massa', maxHp: 20, walkX: 70, walkY: 44,
+    light: ['preman_l1'], ai: 'brawler', reach: 34,
+    score: 100, drops: { koin: 0.2 },
+    look: { ...PREMAN_LOOK, skin: '#b07a4f', top: '#a4452a', clothLight: '#c8653a', pants: '#3a3a3a', headgear: 'none' },
+  },
+  provokator: {
+    id: 'provokator', nameKey: 'enemy_provokator', maxHp: 38, walkX: 60, walkY: 40,
+    light: ['preman_l1'], weapon: 'toa', ai: 'provokator', supportMove: 'provokasi', supportCd: 6,
+    score: 450, drops: { koin: 0.5, bukti: 0.3 },
+    look: { ...PREMAN_LOOK, top: '#2a2a2a', clothLight: '#3a3a3a', pants: '#2a2a2a', sleeve: '#2a2a2a', headgear: 'mask' },
+  },
+  buzzer: {
+    id: 'buzzer', nameKey: 'enemy_buzzer', maxHp: 24, walkX: 54, walkY: 34, float: 34,
+    light: [], ai: 'ranged', range: [90, 170], shot: 'buzzer_spam', shotCd: 2.4, render: 'buzzer', body: { w: 9, h: 22 },
+    score: 300, drops: { koin: 0.3, bukti: 0.12 }, look: PREMAN_LOOK,
+  },
+  komandan_truk: {
+    id: 'komandan_truk', nameKey: 'boss_komandan_truk', boss: true, maxHp: 300, armor: true, immovable: true, guard: 0.6,
+    walkX: 50, walkY: 26, light: [], ai: 'boss', render: 'truck', body: { w: 44, h: 70 }, keep: 160,
+    attacks: [
+      { move: 'truk_semprot', min: 40, weight: 2, align: true },
+      { move: 'truk_tabrak', min: 120, weight: 1.5, align: true },
+      { move: 'truk_preman', weight: 0.6 },
+    ],
+    summons: [{ at: 0.5, allies: ['mahasiswa', 'ojol'], tutorial: 'tut_allies' }],
+    score: 8000, drops: { bukti: 1 }, look: PREMAN_LOOK,
+  },
+  komandan: {
+    id: 'komandan', nameKey: 'boss_komandan', boss: true, size: 1.35, maxHp: 280, armor: true,
+    walkX: 58, walkY: 36, light: ['boss_l1'], heavy: 'boss_stomp', special: 'boss_rush', ai: 'bossPreman', reach: 50,
+    score: 9000, drops: { uang: 1, bukti: 1 },
+    look: { skin: '#8a5a38', top: '#4a5a3a', pants: '#3a4a2a', sleeve: '#8a5a38', clothLight: '#5a6a4a', sash: '#2a2a2a', headgear: 'beret', beret: '#a4302a', chain: '#f2c94c', hair: '#1a1210' },
+  },
+
+  // ---- Stage 5: Gedung Pejabat ----
+  tikus: {
+    id: 'tikus', nameKey: 'enemy_tikus', maxHp: 18, walkX: 130, walkY: 70,
+    light: [], ai: 'thief', render: 'tikus', body: { w: 8, h: 26 },
+    score: 250, drops: { koin: 0.5, bukti: 0.1 }, look: PREMAN_LOOK,
+  },
+  ajudan: {
+    id: 'ajudan', nameKey: 'enemy_ajudan', maxHp: 55, walkX: 70, walkY: 44,
+    light: ['preman_l1'], heavy: 'preman_heavy', block: true, shieldColor: '#2a2a2a', ai: 'brawler', reach: 38,
+    score: 400, drops: { koin: 0.4, bukti: 0.1 },
+    look: { ...PREMAN_LOOK, skin: '#a8744a', top: '#1a1a1e', clothLight: '#f6f2e4', pants: '#1a1a1e', sleeve: '#1a1a1e', sash: '#1a1a1e', headgear: 'shades' },
+  },
+  makelar: {
+    id: 'makelar', nameKey: 'enemy_makelar', maxHp: 40, walkX: 60, walkY: 40,
+    light: ['preman_l1'], weapon: 'koper', ai: 'support', supportMove: 'makelar_heal', supportCd: 6,
+    score: 500, drops: { uang: 0.5, bukti: 0.4 },
+    look: { ...PREMAN_LOOK, skin: '#c08a5a', top: '#8a3a2a', clothLight: '#e0b252', pants: '#2a2a2a', sleeve: '#8a3a2a', headgear: 'slick', chain: '#f2c94c' },
+  },
+  jaksa_palsu: {
+    id: 'jaksa_palsu', nameKey: 'enemy_jaksa', maxHp: 38, walkX: 56, walkY: 36,
+    light: ['preman_l1'], ai: 'ranged', range: [90, 160], shot: 'jaksa_denda', shotCd: 2.6,
+    score: 450, drops: { koin: 0.4, bukti: 0.3 },
+    look: { ...PREMAN_LOOK, skin: '#c08a5a', top: '#1a1a1e', clothLight: '#f6f2e4', pants: '#1a1a1e', sleeve: '#1a1a1e', sash: '#a4302a', headgear: 'peci' },
+  },
+  pejabat_tinggi: {
+    id: 'pejabat_tinggi', nameKey: 'boss_pejabat', boss: true, size: 1.25, maxHp: 380, armor: true, guard: 0.6,
+    walkX: 46, walkY: 30, light: [], ai: 'boss', reach: 50, keep: 120,
+    attacks: [
+      { move: 'pejabat_duit', min: 60, weight: 2, align: true },
+      { move: 'pejabat_slam', max: 70, weight: 2, align: true },
+      { move: 'pejabat_ajudan', weight: 0.5 },
+    ],
+    summons: [
+      { at: 0.6, enemies: ['makelar', 'makelar'], shield: true, tutorial: 'tut_kebal' },
+      { at: 0.3, enemies: ['tikus', 'tikus', 'jaksa_palsu'] },
+    ],
+    score: 20000, drops: { uang: 1, bukti: 1 },
+    look: { skin: '#c8946a', top: '#c8a050', pants: '#8a7040', sleeve: '#c8a050', clothLight: '#e0c070', sash: '#5a3a1a', headgear: 'peci', chain: '#f2c94c', hair: '#1a1210' },
+  },
+  batara_kala: {
+    id: 'batara_kala', nameKey: 'boss_kala', boss: true, maxHp: 520, armor: true, immovable: true, guard: 0.6,
+    walkX: 30, walkY: 24, light: [], ai: 'boss', render: 'kala', body: { w: 34, h: 120 }, keep: 130, cooldown: 1.2,
+    attacks: [
+      { move: 'kala_slam', max: 90, weight: 2, align: true },
+      { move: 'kala_breath', min: 60, weight: 2, align: true },
+      { move: 'kala_fire', weight: 1 },
+      { move: 'kala_eclipse', weight: 0.7 },
+    ],
+    summons: [
+      { at: 0.66, enemies: ['asap', 'tikus', 'buzzer'], tutorial: 'tut_kala_echo' },
+      { at: 0.33, enemies: ['robot', 'spekulan', 'pembakar'] },
+    ],
+    score: 50000, drops: {}, look: PREMAN_LOOK,
+  },
   preman_kampung: {
     id: 'preman_kampung',
     nameKey: 'boss_preman_kampung',

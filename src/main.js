@@ -14,13 +14,15 @@ import { STAGE0 } from './stages/stage0_kampung.js';
 import { STAGE1 } from './stages/stage1_hutan.js';
 import { STAGE2 } from './stages/stage2_pabrik.js';
 import { STAGE3 } from './stages/stage3_pasar.js';
+import { STAGE4 } from './stages/stage4_demo.js';
+import { STAGE5 } from './stages/stage5_gedung.js';
 import { buy, applyToHero } from './systems/economy.js';
 import { Story } from './ui/story.js';
 import { STORY, ENDINGS, endingFor, canFaceKala, totalEvidence } from './story/story.js';
 import { SPECIAL_COST } from './entities/fighter.js';
 
-const STAGES = { padepokan: PADEPOKAN, stage0: STAGE0, stage1: STAGE1, stage2: STAGE2, stage3: STAGE3 };
-const STAGE_ORDER = ['stage0', 'stage1', 'stage2', 'stage3'];
+const STAGES = { padepokan: PADEPOKAN, stage0: STAGE0, stage1: STAGE1, stage2: STAGE2, stage3: STAGE3, stage4: STAGE4, stage5: STAGE5 };
+const STAGE_ORDER = ['stage0', 'stage1', 'stage2', 'stage3', 'stage4', 'stage5'];
 const nextStageOf = (id) => STAGE_ORDER[STAGE_ORDER.indexOf(id) + 1] ?? null;
 const FINAL_STAGE = 'stage5';
 const urlStage = new URLSearchParams(location.search).get('stage');

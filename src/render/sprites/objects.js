@@ -215,6 +215,19 @@ export function drawHeldWeapon(ctx, pts, id, facing) {
   } else if (w.draw === 'bag') {
     r(ctx, OUT, hx - 7, hy - 7, 14, 14);
     r(ctx, w.color, hx - 6, hy - 6, 12, 12);
+  } else if (w.draw === 'mega') {
+    // toa (megaphone): small handle, cone pointing forward
+    r(ctx, OUT, hx - 2, hy - 2, 4, 6);
+    for (let i = 0; i < 9; i++) {
+      const h = 3 + i;
+      r(ctx, OUT, hx + facing * (2 + i) - 1, hy - 4 - h / 2, 2, h + 2);
+      r(ctx, i > 6 ? '#c8322a' : w.color, hx + facing * (2 + i) - 1, hy - 3 - h / 2, 2, h);
+    }
+  } else if (w.draw === 'case') {
+    r(ctx, OUT, hx - 2, hy - 1, 4, 3);
+    r(ctx, OUT, hx - 9, hy + 1, 18, 13);
+    r(ctx, w.color, hx - 8, hy + 2, 16, 11);
+    r(ctx, '#f2c94c', hx - 1, hy + 5, 2, 3);
   } else if (w.draw === 'bucket') {
     const cx = hx + dx * 4;
     const cy = hy + dy * 4;

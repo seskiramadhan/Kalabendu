@@ -179,6 +179,19 @@ function drawHeadgear(ctx, look, hx, hy, facing) {
   } else if (look.headgear === 'peci') {
     ctx.fillStyle = '#1a1a1a';
     ctx.fillRect(hx - 6, hy - 11, 12, 6);
+  } else if (look.headgear === 'mask') {
+    // hoodie and a face mask: only the eyes show
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(hx - 8, hy - 9, 16, 6);
+    ctx.fillRect(facing > 0 ? hx - 8 : hx + 4, hy - 6, 4, 12);
+    ctx.fillStyle = '#e6e0cc';
+    ctx.fillRect(facing > 0 ? hx - 3 : hx - 6, hy + 1, 9, 4);
+  } else if (look.headgear === 'beret') {
+    ctx.fillStyle = look.beret;
+    ctx.fillRect(hx - 8, hy - 10, 15, 5);
+    ctx.fillRect(facing > 0 ? hx - 9 : hx + 4, hy - 8, 5, 3);
+    ctx.fillStyle = '#f2c94c';
+    ctx.fillRect(facing > 0 ? hx + 2 : hx - 4, hy - 9, 2, 2);
   } else if (look.headgear === 'bandana') {
     ctx.fillStyle = look.bandana;
     ctx.fillRect(hx - 7, hy - 8, 15, 5);

@@ -635,12 +635,200 @@ function pasarFloor(stage) {
   return { canvas: c, factor: 1, y: stage.floorTop };
 }
 
+// ---- Stage 4: Jalan Raya Demo ----
+
+function demoFar(stage) {
+  const r = rng(307);
+  const width = VIEW_W + (stage.width - VIEW_W) * 0.12;
+  const c = canvas(width, VIEW_H);
+  const ctx = c.getContext('2d');
+  skyline(ctx, width, 132, '#6a5a6a', '#f2d8a0', r);
+  // the glass tower far away at the end of the road
+  px(ctx, '#3a4a6a', width - 120, 20, 40, 120);
+  for (let y = 26; y < 136; y += 6) px(ctx, '#8ab0d8', width - 116, y, 32, 2);
+  px(ctx, '#f2c94c', width - 102, 12, 4, 8);
+  return { canvas: c, factor: 0.12, y: 0 };
+}
+
+function demoMid(stage) {
+  const r = rng(311);
+  const width = VIEW_W + (stage.width - VIEW_W) * 0.4;
+  const c = canvas(width, VIEW_H);
+  const ctx = c.getContext('2d');
+  for (let x = 0; x < width; x += 60 + Math.floor(r() * 30)) {
+    const h = 50 + Math.floor(r() * 30);
+    px(ctx, '#4a3e4a', x, 150 - h, 52, h + 20);
+    for (let wy = 156 - h; wy < 140; wy += 8) for (let wx = x + 4; wx < x + 48; wx += 8) px(ctx, r() < 0.3 ? '#e8c890' : '#3a2e3a', wx, wy, 4, 4);
+  }
+  // crowd silhouettes holding banners and signs
+  for (let x = 0; x < width; x += 5) {
+    const h = 10 + Math.floor(r() * 5);
+    px(ctx, '#2a2028', x, 166 - h, 4, h + 10);
+    px(ctx, '#2a2028', x + 1, 162 - h, 3, 3);
+    if (r() < 0.06) {
+      px(ctx, '#4a3a2a', x + 1, 140 - h, 1, 24);
+      px(ctx, r() < 0.5 ? '#f6f2e4' : '#c8322a', x - 6, 136 - h, 14, 8);
+    }
+  }
+  return { canvas: c, factor: 0.4, y: 0 };
+}
+
+function demoWall(stage) {
+  const r = rng(317);
+  const c = canvas(stage.width, VIEW_H);
+  const ctx = c.getContext('2d');
+  const top = stage.floorTop;
+  // shop fronts with rolling shutters, a sidewalk, and protest banners
+  for (let x = 0; x < stage.width; x += 120) {
+    const col = ['#8a6a5a', '#6a7a8a', '#9a8a6a', '#7a5a6a'][Math.floor(r() * 4)];
+    px(ctx, col, x, 96, 118, top - 104);
+    px(ctx, '#5a5a62', x + 10, 120, 98, top - 128);
+    for (let y = 122; y < top - 8; y += 4) px(ctx, '#6a6a72', x + 10, y, 98, 2);
+    px(ctx, '#2a2a2a', x + 14, 102, 90, 12);
+  }
+  px(ctx, '#9a9a9a', 0, top - 8, stage.width, 8);
+  px(ctx, '#6a6a6a', 0, top - 2, stage.width, 2);
+  const banners = ['TURUNKAN HARGA!', 'KERJA LAYAK', 'USUT TUNTAS', 'RAKYAT BERSATU', 'HUTAN BUKAN KEBUN', 'TOLAK SUAP'];
+  let i = 0;
+  for (let x = 60; x < stage.width; x += 340 + Math.floor(r() * 60)) {
+    const text = banners[i++ % banners.length];
+    const w = text.length * 6 + 12;
+    px(ctx, '#4a3a2a', x - 2, 98, 2, 40);
+    px(ctx, '#4a3a2a', x + w, 98, 2, 40);
+    px(ctx, '#f6f2e4', x, 100, w, 14);
+    ctx.fillStyle = '#c8322a';
+    ctx.font = 'bold 8px monospace';
+    ctx.fillText(text, x + 6, 110);
+  }
+  // an angkot parked on the side
+  for (let x = 900; x < stage.width; x += 1500) {
+    px(ctx, '#120c0a', x - 1, top - 34, 62, 28);
+    px(ctx, '#3a9a5a', x, top - 33, 60, 26);
+    px(ctx, '#9ad0e8', x + 6, top - 30, 48, 8);
+    px(ctx, '#2a2a2a', x + 8, top - 8, 10, 8);
+    px(ctx, '#2a2a2a', x + 44, top - 8, 10, 8);
+  }
+  return { canvas: c, factor: 1, y: 0 };
+}
+
+function demoFloor(stage) {
+  const r = rng(331);
+  const h = VIEW_H - stage.floorTop;
+  const c = canvas(stage.width, h);
+  const ctx = c.getContext('2d');
+  px(ctx, '#3a3a40', 0, 0, stage.width, h);
+  for (let i = 0; i < stage.width * h * 0.04; i++) px(ctx, r() < 0.5 ? '#34343a' : '#44444a', r() * stage.width, r() * h, 2, 1);
+  for (let x = 0; x < stage.width; x += 40) px(ctx, '#d8d0b0', x, Math.round(h / 2), 22, 2);
+  for (let i = 0; i < stage.width / 60; i++) {
+    // scattered leaflets and puddles from the water cannon
+    const x = r() * stage.width;
+    if (r() < 0.5) px(ctx, '#f6f2e4', x, 6 + r() * (h - 12), 4, 3);
+    else px(ctx, 'rgba(150,180,210,0.35)', x, 6 + r() * (h - 12), 18, 3);
+  }
+  return { canvas: c, factor: 1, y: stage.floorTop };
+}
+
+// ---- Stage 5: Gedung Pejabat (lobby -> lift -> vault) ----
+
+function gedungFar(stage) {
+  const r = rng(347);
+  const f = 0.12;
+  const width = VIEW_W + (stage.width - VIEW_W) * f;
+  const c = canvas(width, VIEW_H);
+  const ctx = c.getContext('2d');
+  skyline(ctx, width, 160, '#2a3450', '#f2d8a0', r);
+  return { canvas: c, factor: f, y: 0 };
+}
+
+function gedungMid(stage) {
+  const width = VIEW_W + (stage.width - VIEW_W) * 0.4;
+  const c = canvas(width, VIEW_H);
+  return { canvas: c, factor: 0.4, y: 0 };
+}
+
+function gedungWall(stage) {
+  const r = rng(353);
+  const c = canvas(stage.width, VIEW_H);
+  const ctx = c.getContext('2d');
+  const top = stage.floorTop;
+  for (let x = 0; x < stage.width; x += 4) {
+    const kind = zoneKind(stage, x);
+    if (kind === 'lobby') {
+      // tall glass windows with gold frames
+      px(ctx, (x % 64) < 4 ? '#c8a050' : '#5a7aa0', x, 20, 4, top - 20);
+      if ((x % 64) >= 4 && (x % 16) === 0) px(ctx, 'rgba(255,255,255,0.25)', x, 30, 2, top - 50);
+    } else if (kind === 'lift') {
+      px(ctx, (x % 40) < 4 ? '#3a3a42' : '#6a6a74', x, 0, 4, top);
+    } else {
+      // vault: steel wall with gold bars stacked high
+      px(ctx, '#4a4a52', x, 0, 4, top);
+      if ((x % 48) === 0) px(ctx, '#2a2a30', x, 0, 2, top);
+    }
+  }
+  // lobby: a gold plaque and marble columns
+  const lobby = stage.zones.find((z) => z.kind === 'lobby');
+  for (let x = lobby.x0 + 80; x < lobby.x1 - 40; x += 260) {
+    px(ctx, '#e6dcc8', x, 40, 18, top - 40);
+    px(ctx, '#c8a050', x - 3, 36, 24, 6);
+    px(ctx, '#c8a050', x - 3, top - 6, 24, 6);
+  }
+  px(ctx, '#120c0a', lobby.x0 + 200, 60, 150, 22);
+  px(ctx, '#c8a050', lobby.x0 + 201, 61, 148, 20);
+  ctx.fillStyle = '#3a2a10';
+  ctx.font = 'bold 8px monospace';
+  ctx.fillText('MENARA MEGAH SEJAHTERA', lobby.x0 + 206, 74);
+  // vault: shelves of gold and cash, a big round door
+  const vault = stage.zones.find((z) => z.kind === 'vault');
+  for (let x = vault.x0 + 40; x < vault.x1; x += 120) {
+    for (let y = 70; y < top - 10; y += 14) {
+      px(ctx, '#2a2a30', x, y + 10, 90, 3);
+      for (let k = 0; k < 6; k++) px(ctx, r() < 0.6 ? '#f2c94c' : '#4a8a4a', x + 4 + k * 14, y + 2, 12, 8);
+    }
+  }
+  const dx = vault.x0 + 10;
+  ctx.fillStyle = '#120c0a';
+  ctx.beginPath();
+  ctx.arc(dx, 110, 44, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#8a8a94';
+  ctx.beginPath();
+  ctx.arc(dx, 110, 42, 0, Math.PI * 2);
+  ctx.fill();
+  for (let a = 0; a < 6; a++) px(ctx, '#5a5a62', dx + Math.cos(a) * 26 - 2, 110 + Math.sin(a) * 26 - 2, 5, 5);
+  return { canvas: c, factor: 1, y: 0 };
+}
+
+function gedungFloor(stage) {
+  const r = rng(359);
+  const h = VIEW_H - stage.floorTop;
+  const c = canvas(stage.width, h);
+  const ctx = c.getContext('2d');
+  for (let x = 0; x < stage.width; x += 4) {
+    const kind = zoneKind(stage, x);
+    px(ctx, kind === 'lobby' ? '#d8d0c0' : kind === 'lift' ? '#5a5a62' : '#3a3a42', x, 0, 4, h);
+  }
+  for (let i = 0; i < stage.width * h * 0.03; i++) {
+    const x = r() * stage.width;
+    const kind = zoneKind(stage, x);
+    px(ctx, kind === 'lobby' ? (r() < 0.5 ? '#c8c0b0' : '#e8e0d0') : kind === 'lift' ? '#4a4a52' : r() < 0.08 ? '#c8a050' : '#44444c', x, r() * h, 2, 1);
+  }
+  for (let x = 0; x < stage.width; x += 32) if (zoneKind(stage, x) !== 'lift') px(ctx, 'rgba(0,0,0,0.12)', x, 0, 1, h);
+  // red carpet through the lobby
+  const lobby = stage.zones.find((z) => z.kind === 'lobby');
+  px(ctx, '#8a1a1a', lobby.x0, Math.round(h / 2) - 10, lobby.x1 - lobby.x0, 20);
+  px(ctx, '#c8a050', lobby.x0, Math.round(h / 2) - 10, lobby.x1 - lobby.x0, 1);
+  px(ctx, '#c8a050', lobby.x0, Math.round(h / 2) + 9, lobby.x1 - lobby.x0, 1);
+  return { canvas: c, factor: 1, y: stage.floorTop };
+}
+
 const THEMES = {
   padepokan: [buildFar, buildMid, buildWall, buildFloor],
   kampung: [kampungFar, kampungMid, kampungWall, kampungFloor],
   hutan: [hutanFar, hutanMid, hutanWall, hutanFloor],
   pabrik: [pabrikFar, pabrikMid, pabrikWall, pabrikFloor],
   pasar: [pasarFar, pasarMid, pasarWall, pasarFloor],
+  demo: [demoFar, demoMid, demoWall, demoFloor],
+  gedung: [gedungFar, gedungMid, gedungWall, gedungFloor],
 };
 
 export function buildStageArt(stage) {

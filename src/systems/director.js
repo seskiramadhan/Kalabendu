@@ -56,9 +56,12 @@ export class Director {
       return;
     }
     this.phase = 'scroll';
-    g.go = true;
     g.camera.lockRight = this.section.camX;
-    g.emit({ type: 'go' });
+    // A section on the same spot (Batara Kala after Pejabat Tinggi) needs no GO arrow.
+    if (this.section.camX > g.camera.x + 2) {
+      g.go = true;
+      g.emit({ type: 'go' });
+    }
   }
 
   spawnWave(w) {

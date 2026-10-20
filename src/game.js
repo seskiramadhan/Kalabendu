@@ -170,11 +170,22 @@ export class Game {
     for (const e of this.entities) if (isFighter(e)) this.keepOnStage(e);
     for (const h of this.heroes.values()) this.checkHeroDown(h);
     this.updateCombo(dt);
+    this.updateShields();
     for (const e of this.entities) if (e.remove) this.ai.engaged.delete(e.uid);
     this.entities = this.entities.filter((e) => !e.remove);
     this.updateCamera(dt);
     this.director?.step(dt);
     this.updateTrainingSpawner(dt);
+  }
+
+  // "Kebal hukum": a shielded boss stays untouchable while a Makelar Kasus lives.
+  updateShields() {
+    const b = this.boss;
+    if (!b?.shielded) return;
+    if (this.enemies.some((e) => e.def.id === 'makelar' && e.state !== 'dead')) return;
+    b.shielded = false;
+    this.emit({ type: 'tutorial', key: 'tut_kebal_down' });
+    this.emit({ type: 'shake', amount: 4 });
   }
 
   heroLanded(hero, m) {
@@ -455,15 +466,18 @@ export class Game {
     for (const e of this.enemies) {
       if (e === f || e.state === 'dead' || Math.abs(e.x - f.x) > 260) continue;
       if (e.hp >= e.def.maxHp) continue;
-      e.hp = Math.min(e.def.maxHp, e.hp + amount);
+      // Bosses only get a small top-up, so a fight can't drag on forever.
+      e.hp = Math.min(e.def.maxHp, e.hp + (e.def.boss ? amount * 0.25 : amount));
       this.emit({ type: 'heal', from: f, to: e });
     }
     this.emit({ type: 'sfx', name: 'heal' });
   }
 
   // Move-driven summon (a list of enemy types at the screen edges).
-  summon(f, types) {
-    types.forEach((type, i) => {
+  // Called-in helpers; capped so a boss can't flood the screen.
+  summon(f, types, cap = 4) {
+    const alive = this.enemies.filter((e) => e.state !== 'dead' && !e.def.boss).length;
+    types.slice(0, Math.max(0, cap - alive)).forEach((type, i) => {
       const left = i % 2 === 0;
       const e = this.spawnEnemy(type, left ? this.camera.x - 30 : this.camera.x + VIEW_W + 30, f.y + (i - 1) * 18, { minion: true });
       e.entering = true;
@@ -473,7 +487,7 @@ export class Game {
 
   // Boss phase change: new enemies and/or allies joining the hero.
   summonGroup(f, group) {
-    if (group.enemies) this.summon(f, group.enemies);
+    if (group.enemies) this.summon(f, group.enemies, 7);
     group.allies?.forEach((type, i) => this.spawnAlly(type, this.camera.x - 30 - i * 24, this.stage.floorTop + 20 + i * 22));
     if (group.tutorial) this.emit({ type: 'tutorial', key: group.tutorial });
     if (group.shield) f.shielded = true;
@@ -545,6 +559,7 @@ export class Game {
       e.loot = 0;
     }
     if (e.def.boss) this.emit({ type: 'bossDown', who: e });
+    if (e.def.id === 'batara_kala') this.beatKala = true;
   }
 
   breakProp(prop) {

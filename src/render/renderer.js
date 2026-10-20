@@ -6,11 +6,11 @@ import { drawFigure } from './sprites/skeleton.js';
 import { poseFor, animState } from './sprites/poses.js';
 import { drawProp, drawItem, drawProjectile, drawHeldWeapon } from './sprites/objects.js';
 import { activeHitbox, hurtbox } from '../combat/hits.js';
-import { drawAsap, drawBuldoser, drawRaja, drawFire, flames, drawRobot, drawMech, drawHantu, drawCandle } from './sprites/monsters.js';
+import { drawAsap, drawBuldoser, drawRaja, drawFire, flames, drawRobot, drawMech, drawHantu, drawCandle, drawBuzzer, drawTruck, drawTikus, drawKala } from './sprites/monsters.js';
 import { applyEraGrade } from '../systems/era.js';
 import { zoneAt } from '../systems/environment.js';
 
-const MONSTERS = { asap: drawAsap, buldoser: drawBuldoser, raja: drawRaja, robot: drawRobot, mech: drawMech, hantu: drawHantu };
+const MONSTERS = { asap: drawAsap, buldoser: drawBuldoser, raja: drawRaja, robot: drawRobot, mech: drawMech, hantu: drawHantu, buzzer: drawBuzzer, truck: drawTruck, tikus: drawTikus, kala: drawKala };
 
 const FIG = 120;
 
@@ -100,6 +100,7 @@ export class Renderer {
       else this.drawFighter(ctx, e, game, camX, time);
     }
     this.drawHaze(ctx, game, camX);
+    if (game.darkness > 0) this.drawDarkness(ctx, game, camX);
     this.effects.draw(ctx, camX);
     applyEraGrade(ctx, game.era, VIEW_W, VIEW_H);
     if (debug) this.drawDebugBoxes(ctx, game, camX);
@@ -143,6 +144,7 @@ export class Renderer {
       ctx.drawImage(this.fig, Math.round(fx - w / 2), Math.round(e.y - e.z - (FIG - 4) * size), w, w);
     }
     const headY = e.y - e.z - 70 * size;
+    if (e.shielded) this.drawKebal(ctx, fx, e.y - e.z, size, time);
     const m = e.move;
     if (m?.telegraph && e.state === 'attack' && e.t < m.startup / 60 && Math.floor(time * 12) % 2) this.drawAlert(ctx, fx, headY - 14);
     if (e.poison > 0) {
@@ -182,6 +184,26 @@ export class Renderer {
         ctx.fillText(`${price.toLocaleString('id-ID')}▲`, x + 30, 113 + i * 10);
       });
     }
+    // Glass lift: light bars race down the shaft and the floor counter climbs.
+    for (const z of game.stage.zones ?? []) {
+      if (z.kind !== 'lift') continue;
+      const x0 = Math.max(0, Math.round(z.x0 - camX));
+      const x1 = Math.min(VIEW_W, Math.round(z.x1 - camX));
+      if (x1 <= x0) continue;
+      const top = game.stage.floorTop;
+      ctx.fillStyle = 'rgba(255,230,170,0.35)';
+      for (let k = 0; k < 4; k++) ctx.fillRect(x0, Math.round(((time * 160 + k * (top / 4)) % top)), x1 - x0, 3);
+      const p = Math.max(0, Math.min(1, (camX + VIEW_W / 2 - z.x0) / (z.x1 - z.x0)));
+      const floor = 2 + Math.floor(p * 40);
+      const lx = Math.round(z.x0 + 120 - camX);
+      if (lx > -40 && lx < VIEW_W) {
+        ctx.fillStyle = '#120c0a';
+        ctx.fillRect(lx - 2, 28, 40, 16);
+        ctx.fillStyle = '#ff6a2a';
+        ctx.font = 'bold 9px monospace';
+        ctx.fillText(`▲${String(floor).padStart(2, '0')}`, lx + 2, 40);
+      }
+    }
     for (const sc of game.stage.screens ?? []) {
       const x = Math.round(sc.x - camX);
       if (x < -sc.w || x > VIEW_W) continue;
@@ -204,6 +226,40 @@ export class Renderer {
       const idx = Math.max(1000, Math.round(7000 - ((time * 37) % 3000)));
       ctx.fillText(`INDEKS ${idx.toLocaleString('id-ID')} ▼`, x + 4, 128);
     }
+  }
+
+  // "Kebal hukum": a golden bubble while a Makelar Kasus protects the boss.
+  drawKebal(ctx, fx, footY, size, time) {
+    const cx = Math.round(fx);
+    const cy = Math.round(footY - 40 * size);
+    const rad = 34 * size + Math.sin(time * 6) * 2;
+    ctx.strokeStyle = 'rgba(242,201,76,0.8)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, rad, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(242,201,76,0.12)';
+    ctx.fill();
+    ctx.fillStyle = '#f2c94c';
+    ctx.font = 'bold 6px monospace';
+    ctx.fillText('KEBAL', cx - 9, Math.round(cy - rad - 3));
+  }
+
+  // Batara Kala's eclipse: the screen goes dark except a little light around each hero.
+  drawDarkness(ctx, game, camX) {
+    const k = Math.min(1, game.darkness / 1.5, (6 - Math.min(6, game.darkness)) * 3);
+    ctx.save();
+    ctx.fillStyle = `rgba(6,2,10,${0.86 * k})`;
+    ctx.beginPath();
+    ctx.rect(0, 0, VIEW_W, VIEW_H);
+    for (const h of game.heroes.values()) {
+      const x = Math.round(h.x - camX);
+      const y = Math.round(h.y - h.z - 30);
+      ctx.moveTo(x + 46, y);
+      ctx.arc(x, y, 46, 0, Math.PI * 2, true);
+    }
+    ctx.fill('evenodd');
+    ctx.restore();
   }
 
   drawShield(ctx, e, fx) {

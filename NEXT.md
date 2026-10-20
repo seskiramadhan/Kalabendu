@@ -1,6 +1,6 @@
 # NEXT — Kalabendu (beat 'em up) plan
 
-Status line: **Milestone 8 done, Milestone 9 next (user asked to finish all milestones in one go, then review)** (2026-10-20; stage list updated by the user the same day)
+Status line: **Milestone 9 done, Milestone 10 next (user asked to finish all milestones in one go, then review)** (2026-10-20; stage list updated by the user the same day)
 
 ## Milestones (each playable before the next)
 | # | Milestone | Status |
@@ -13,7 +13,7 @@ Status line: **Milestone 8 done, Milestone 9 next (user asked to finish all mile
 | 6 | Stage 1 Hutan Terbakar → Kebun Sawit: Asap, Pembakar Lahan, Penebang Liar, Buldoser Liar, Raja Sawit; era system + background changes; karhutla flames/haze | done (v0.9.0) |
 | 7 | Stage 2 Pabrik Tutup (Satpam Bayaran, Mandor Kejam, Robot Pengganti, Juragan Outsourcing + worker allies) and Stage 3 Pasar Rakyat → Lantai Bursa (Spekulan, Penimbun, Rentenir, candlestick hazards, Hantu Bursa); warung shop + inflation | done (v0.10.0) |
 | 8 | Story scenes (dialogue + wayang silhouettes), Pejabat bribes before stages 1-5, bukti, endings | done (v0.11.0) |
-| 9 | Stage 4 Jalan Raya Demo (Preman Bayaran, Provokator, Buzzer, Komandan Preman) and Stage 5 Gedung Pejabat (Tikus Berdasi, Ajudan, Makelar Kasus, Jaksa Palsu, Pejabat Tinggi, Batara Kala) | todo |
+| 9 | Stage 4 Jalan Raya Demo (Preman Bayaran, Provokator, Buzzer, Komandan Preman) and Stage 5 Gedung Pejabat (Tikus Berdasi, Ajudan, Makelar Kasus, Jaksa Palsu, Pejabat Tinggi, Batara Kala) | done (v0.12.0) |
 | 10 | Sri, Ujang, Mak Inah; local 2-player co-op | todo |
 | — | README in English + Indonesian | todo |
 
@@ -34,4 +34,5 @@ Status line: **Milestone 8 done, Milestone 9 next (user asked to finish all mile
 - Continue is an input message {type:'continue', playerId} so online co-op can send it too.
 - Stage clear shows "Main lagi"; going on to Stage 1 comes with M6.
 - Full request: CLAUDE.md. Old sandbox game: branch sandbox-v0.3.1.
+- Stage 4/5 (M9): boss sections can repeat the same camX (truck then Komandan; Pejabat then Batara Kala with requires:'kala', no GO arrow). Pejabat is shielded (KEBAL) while a Makelar lives (game.updateShields). Move summons are capped at 4 alive non-boss enemies; bosses heal at 25%. Kala's eclipse sets game.darkness (renderer spotlight).
 - The padepokan training yard stays reachable with ?stage=padepokan.

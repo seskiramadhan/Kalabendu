@@ -1,17 +1,17 @@
 {
-  "version": "0.11.0",
+  "version": "0.12.0",
   "notes": {
     "id": [
-      "Cerita antar-stage: adegan wayang kulit dengan Ki Dalang, dialog dengan potret (tekan Lanjut atau Lewati)",
-      "Pak Pejabat menawarkan suap sebelum stage 1–5: terima (uang + serangan, tapi zaman makin gelap & harga naik) atau tolak",
-      "Kumpulkan Bukti dari musuh dan bos (lihat ikon map di panel)",
-      "Tiga akhir cerita: Kalasuba, setengah jalan, atau Kalabendu berlanjut"
+      "Stage 4 Jalan Raya Demo: Preman Bayaran, Provokator ber-toa, Buzzer melayang, Komandan Preman di truk air; mahasiswa & ojol ikut bertarung",
+      "Stage 5 Gedung Pejabat: lobi, lift kaca, brankas emas; Tikus Berdasi, Ajudan, Makelar Kasus, Jaksa Palsu",
+      "Bos Pejabat Tinggi dengan perisai KEBAL HUKUM (kalahkan Makelar dulu)",
+      "Batara Kala, bos terakhir sejati, muncul jika semua suap ditolak dan bukti cukup"
     ],
     "en": [
-      "Story between stages: wayang shadow-puppet scenes with Ki Dalang, dialogue with portraits (Next or Skip)",
-      "Mr. Official offers a bribe before stages 1–5: take it (money + attack, but a darker age & higher prices) or refuse",
-      "Collect Evidence from enemies and bosses (folder icon in your panel)",
-      "Three endings: Kalasuba, halfway, or Kalabendu goes on"
+      "Stage 4 Protest Avenue: hired thugs, megaphone agitators, floating buzzers, the Thug Commander on a water truck; students & ojol drivers fight with you",
+      "Stage 5 Official's Tower: lobby, glass lift, gold vault; Necktie Rats, Bodyguards, Case Brokers, Fake Prosecutors",
+      "High Official boss with an ABOVE THE LAW shield (beat the Case Brokers first)",
+      "Batara Kala, the true final boss, appears if you refused every bribe and found enough evidence"
     ]
   }
 }

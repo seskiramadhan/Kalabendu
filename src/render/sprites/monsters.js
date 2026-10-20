@@ -310,3 +310,212 @@ export function drawCandle(ctx, c, camX, time) {
     if (Math.floor(time * 20) % 2) r(ctx, '#ffd25a', x - 10, y - 4, 20, 2);
   }
 }
+
+// Buzzer: a floating phone that spams notifications.
+export function drawBuzzer(ctx, e, camX, time) {
+  const f = e.facing;
+  const x = Math.round(e.x - camX);
+  const bob = Math.round(Math.sin(time * 5 + e.uid) * 2);
+  const y = Math.round(e.y - e.z) + bob;
+  const lying = e.state === 'knockdown' || e.state === 'dead';
+  const wind = e.state === 'attack' && e.move && e.t < e.move.startup / 60;
+  if (lying) {
+    r(ctx, OUT, x - 11, y - 6, 22, 6);
+    r(ctx, '#2a2a3a', x - 10, y - 5, 20, 4);
+    r(ctx, '#3a6aa0', x - 8, y - 5, 16, 1);
+    return;
+  }
+  // little wings
+  const flap = Math.floor(time * 16) % 2 ? 3 : 0;
+  r(ctx, '#d8e4f0', x - 14, y - 22 - flap, 6, 4);
+  r(ctx, '#d8e4f0', x + 8, y - 22 - flap, 6, 4);
+  r(ctx, OUT, x - 8, y - 32, 16, 26);
+  r(ctx, '#2a2a3a', x - 7, y - 31, 14, 24);
+  r(ctx, wind ? '#ff5a4a' : '#5aa0e0', x - 6, y - 29, 12, 18);
+  // angry emoji face
+  r(ctx, OUT, x - 4 + f, y - 25, 2, 2);
+  r(ctx, OUT, x + 2 + f, y - 25, 2, 2);
+  r(ctx, OUT, x - 3 + f, y - 19, 6, 1);
+  // notification badge
+  r(ctx, '#e0402a', x + 4, y - 35, 6, 6);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 5px monospace';
+  ctx.fillText('9', x + 5, y - 30);
+  // shadow on the floor
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.fillRect(x - 6, Math.round(e.y) - 1, 12, 2);
+}
+
+// Komandan Preman on a water-cannon truck.
+export function drawTruck(ctx, e, camX, time) {
+  const f = e.facing;
+  const x = Math.round(e.x - camX);
+  const y = Math.round(e.y);
+  const m = e.move;
+  const wind = e.state === 'attack' && m && e.t < m.startup / 60;
+  const shake = wind && m?.id === 'truk_tabrak' ? (Math.floor(time * 40) % 2 ? 1 : -1) : 0;
+  const bx = x + shake;
+  // wheels
+  for (const dx of [-30, 22]) {
+    r(ctx, OUT, bx + dx - 1, y - 14, 16, 14);
+    r(ctx, '#2a2a2a', bx + dx, y - 13, 14, 12);
+    r(ctx, '#8a8a8a', bx + dx + 5, y - 9, 4, 4);
+  }
+  // tank body (back) and cab (front)
+  r(ctx, OUT, bx - 46, y - 50, 70, 38);
+  r(ctx, '#5a6a7a', bx - 45, y - 49, 68, 36);
+  r(ctx, '#3a4a5a', bx - 45, y - 24, 68, 4);
+  r(ctx, '#f6f2e4', bx - 40, y - 42, 30, 6);
+  r(ctx, OUT, bx + 22 * f - 14, y - 58, 30, 46);
+  r(ctx, '#3a4a5a', bx + 22 * f - 13, y - 57, 28, 44);
+  r(ctx, '#9ad0e8', bx + 22 * f - 10 + (f > 0 ? 6 : 0), y - 54, 14, 12);
+  // siren
+  const blink = Math.floor(time * 6) % 2;
+  r(ctx, blink ? '#e0402a' : '#3a6aa0', bx + 22 * f - 6, y - 63, 6, 5);
+  r(ctx, blink ? '#3a6aa0' : '#e0402a', bx + 22 * f + 1, y - 63, 6, 5);
+  // Komandan on the roof: big body, red beret
+  const kx = bx - 10;
+  const ky = y - 50;
+  r(ctx, OUT, kx - 9, ky - 26, 18, 26);
+  r(ctx, '#4a5a3a', kx - 8, ky - 25, 16, 25);
+  r(ctx, OUT, kx - 7, ky - 40, 14, 14);
+  r(ctx, '#8a5a38', kx - 6, ky - 39, 12, 12);
+  r(ctx, '#a4302a', kx - 8, ky - 42, 15, 5);
+  r(ctx, '#120c0a', kx - 3 + 2 * f, ky - 35, 6, 2);
+  r(ctx, '#f2c94c', kx - 6, ky - 22, 12, 2);
+  // water cannon turret on the roof
+  const tx = bx + 4;
+  const ty = y - 54;
+  r(ctx, OUT, tx - 6, ty - 8, 12, 9);
+  r(ctx, '#8a94a0', tx - 5, ty - 7, 10, 7);
+  const aim = wind && m?.id === 'truk_semprot' ? 4 : 0;
+  r(ctx, OUT, tx + (f > 0 ? 4 : -26), ty - 6 - aim, 22, 5);
+  r(ctx, '#a0aab4', tx + (f > 0 ? 5 : -25), ty - 5 - aim, 20, 3);
+  if (e.state === 'attack' && m?.id === 'truk_tabrak' && !wind) {
+    ctx.fillStyle = 'rgba(80,70,60,0.6)';
+    for (let i = 0; i < 4; i++) ctx.fillRect(bx - 50 * f - i * 6 * f, y - 8 - i * 3, 6, 6);
+  }
+  if (e.state === 'dizzy') {
+    ctx.fillStyle = 'rgba(200,220,240,0.7)';
+    for (let i = 0; i < 3; i++) ctx.fillRect(bx + 22 * f - 3 + Math.sin(time * 4 + i) * 4, y - 70 - i * 8 - ((time * 30) % 8), 6, 6);
+  }
+  if (e.state === 'dead') {
+    ctx.fillStyle = `rgba(200,220,240,${Math.max(0, 0.6 - e.t * 0.3)})`;
+    ctx.fillRect(bx - 50, y - 100, 100, 100);
+  }
+}
+
+// Tikus Berdasi: a rat in a necktie that runs off with coins.
+export function drawTikus(ctx, e, camX, time) {
+  const f = e.facing;
+  const x = Math.round(e.x - camX);
+  const y = Math.round(e.y - e.z);
+  const lying = e.state === 'airborne' || e.state === 'knockdown' || e.state === 'dead';
+  if (lying) {
+    r(ctx, OUT, x - 12, y - 8, 24, 8);
+    r(ctx, '#7a7a82', x - 11, y - 7, 22, 6);
+    r(ctx, '#c8322a', x - 2, y - 7, 4, 6);
+    return;
+  }
+  const step = e.state === 'walk' ? Math.round(Math.sin(e.walkDist / 4) * 2) : 0;
+  // tail
+  for (let i = 0; i < 10; i++) r(ctx, '#d89a9a', x - f * (8 + i), y - 6 - Math.sin(i / 2 + time * 6) * 2, 2, 2);
+  // legs
+  r(ctx, '#5a5a62', x - 5, y - 6, 3, 6 + step);
+  r(ctx, '#5a5a62', x + 2, y - 6, 3, 6 - step);
+  // body in a little suit
+  r(ctx, OUT, x - 7, y - 22, 14, 17);
+  r(ctx, '#2a2a34', x - 6, y - 21, 12, 15);
+  r(ctx, '#f6f2e4', x - 2, y - 21, 4, 5);
+  r(ctx, '#c8322a', x - 1, y - 20, 2, 8);
+  // head with big ears and snout
+  r(ctx, OUT, x - 6, y - 32, 13, 11);
+  r(ctx, '#8a8a92', x - 5, y - 31, 11, 9);
+  r(ctx, '#8a8a92', x + f * 6 - 2, y - 28, 5, 4);
+  r(ctx, '#e0a0a0', x + f * 9 - 1, y - 28, 2, 2);
+  r(ctx, '#d89a9a', x - 6, y - 35, 4, 4);
+  r(ctx, '#d89a9a', x + 2, y - 35, 4, 4);
+  r(ctx, OUT, x + f * 2, y - 29, 2, 2);
+  // coin sack when carrying loot
+  if (e.loot > 0) {
+    r(ctx, OUT, x - f * 10 - 5, y - 26, 10, 10);
+    r(ctx, '#c8a050', x - f * 10 - 4, y - 25, 8, 8);
+  }
+}
+
+// Batara Kala: the giant embodiment of the age of curse, drawn like a wayang raksasa.
+export function drawKala(ctx, e, camX, time) {
+  const f = e.facing;
+  const x = Math.round(e.x - camX);
+  const y = Math.round(e.y);
+  const m = e.move;
+  const wind = e.state === 'attack' && m && e.t < m.startup / 60;
+  const slamming = e.state === 'attack' && m?.id === 'kala_slam' && !wind;
+  const fade = e.state === 'dead' ? Math.max(0, 1 - e.t / 2) : 1;
+  ctx.globalAlpha = fade;
+  // dark aura
+  const glow = ctx.createRadialGradient(x, y - 70, 10, x, y - 70, 90);
+  glow.addColorStop(0, wind ? 'rgba(255,60,30,0.35)' : 'rgba(120,20,40,0.3)');
+  glow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(x - 90, y - 160, 180, 170);
+  // legs and kain
+  for (const dx of [-16, 6]) {
+    r(ctx, OUT, x + dx - 1, y - 40, 12, 40);
+    r(ctx, '#3a1a1a', x + dx, y - 39, 10, 39);
+  }
+  r(ctx, OUT, x - 24, y - 58, 48, 24);
+  r(ctx, '#5a1a2a', x - 23, y - 57, 46, 22);
+  for (let i = 0; i < 6; i++) r(ctx, '#c8a050', x - 21 + i * 8, y - 50, 3, 3);
+  // torso
+  r(ctx, OUT, x - 22, y - 104, 44, 48);
+  r(ctx, '#2a1218', x - 21, y - 103, 42, 46);
+  r(ctx, '#c8a050', x - 21, y - 90, 42, 3);
+  // arms: one raised for the slam
+  const armA = wind && m?.id === 'kala_slam' ? -2.3 : slamming ? 0.9 : 0.5 + Math.sin(time * 1.5) * 0.1;
+  const sx = x + 20 * f;
+  const sy = y - 98;
+  const ex = sx + Math.cos(armA) * 50 * f;
+  const ey = sy + Math.sin(armA) * 50 + 18;
+  ctx.strokeStyle = OUT;
+  ctx.lineWidth = 11;
+  ctx.beginPath();
+  ctx.moveTo(sx, sy);
+  ctx.lineTo(ex, ey);
+  ctx.stroke();
+  ctx.strokeStyle = '#3a1a1a';
+  ctx.lineWidth = 8;
+  ctx.stroke();
+  r(ctx, '#c8a050', ex - 6, ey - 6, 12, 12);
+  r(ctx, OUT, x - 30 * f - 6, y - 98, 12, 40);
+  r(ctx, '#3a1a1a', x - 30 * f - 5, y - 97, 10, 38);
+  // head: big round eyes, fangs, golden crown with flames
+  const hx = x + 4 * f;
+  const hy = y - 124 + Math.round(Math.sin(time * 2) * 2);
+  r(ctx, OUT, hx - 17, hy - 16, 34, 34);
+  r(ctx, '#8a1a1a', hx - 16, hy - 15, 32, 32);
+  r(ctx, '#f6f2e4', hx - 11 + 2 * f, hy - 8, 9, 9);
+  r(ctx, '#f6f2e4', hx + 3 + 2 * f, hy - 8, 9, 9);
+  r(ctx, wind ? '#ff3a2a' : OUT, hx - 8 + 4 * f, hy - 5, 4, 4);
+  r(ctx, wind ? '#ff3a2a' : OUT, hx + 6 + 4 * f, hy - 5, 4, 4);
+  r(ctx, OUT, hx - 12, hy + 6, 24, 8);
+  r(ctx, '#f6f2e4', hx - 10, hy + 6, 4, 7);
+  r(ctx, '#f6f2e4', hx + 6, hy + 6, 4, 7);
+  r(ctx, '#f6f2e4', hx - 4, hy + 6, 2, 3);
+  r(ctx, '#f6f2e4', hx + 2, hy + 6, 2, 3);
+  r(ctx, OUT, hx - 18, hy - 26, 36, 12);
+  r(ctx, '#c8a050', hx - 17, hy - 25, 34, 10);
+  for (let i = 0; i < 5; i++) r(ctx, '#e0c070', hx - 15 + i * 7, hy - 32 + (i % 2) * 3, 4, 8);
+  flames(ctx, hx, hy - 32, 14, 10 + Math.sin(time * 5) * 3, time);
+  if (e.state === 'dizzy') {
+    for (let i = 0; i < 4; i++) {
+      const a = time * 5 + (i * Math.PI) / 2;
+      r(ctx, '#f2c94c', hx + Math.cos(a) * 22 - 1, hy - 40 + Math.sin(a) * 5, 3, 3);
+    }
+  }
+  ctx.globalAlpha = 1;
+  if (e.state === 'dead') {
+    ctx.fillStyle = `rgba(255,240,200,${Math.max(0, 0.7 - e.t * 0.35)})`;
+    ctx.fillRect(x - 60, y - 170, 120, 170);
+  }
+}
