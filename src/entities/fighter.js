@@ -55,6 +55,10 @@ export function createFighter(def, team, x, y) {
     ownerUid: null,
     dizzyTime: 0,
     killed: false,
+    semangat: 0,
+    lives: team === 'hero' ? 3 : 0,
+    rehitK: -1,
+    respawnDrop: false,
     lastHitAt: -10,
     walkDist: 0,
     remove: false,
@@ -152,7 +156,7 @@ export function updateFighter(f, game, dt) {
         if (!(f.kind === 'hero' && game.tryPickup(f))) startMove(f, game, lightChain(f)[0]);
       } else if (pressed & BTN.HEAVY && f.weapon && f.kind === 'hero') startMove(f, game, 'throw_anim');
       else if (pressed & BTN.HEAVY && def.heavy) startMove(f, game, def.heavy);
-      else if (pressed & BTN.SPECIAL && def.special) startMove(f, game, def.special);
+      else if (pressed & BTN.SPECIAL && def.special) trySpecial(f, game);
       else {
         f.vx = dir.x * def.walkX;
         f.vy = dir.y * def.walkY;
@@ -181,6 +185,17 @@ export function updateFighter(f, game, dt) {
       if (m.lunge) f.vx = f.t >= s && f.t < s + a ? f.facing * m.lunge : 0;
       else f.vx = f.t < s + a ? (f.facing * m.step) / (s + a) : 0;
       f.vy = 0;
+      if (m.rehit && f.t >= s) {
+        const k = Math.floor((f.t - s) / (m.rehit * FRAME));
+        if (k !== f.rehitK) {
+          f.rehitK = k;
+          f.hitIds.clear();
+        }
+      }
+      if (pressed & BTN.SPECIAL && f.kind === 'hero' && def.special && m.id !== def.special && f.t >= s) {
+        trySpecial(f, game);
+        break;
+      }
       if (f.t >= s + a) {
         if (pressed & BTN.DODGE && def.canDodge) {
           startDodge(f, game, dir);
@@ -251,6 +266,11 @@ export function updateFighter(f, game, dt) {
     case 'hurt':
       f.vx *= Math.max(0, 1 - dt * 9);
       f.vy = 0;
+      // A special can break out of hitstun, at the cost of Semangat.
+      if (pressed & BTN.SPECIAL && f.kind === 'hero' && def.special) {
+        trySpecial(f, game);
+        break;
+      }
       if (f.t >= f.stun) setState(f, 'idle');
       break;
     case 'airborne':
@@ -275,7 +295,7 @@ export function updateFighter(f, game, dt) {
       break;
     case 'dead':
       f.vx = 0;
-      if (f.t >= DEAD_TIME) f.remove = true;
+      if (f.t >= DEAD_TIME && f.kind !== 'hero') f.remove = true;
       break;
   }
 
@@ -288,6 +308,26 @@ export function updateFighter(f, game, dt) {
     f.z += f.vz * dt;
     if (f.z <= 0) land(f, game);
   }
+}
+
+export const SPECIAL_COST = 50;
+
+function trySpecial(f, game) {
+  if (f.kind === 'hero') {
+    if (f.semangat < SPECIAL_COST) {
+      game.emit({ type: 'noSemangat', who: f });
+      return false;
+    }
+    f.semangat -= SPECIAL_COST;
+  }
+  startMove(f, game, f.def.special);
+  const m = f.move;
+  if (m.invulnFrames) f.invuln = Math.max(f.invuln, m.invulnFrames * FRAME);
+  f.rehitK = -1;
+  game.emit({ type: 'special', who: f });
+  game.emit({ type: 'label', who: f, key: m.nameKey });
+  game.emit({ type: 'sfx', name: 'special' });
+  return true;
 }
 
 function startGrab(f, game, e) {
@@ -354,6 +394,10 @@ function updateGrab(f, game, dt, dir, pressed) {
 function land(f, game) {
   f.z = 0;
   f.thrown = false;
+  if (f.respawnDrop) {
+    f.respawnDrop = false;
+    game.shockwave(f);
+  }
   if (f.state === 'airborne') {
     if (!f.bounced && f.vz < -150) {
       f.bounced = true;

@@ -1,4 +1,4 @@
-import { createFighter, updateFighter } from './entities/fighter.js';
+import { createFighter, updateFighter, SPECIAL_COST } from './entities/fighter.js';
 import { HEROES } from './entities/heroes.js';
 import { ENEMIES } from './entities/enemies.js';
 import { createItem, updateItem } from './entities/items.js';
@@ -17,6 +17,11 @@ const PICKUP_X = 16;
 const PICKUP_Y = 9;
 const GRAB_X = 24;
 const GRAB_Y = 7;
+const COMBO_WINDOW = 1.4;
+const CONTINUE_TIME = 10;
+const RESPAWN_DELAY = 1.1;
+const SEMANGAT_DEAL = 0.9;
+const SEMANGAT_TAKE = 0.7;
 let nextProjectileUid = 3_000_000;
 
 function rng(seed) {
@@ -48,6 +53,10 @@ export class Game {
     this.go = false;
     this.cleared = false;
     this.boss = null;
+    this.combo = { count: 0, timer: 0, best: 0 };
+    this.over = false;
+    this.continueTimer = 0;
+    this.taughtSpecial = false;
     for (const p of stage.props ?? []) this.entities.push(createProp(p.type, p.x, p.y, p.drops));
     for (const it of stage.items ?? []) this.entities.push(createItem(it.type, it.x, it.y));
     this.director = stage.sections ? new Director(this) : null;
@@ -81,6 +90,10 @@ export class Game {
   applyInput(msg) {
     const hero = this.heroes.get(msg.playerId);
     if (!hero) return;
+    if (msg.type === 'continue') {
+      this.continueGame(hero);
+      return;
+    }
     hero.input.held = msg.held;
     hero.input.pressed |= msg.pressed;
   }
@@ -95,6 +108,11 @@ export class Game {
 
   step(dt) {
     this.time += dt;
+    if (this.over) {
+      this.continueTimer = Math.max(0, this.continueTimer - dt);
+      for (const h of this.heroes.values()) h.input.pressed = 0;
+      return;
+    }
     if (this.hitstop > 0) {
       this.hitstop -= dt;
       return;
@@ -112,20 +130,120 @@ export class Game {
     this.collectTouching();
     this.separateEnemies();
     for (const e of this.entities) if (isFighter(e)) this.keepOnStage(e);
-    for (const h of this.heroes.values()) {
-      // Placeholder until game over arrives in milestone 4.
-      if (h.state === 'dead') {
-        h.hp = h.def.maxHp;
-        h.state = 'getup';
-        h.t = 0;
-        h.invuln = 1.5;
-      }
-    }
+    for (const h of this.heroes.values()) this.checkHeroDown(h);
+    this.updateCombo(dt);
     for (const e of this.entities) if (e.remove) this.ai.engaged.delete(e.uid);
     this.entities = this.entities.filter((e) => !e.remove);
     this.updateCamera(dt);
     this.director?.step(dt);
     this.updateTrainingSpawner(dt);
+  }
+
+  heroLanded(hero, m) {
+    this.addScore(m.damage * 10);
+    if (!m.special) {
+      const before = hero.semangat;
+      hero.semangat = Math.min(100, hero.semangat + m.damage * SEMANGAT_DEAL);
+      if (!this.taughtSpecial && before < SPECIAL_COST && hero.semangat >= SPECIAL_COST) {
+        this.taughtSpecial = true;
+        this.emit({ type: 'tutorial', key: 'tut_special' });
+      }
+    }
+    this.combo.count++;
+    this.combo.timer = COMBO_WINDOW;
+    this.combo.best = Math.max(this.combo.best, this.combo.count);
+    this.emit({ type: 'combo', count: this.combo.count });
+  }
+
+  heroHurt(hero, m) {
+    hero.semangat = Math.min(100, hero.semangat + m.damage * SEMANGAT_TAKE);
+    this.endCombo();
+    this.emit({ type: 'heroHurt', who: hero });
+  }
+
+  updateCombo(dt) {
+    if (this.combo.count === 0) return;
+    this.combo.timer -= dt;
+    if (this.combo.timer <= 0) this.endCombo();
+  }
+
+  // Long combos pay a bonus when they end.
+  endCombo() {
+    const n = this.combo.count;
+    this.combo.count = 0;
+    this.combo.timer = 0;
+    if (n >= 5) {
+      const bonus = n * n * 5;
+      this.addScore(bonus);
+      this.emit({ type: 'comboEnd', count: n, bonus });
+      this.emit({ type: 'sfx', name: 'combo' });
+    }
+  }
+
+  checkHeroDown(h) {
+    if (h.state !== 'dead' || h.t < RESPAWN_DELAY || this.over) return;
+    if (h.lives > 0) {
+      h.lives--;
+      this.respawn(h);
+    } else {
+      this.over = true;
+      this.continueTimer = CONTINUE_TIME;
+      this.endCombo();
+      this.emit({ type: 'gameOver' });
+    }
+  }
+
+  // Drops the hero in from above; landing knocks nearby enemies away.
+  respawn(h) {
+    h.hp = h.def.maxHp;
+    h.semangat = Math.max(h.semangat, SPECIAL_COST);
+    h.state = 'jump';
+    h.t = 0;
+    h.z = 170;
+    h.vz = 0;
+    h.vx = 0;
+    h.vy = 0;
+    h.airAttacked = true;
+    h.invuln = 3;
+    h.move = null;
+    h.weapon = null;
+    h.killed = false;
+    h.juggles = 0;
+    h.respawnDrop = true;
+    h.x = Math.max(this.camera.x + 60, Math.min(this.camera.x + 420, h.x));
+    this.emit({ type: 'respawn', who: h });
+  }
+
+  shockwave(h) {
+    this.emit({ type: 'shake', amount: 5 });
+    this.emit({ type: 'sfx', name: 'hitHeavy' });
+    this.emit({ type: 'dust', x: h.x, y: h.y, size: 3 });
+    for (const e of this.enemies) {
+      if (e.state === 'dead' || Math.abs(e.x - h.x) > 110 || Math.abs(e.y - h.y) > 40) continue;
+      const dir = e.x >= h.x ? 1 : -1;
+      e.state = 'airborne';
+      e.t = 0;
+      e.z = Math.max(e.z, 1);
+      e.vz = 200;
+      e.vx = dir * 160;
+      e.bounced = false;
+      e.move = null;
+      this.ai.engaged.delete(e.uid);
+    }
+  }
+
+  continueGame(h) {
+    if (!this.over || this.continueTimer <= 0) return;
+    this.over = false;
+    this.score = 0;
+    h.lives = 3;
+    h.semangat = 100;
+    this.respawn(h);
+    this.emit({ type: 'continued' });
+  }
+
+  get finished() {
+    return this.over && this.continueTimer <= 0;
   }
 
   // Food and coins are picked up by walking over them.

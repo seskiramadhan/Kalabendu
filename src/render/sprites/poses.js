@@ -84,6 +84,13 @@ function loopPose(frames, time) {
 
 function attackPose(f) {
   const m = f.move;
+  if (m.anim === 'spin') {
+    const s0 = m.startup * FRAME;
+    const a0 = m.active * FRAME;
+    if (f.t < s0) return lerpPose(POSES.stance, POSES.sabit_wind, ease(f.t / s0));
+    if (f.t < s0 + a0) return { ...POSES.sabit_hit, spin: ((f.t - s0) / a0) * 720 };
+    return lerpPose(POSES.sabit_hit, POSES.stance, ease(Math.min(1, (f.t - s0 - a0) / (m.recovery * FRAME))));
+  }
   const [wind, hit] = ATTACK[m.anim];
   const s = m.startup * FRAME;
   const a = m.active * FRAME;

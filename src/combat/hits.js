@@ -102,8 +102,8 @@ export function react(game, attacker, target, m, contact, opts = {}) {
   const hero = owner(game, attacker);
   target.hp = Math.max(0, target.hp - m.damage);
   target.lastHitAt = game.time;
-  if (hero?.team === 'hero') game.addScore(m.damage * 10);
-  if (target.team === 'hero') game.emit({ type: 'heroHurt', who: target });
+  if (hero?.team === 'hero' && target.team !== 'hero') game.heroLanded(hero, m);
+  if (target.team === 'hero') game.heroHurt(target, m);
   if (target.weapon && target.state !== 'grabbed') game.dropWeapon(target);
   wearWeapon(game, attacker, m);
 

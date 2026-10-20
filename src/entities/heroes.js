@@ -10,6 +10,7 @@ export const HEROES = {
     canGrab: true,
     light: ['bayu_l1', 'bayu_l2', 'bayu_l3', 'bayu_l4'],
     heavy: 'bayu_heavy',
+    special: 'bayu_special',
     air: { light: 'bayu_air_punch', heavy: 'bayu_air' },
     look: {
       skin: '#c08a5a',

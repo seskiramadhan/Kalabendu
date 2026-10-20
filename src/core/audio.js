@@ -86,6 +86,17 @@ class Audio {
       case 'jump':
         this.tone(0.08, { freq: 300, to: 520, type: 'triangle', gain: 0.12 });
         break;
+      case 'special':
+        this.tone(0.35, { freq: 220, to: 880, type: 'sawtooth', gain: 0.12 });
+        this.noise(0.4, { freq: 400, sweepTo: 3000, q: 0.6, gain: 0.25 });
+        break;
+      case 'deny':
+        this.tone(0.12, { freq: 180, to: 120, type: 'square', gain: 0.12 });
+        break;
+      case 'combo':
+        this.tone(0.1, { freq: 880, type: 'triangle', gain: 0.15 });
+        setTimeout(() => this.tone(0.15, { freq: 1320, type: 'triangle', gain: 0.15 }), 80);
+        break;
       case 'pickup':
         this.tone(0.08, { freq: 660, type: 'triangle', gain: 0.2 });
         setTimeout(() => this.tone(0.12, { freq: 990, type: 'triangle', gain: 0.2 }), 70);

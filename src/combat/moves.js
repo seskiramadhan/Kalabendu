@@ -33,6 +33,13 @@ export const MOVES = {
     damage: 9, push: 70, launch: 150, knockdown: true,
     hit: { x: 3, w: 46, z: 0, h: 14, depth: 12 }, sfx: 'whooshBig', shake: 2,
   },
+  // Jurus Badai Sabit: spinning double crescent kick, hits both sides twice.
+  bayu_special: {
+    nameKey: 'move_special', anim: 'spin', special: true,
+    startup: 6, active: 24, recovery: 14, step: 18, rehit: 12, invulnFrames: 34,
+    damage: 12, push: 170, launch: 250, knockdown: true,
+    hit: { x: -44, w: 88, z: 0, h: 60, depth: 18 }, sfx: 'whooshBig', shake: 4, hitstop: 0.08,
+  },
   bayu_air_punch: {
     nameKey: 'move_airpunch', anim: 'airpunch',
     startup: 3, active: 600, recovery: 0,

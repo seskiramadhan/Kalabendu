@@ -1,15 +1,17 @@
 {
-  "version": "0.6.1",
+  "version": "0.7.0",
   "notes": {
     "id": [
-      "Bar musuh ala Streets of Rage: nama + nyawa musuh yang terakhir kamu pukul muncul di bawah panel Bayu",
-      "Warna bar musuh kuning → oranye → merah, dengan jejak putih saat terkena pukulan",
-      "Bos: bar berlapis dengan hitungan x2/x3"
+      "Meter Semangat (biru, 2 bagian) terisi saat memukul dan dipukul",
+      "Jurus Badai Sabit (I / tombol Jurus): tendangan berputar ke dua arah, kebal, bisa untuk lolos saat dipukul",
+      "Penghitung combo \"PUKULAN\" dengan bonus skor untuk combo panjang",
+      "3 nyawa: Bayu turun dari atas dan menghempas musuh; GAME OVER dengan hitungan mundur Lanjutkan"
     ],
     "en": [
-      "Streets of Rage style enemy bar: the name and health of the last enemy you hit appear under Bayu’s panel",
-      "Enemy bar goes yellow → orange → red, with a white damage trail",
-      "Bosses: layered bar with an x2/x3 counter"
+      "Semangat meter (blue, 2 segments) fills as you hit and get hit",
+      "Crescent Storm special (I / Special button): spinning kick both ways, invincible, can break out of hitstun",
+      "HITS combo counter with bonus score for long combos",
+      "3 lives: Bayu drops back in and knocks enemies away; GAME OVER with a Continue countdown"
     ]
   }
 }

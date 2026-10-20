@@ -36,6 +36,8 @@ export class Effects {
           color: ev.colors[i % ev.colors.length], size: 2 + Math.floor(Math.random() * 3), age: 0, life: 0.7,
         });
       }
+    } else if (ev.type === 'special') {
+      this.items.push({ kind: 'ring', who: ev.who, age: 0, life: 0.45 });
     } else if (ev.type === 'pickup') {
       const text = ev.rupiah ? `Rp ${ev.rupiah.toLocaleString('id-ID')}` : `+${ev.amount}`;
       this.items.push({ kind: 'popup', x: ev.x, y: ev.y, z: 24, text, color: ev.rupiah ? '#f2c94c' : '#7ce07a', age: 0, life: 0.9 });
@@ -93,6 +95,13 @@ export class Effects {
         ctx.fillStyle = e.color;
         ctx.fillText(e.text, Math.round(e.x - camX - 10), Math.round(e.y - e.z));
         ctx.globalAlpha = 1;
+      } else if (e.kind === 'ring') {
+        const rad = 10 + (e.age / e.life) * 60;
+        ctx.strokeStyle = `rgba(242,201,76,${k})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(Math.round(e.who.x - camX), Math.round(e.who.y - 2), rad, rad * 0.35, 0, 0, Math.PI * 2);
+        ctx.stroke();
       } else if (e.kind === 'chip') {
         ctx.fillStyle = `rgba(255,236,170,${k})`;
         ctx.fillRect(Math.round(e.x - camX), Math.round(e.y - e.z), 2, 2);

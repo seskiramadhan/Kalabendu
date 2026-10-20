@@ -14,6 +14,12 @@ export class Hud {
     this.touch = false;
     this.target = null;
     this.targetTime = 0;
+    this.comboShown = 0;
+    this.comboPop = 0;
+    this.comboFade = 0;
+    this.bonus = null;
+    this.flash = 0;
+    this.deny = 0;
     this.trailHp = 0;
   }
 
@@ -24,6 +30,14 @@ export class Hud {
       this.target = ev.target;
       this.targetTime = TARGET_TIME;
     }
+    if (ev.type === 'combo') {
+      this.comboShown = ev.count;
+      this.comboPop = 1;
+      this.comboFade = 1.6;
+    }
+    if (ev.type === 'comboEnd') this.bonus = { text: `${t('comboBonus')} +${ev.bonus}`, time: 1.6 };
+    if (ev.type === 'special') this.flash = 1;
+    if (ev.type === 'noSemangat') this.deny = 0.5;
     if (ev.type === 'tutorial') {
       const touchKey = ev.key + '_touch';
       this.tutorial = this.touch && t(touchKey) !== touchKey ? touchKey : ev.key;
@@ -41,16 +55,23 @@ export class Hud {
 
     const hero = game.heroes.get('p1');
     if (hero) this.drawHeroPanel(ctx, hero, game, X, Y, u);
+    if (this.flash > 0) {
+      ctx.fillStyle = `rgba(255,244,210,${this.flash * 0.45})`;
+      ctx.fillRect(X(0), Y(0), 480 * u, 270 * u);
+      this.flash = Math.max(0, this.flash - dt * 4);
+    }
     this.updateTarget(game, dt);
+    this.drawCombo(ctx, X, Y, u, dt);
     if (this.target) this.drawTargetBar(ctx, this.target, X, Y, u);
     if (game.go && Math.floor(time * 3) % 2 === 0) this.drawGo(ctx, X, Y, u);
     if (this.tutorialTime > 0 && this.tutorial) this.drawTutorial(ctx, X, Y, u);
     if (game.cleared) this.drawClear(ctx, game, X, Y, u);
+    if (game.over) this.drawGameOver(ctx, game, X, Y, u);
     ctx.restore();
   }
 
   drawHeroPanel(ctx, hero, game, X, Y, u) {
-    batikBox(ctx, X(6), Y(6), 120 * u, 30 * u, u);
+    batikBox(ctx, X(6), Y(6), 124 * u, 36 * u, u);
     // portrait: Bayu's face with udeng
     ctx.fillStyle = '#3a2619';
     ctx.fillRect(X(10), Y(10), 22 * u, 22 * u);
@@ -60,15 +81,94 @@ export class Hud {
     ctx.fillRect(X(13), Y(13), 16 * u, 5 * u);
     ctx.fillStyle = '#120c0a';
     ctx.fillRect(X(23), Y(21), 2 * u, 2 * u);
+    ctx.fillStyle = '#f2c94c';
+    ctx.font = `900 ${Math.round(7 * u)}px system-ui, sans-serif`;
+    ctx.fillText(`x${hero.lives}`, X(12), Y(37));
 
     ctx.fillStyle = '#f3e3c3';
     ctx.font = `bold ${Math.round(8 * u)}px system-ui, sans-serif`;
     ctx.fillText(t(hero.def.nameKey).toUpperCase(), X(36), Y(13));
-    bar(ctx, X(36), Y(18), 84 * u, 5 * u, hero.hp / hero.def.maxHp, '#4aa03c', u);
+    bar(ctx, X(36), Y(18), 88 * u, 5 * u, hero.hp / hero.def.maxHp, '#4aa03c', u);
+    this.drawSemangat(ctx, hero, X(36), Y(26), 88 * u, 3 * u, u);
     ctx.font = `${Math.round(6.5 * u)}px system-ui, sans-serif`;
     ctx.fillStyle = '#e0b252';
-    ctx.fillText(`${t('score')} ${String(game.score).padStart(6, '0')}`, X(36), Y(29));
-    ctx.fillText(`Rp ${game.rupiah.toLocaleString('id-ID')}`, X(88), Y(29));
+    ctx.fillText(`${t('score')} ${String(game.score).padStart(6, '0')}`, X(36), Y(36));
+    ctx.fillText(`Rp ${game.rupiah.toLocaleString('id-ID')}`, X(90), Y(36));
+  }
+
+  // Two segments; each full segment is one Jurus.
+  drawSemangat(ctx, hero, x, y, w, h, u) {
+    const k = hero.semangat / 100;
+    const ready = hero.semangat >= 50;
+    ctx.fillStyle = '#120c0a';
+    ctx.fillRect(x - u, y - u, w + 2 * u, h + 2 * u);
+    ctx.fillStyle = '#26203a';
+    ctx.fillRect(x, y, w, h);
+    const pulse = ready ? 0.75 + 0.25 * Math.sin(performance.now() / 120) : 1;
+    ctx.fillStyle = this.deny > 0 ? '#e0402a' : ready ? `rgba(120,200,255,${pulse})` : '#6a8ad8';
+    ctx.fillRect(x, y, w * k, h);
+    ctx.fillStyle = '#120c0a';
+    ctx.fillRect(x + w / 2 - u / 2, y, u, h);
+  }
+
+  drawCombo(ctx, X, Y, u, dt) {
+    this.comboPop = Math.max(0, this.comboPop - dt * 6);
+    this.comboFade -= dt;
+    if (this.bonus) {
+      this.bonus.time -= dt;
+      if (this.bonus.time <= 0) this.bonus = null;
+    }
+    if (this.comboShown >= 2 && this.comboFade > 0) {
+      ctx.globalAlpha = Math.min(1, this.comboFade * 2);
+      const size = Math.round((18 + this.comboPop * 8) * u);
+      ctx.textAlign = 'right';
+      ctx.font = `900 ${size}px system-ui, sans-serif`;
+      ctx.lineWidth = 3 * u;
+      ctx.strokeStyle = '#120c0a';
+      ctx.fillStyle = this.comboShown >= 10 ? '#f08a2a' : '#f2c94c';
+      ctx.strokeText(String(this.comboShown), X(468), Y(70));
+      ctx.fillText(String(this.comboShown), X(468), Y(70));
+      ctx.font = `bold ${Math.round(7 * u)}px system-ui, sans-serif`;
+      ctx.fillStyle = '#f3e3c3';
+      ctx.strokeText(t('hits'), X(468), Y(84));
+      ctx.fillText(t('hits'), X(468), Y(84));
+      ctx.textAlign = 'left';
+      ctx.globalAlpha = 1;
+    }
+    if (this.bonus) {
+      ctx.globalAlpha = Math.min(1, this.bonus.time * 2);
+      ctx.textAlign = 'right';
+      ctx.font = `bold ${Math.round(8 * u)}px system-ui, sans-serif`;
+      ctx.fillStyle = '#7ce07a';
+      ctx.strokeStyle = '#120c0a';
+      ctx.lineWidth = 2 * u;
+      ctx.strokeText(this.bonus.text, X(468), Y(96));
+      ctx.fillText(this.bonus.text, X(468), Y(96));
+      ctx.textAlign = 'left';
+      ctx.globalAlpha = 1;
+    }
+    this.deny = Math.max(0, this.deny - dt);
+  }
+
+  drawGameOver(ctx, game, X, Y, u) {
+    ctx.fillStyle = 'rgba(18,12,10,0.7)';
+    ctx.fillRect(X(0), Y(0), 480 * u, 270 * u);
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 3 * u;
+    ctx.strokeStyle = '#120c0a';
+    ctx.fillStyle = '#e0402a';
+    ctx.font = `900 ${Math.round(26 * u)}px system-ui, sans-serif`;
+    ctx.strokeText(t('gameOver'), X(240), Y(96));
+    ctx.fillText(t('gameOver'), X(240), Y(96));
+    if (!game.finished) {
+      ctx.fillStyle = '#f2c94c';
+      ctx.font = `900 ${Math.round(14 * u)}px system-ui, sans-serif`;
+      ctx.fillText(`${t('continueQ')} ${Math.ceil(game.continueTimer - 0.01)}`, X(240), Y(126));
+      ctx.fillStyle = '#f3e3c3';
+      ctx.font = `${Math.round(7 * u)}px system-ui, sans-serif`;
+      ctx.fillText(t(this.touch ? 'continueHint_touch' : 'continueHint'), X(240), Y(142));
+    }
+    ctx.textAlign = 'left';
   }
 
   updateTarget(game, dt) {
@@ -92,10 +192,10 @@ export class Hud {
     const fade = Math.max(0, Math.min(1, (this.targetTime + 0.4) / 0.4));
     ctx.globalAlpha = fade;
     const w = 112;
-    batikBox(ctx, X(6), Y(38), (w + 8) * u, 19 * u, u);
+    batikBox(ctx, X(6), Y(44), (w + 12) * u, 19 * u, u);
     ctx.fillStyle = '#f3e3c3';
     ctx.font = `bold ${Math.round(6.5 * u)}px system-ui, sans-serif`;
-    ctx.fillText(t(e.def.nameKey).toUpperCase(), X(10), Y(44));
+    ctx.fillText(t(e.def.nameKey).toUpperCase(), X(10), Y(50));
 
     const max = e.def.maxHp;
     const layered = e.def.boss && max > BOSS_LAYER_HP;
@@ -105,7 +205,7 @@ export class Hud {
     const trailLayer = Math.max(0, Math.ceil(this.trailHp / per) - 1);
     const trailIn = trailLayer > hpLayer ? 1 : this.trailHp <= 0 ? 0 : (this.trailHp - hpLayer * per) / per;
     const x = X(10);
-    const y = Y(49);
+    const y = Y(55);
     const bw = w * u;
     const bh = 4 * u;
     ctx.fillStyle = '#120c0a';
@@ -123,7 +223,7 @@ export class Hud {
       ctx.fillStyle = '#f2c94c';
       ctx.font = `900 ${Math.round(7 * u)}px system-ui, sans-serif`;
       ctx.textAlign = 'right';
-      ctx.fillText(`x${hpLayer + 1}`, X(122), Y(44));
+      ctx.fillText(`x${hpLayer + 1}`, X(126), Y(50));
       ctx.textAlign = 'left';
     }
     ctx.globalAlpha = 1;
@@ -153,7 +253,7 @@ export class Hud {
     const h = (lines.length * 10 + 8) * u;
     const w = Math.max(...lines.map((l) => ctx.measureText(l).width)) + 16 * u;
     const x = X(240) - w / 2;
-    const y = Y(64);
+    const y = Y(70);
     const alpha = Math.min(1, this.tutorialTime * 2);
     ctx.globalAlpha = alpha;
     batikBox(ctx, x, y, w, h, u);
