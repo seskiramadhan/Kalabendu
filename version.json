@@ -1,17 +1,17 @@
 {
-  "version": "0.12.0",
+  "version": "0.13.0",
   "notes": {
     "id": [
-      "Stage 4 Jalan Raya Demo: Preman Bayaran, Provokator ber-toa, Buzzer melayang, Komandan Preman di truk air; mahasiswa & ojol ikut bertarung",
-      "Stage 5 Gedung Pejabat: lobi, lift kaca, brankas emas; Tikus Berdasi, Ajudan, Makelar Kasus, Jaksa Palsu",
-      "Bos Pejabat Tinggi dengan perisai KEBAL HUKUM (kalahkan Makelar dulu)",
-      "Batara Kala, bos terakhir sejati, muncul jika semua suap ditolak dan bukti cukup"
+      "Jagoan baru: Sri (cangkul, sapuan lebar), Ujang (lari cepat, Jurus Ojol Ngebut naik motor), Mak Inah (pukulan berat, lempar jala yang menahan musuh)",
+      "Sri terbuka setelah Stage 1, Ujang setelah Stage 2, Mak Inah setelah Stage 3 — pilih di Pilih Jagoan",
+      "Main berdua di satu komputer: Pemain 2 pakai numpad (Enter untuk ikut) atau gamepad ke-2",
+      "Kalau satu pemain habis nyawa, tekan Pukul untuk lanjut selama temanmu masih bertarung"
     ],
     "en": [
-      "Stage 4 Protest Avenue: hired thugs, megaphone agitators, floating buzzers, the Thug Commander on a water truck; students & ojol drivers fight with you",
-      "Stage 5 Official's Tower: lobby, glass lift, gold vault; Necktie Rats, Bodyguards, Case Brokers, Fake Prosecutors",
-      "High Official boss with an ABOVE THE LAW shield (beat the Case Brokers first)",
-      "Batara Kala, the true final boss, appears if you refused every bribe and found enough evidence"
+      "New heroes: Sri (hoe, wide sweeps), Ujang (fast dashes, Full Throttle motorbike charge), Mak Inah (heavy hits, a net throw that holds enemies)",
+      "Sri unlocks after Stage 1, Ujang after Stage 2, Mak Inah after Stage 3 — pick them in Character Select",
+      "Two players on one computer: Player 2 uses the numpad (Enter to join) or a second gamepad",
+      "If one player runs out of lives, press Punch to continue while your partner fights on"
     ]
   }
 }

@@ -1,5 +1,5 @@
 import { t, getLang, setLang } from '../core/i18n.js';
-import { HEROES, ROSTER } from '../entities/heroes.js';
+import { HEROES, ROSTER, HERO_UNLOCKS } from '../entities/heroes.js';
 import { drawFigure } from '../render/sprites/skeleton.js';
 import { POSES } from '../render/sprites/poses.js';
 import { ERAS, eraOf } from '../systems/era.js';
@@ -116,7 +116,7 @@ export class Screens {
     panel.append(h('h2', t('heroSelect')));
     const grid = div('hero-grid');
     for (const r of ROSTER) {
-      const unlocked = !r.locked && save.heroes.includes(r.id);
+      const unlocked = save.heroes.includes(r.id);
       const card = document.createElement('button');
       card.type = 'button';
       card.className = 'hero-card' + (save.hero === r.id ? ' active' : '') + (unlocked ? '' : ' locked');
@@ -127,7 +127,7 @@ export class Screens {
       const ctx = c.getContext('2d');
       const look = HEROES[r.id]?.look ?? silhouette();
       drawFigure(ctx, POSES.stance, unlocked ? look : silhouette(), 30, 76, 0, 1);
-      card.append(c, h('b', t(r.nameKey ?? HEROES[r.id].nameKey)), h('span', unlocked ? t(r.descKey) : t('comingSoon'), 'muted'));
+      card.append(c, h('b', t(r.nameKey ?? HEROES[r.id].nameKey)), h('span', unlocked ? t(r.descKey) : t('unlockAfter').replace('{stage}', t(`${HERO_UNLOCKS[r.id]}_name`)), 'muted'));
       if (unlocked) card.addEventListener('click', () => this.h.onPickHero(r.id));
       grid.append(card);
     }
@@ -179,7 +179,16 @@ export class Screens {
       }, s.buttons === v ? 'chip active' : 'chip'));
     }
 
-    panel.append(lang, vol, toggle('vibrate', 'vibrate'), toggle('tips', 'tips'), size,
+    const pad2 = div('menu-row desktop-only');
+    pad2.append(h('span', t('p2pad')));
+    for (const v of [1, 0]) {
+      pad2.append(btn(t('p2pad_' + v), () => {
+        this.h.onSetting('p2pad', v);
+        this.render();
+      }, (s.p2pad ?? 1) === v ? 'chip active' : 'chip'));
+    }
+
+    panel.append(lang, vol, toggle('vibrate', 'vibrate'), toggle('tips', 'tips'), size, pad2,
       btn(t('resetData'), () => {
         if (confirm(t('resetConfirm'))) {
           this.h.onReset();

@@ -680,3 +680,6 @@ body.portrait[data-buttons] .touch .pad { transform-origin: center; }
   font-weight: 400;
   opacity: 0.85;
 }
+
+/* Player 2 gamepad choice only matters on a computer. */
+.is-touch .desktop-only { display: none; }

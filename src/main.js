@@ -1,5 +1,5 @@
 import { Game } from './game.js';
-import { Keyboard, BTN } from './core/input.js';
+import { Keyboard, BTN, P2_KEYS } from './core/input.js';
 import { Gamepads } from './core/gamepad.js';
 import { startLoop } from './core/loop.js';
 import { audio } from './core/audio.js';
@@ -16,7 +16,8 @@ import { STAGE2 } from './stages/stage2_pabrik.js';
 import { STAGE3 } from './stages/stage3_pasar.js';
 import { STAGE4 } from './stages/stage4_demo.js';
 import { STAGE5 } from './stages/stage5_gedung.js';
-import { buy, applyToHero } from './systems/economy.js';
+import { buy, applyToHero, applyUpgrades } from './systems/economy.js';
+import { HERO_UNLOCKS, ROSTER } from './entities/heroes.js';
 import { Story } from './ui/story.js';
 import { STORY, ENDINGS, endingFor, canFaceKala, totalEvidence } from './story/story.js';
 import { SPECIAL_COST } from './entities/fighter.js';
@@ -40,6 +41,7 @@ const continueBtn = document.getElementById('continue');
 const nextBtn = document.getElementById('next');
 const renderer = new Renderer(canvas);
 const keyboard = new Keyboard();
+const keyboard2 = new Keyboard(P2_KEYS);
 const pads = new Gamepads();
 const touch = isTouchDevice() ? new TouchControls(ui) : null;
 if (touch) document.body.classList.add('is-touch');
@@ -47,6 +49,8 @@ if (touch) blockBrowserZoom();
 renderer.touch = !!touch;
 
 let save = loadSave();
+syncHeroes();
+let p2Active = false;
 let mode = 'menu';
 let paused = true;
 let debug = false;
@@ -73,6 +77,8 @@ function newGame(stageId, { rupiah = 0, preview = false } = {}) {
   game.rupiah = rupiah;
   renderer.setStage(game.stage);
   applySettings();
+  renderer.hud.p2Hint = !touch && !preview;
+  if (p2Active && !preview) addPlayer2(false);
   againBtn.hidden = true;
   continueBtn.hidden = true;
   nextBtn.hidden = true;
@@ -148,6 +154,7 @@ function showEnding() {
 
 function toMenu() {
   mode = 'menu';
+  p2Active = false;
   document.body.classList.add('in-menu');
   renderer.showHud = false;
   newGame(save.stage, { preview: true });
@@ -160,8 +167,38 @@ function toMenu() {
   screens.show('title');
 }
 
+// Heroes join the roster as the story reaches them (see HERO_UNLOCKS).
+function syncHeroes() {
+  const fresh = [];
+  for (const [id, stage] of Object.entries(HERO_UNLOCKS)) {
+    if (save.heroes.includes(id)) continue;
+    if (save.unlocked.includes(nextStageOf(stage))) {
+      save.heroes.push(id);
+      fresh.push(id);
+    }
+  }
+  return fresh;
+}
+
+// Player 2 takes the next unlocked hero; with only one hero, a colour swap.
+function addPlayer2(dropIn) {
+  if (game.heroes.has('p2')) return;
+  const pick = ROSTER.map((r) => r.id).find((id) => id !== save.hero && save.heroes.includes(id));
+  const alt = pick ? undefined : { sash: '#3a7ad8', udeng: '#3a5a9a', top: '#2a3448', pants: '#2a3448', sleeve: '#2a3448', kerudung: '#7a3a6a', helmet: '#3a7ad8' };
+  const h2 = game.addHero('p2', pick ?? save.hero, { look: alt });
+  applyUpgrades(h2, save);
+  if (dropIn) {
+    h2.x = game.heroes.get('p1').x;
+    game.respawn(h2);
+    game.emit({ type: 'tutorial', key: 'p2Joined' });
+  }
+  p2Active = true;
+  renderer.hud.p2Hint = false;
+}
+
 function releaseInputs() {
   keyboard.releaseAll();
+  keyboard2.releaseAll();
   touch?.releaseAll();
 }
 
@@ -354,6 +391,12 @@ function onClear() {
     if (!save.unlocked.includes(next)) save.unlocked.push(next);
     save.stage = next;
   }
+  const fresh = syncHeroes();
+  if (fresh.length) {
+    hint.textContent = fresh.map((id) => t('heroUnlocked').replace('{name}', t(`hero_${id}`))).join(' · ');
+    hint.style.opacity = '1';
+    setTimeout(() => (hint.style.opacity = '0'), 7000);
+  }
   persist();
 }
 
@@ -371,9 +414,26 @@ const loop = startLoop({
       msg.held |= pad.held;
       msg.pressed |= pad.pressed;
     }
-    if (game.over && (continueQueued || msg.pressed & BTN.LIGHT)) game.applyInput({ type: 'continue', playerId: 'p1' });
+    // Player 2: numpad, plus the gamepad chosen in settings.
+    const msg2 = keyboard2.message('p2');
+    const p2pad = save.settings.p2pad ?? 1;
+    const pad2 = p2pad === 0 ? pad : pads.poll(1);
+    if (p2pad === 0 && pad && (p2Active || pad.pressed)) {
+      msg.held &= ~pad.held;
+      msg.pressed &= ~pad.pressed;
+    }
+    if (pad2) {
+      msg2.held |= pad2.held;
+      msg2.pressed |= pad2.pressed;
+    }
+    if (!game.heroes.has('p2') && mode === 'play' && !game.cleared && !game.over && (msg2.pressed || pad2?.start)) addPlayer2(true);
+    if (game.over && (continueQueued || msg.pressed & BTN.LIGHT || msg2.pressed & BTN.LIGHT)) game.applyInput({ type: 'continue', playerId: 'p1' });
     continueQueued = false;
+    for (const [id, m] of [['p1', msg], ['p2', msg2]]) {
+      if (game.heroes.get(id)?.out && m.pressed & BTN.LIGHT) game.applyInput({ type: 'continue', playerId: id });
+    }
     game.applyInput(msg);
+    game.applyInput(msg2);
     game.step(dt);
   },
   render(time, dt) {

@@ -53,6 +53,106 @@ export const MOVES = {
     hit: { x: 5, w: 30, z: 5, h: 24, depth: 11 }, sfx: 'whoosh',
   },
 
+
+  // Sri: rice farmer with a cangkul — longer reach, wide sweeps.
+  sri_l1: {
+    nameKey: 'move_cangkul', anim: 'palm',
+    startup: 5, active: 4, recovery: 11, step: 5,
+    damage: 5, push: 50, stun: 18, next: 'sri_l2', weapon: false,
+    hit: { x: 10, w: 36, z: 28, h: 22, depth: 11 }, sfx: 'whoosh',
+  },
+  sri_l2: {
+    nameKey: 'move_sapu', anim: 'sabit',
+    startup: 6, active: 5, recovery: 12, step: 6,
+    damage: 6, push: 60, stun: 20, next: 'sri_l3',
+    hit: { x: -6, w: 52, z: 20, h: 26, depth: 13 }, sfx: 'whoosh',
+  },
+  sri_l3: {
+    nameKey: 'move_bajak', anim: 'throwPose',
+    startup: 9, active: 5, recovery: 20, step: 10,
+    damage: 11, push: 140, launch: 240, knockdown: true,
+    hit: { x: 8, w: 40, z: 0, h: 50, depth: 13 }, sfx: 'whooshBig', shake: 3,
+  },
+  sri_heavy: {
+    nameKey: 'move_sapuan_sawah', anim: 'sweep',
+    startup: 10, active: 6, recovery: 20, step: 6,
+    damage: 9, push: 110, launch: 140, knockdown: true,
+    hit: { x: -40, w: 86, z: 0, h: 16, depth: 14 }, sfx: 'whooshBig', shake: 2,
+  },
+  sri_special: {
+    nameKey: 'move_sri_special', anim: 'spin', special: true,
+    startup: 8, active: 30, recovery: 14, step: 10, rehit: 10, invulnFrames: 40,
+    damage: 10, push: 190, launch: 220, knockdown: true,
+    hit: { x: -56, w: 112, z: 0, h: 40, depth: 22 }, sfx: 'whooshBig', shake: 4, hitstop: 0.08,
+  },
+
+  // Ujang: ojol driver — quick jabs, dash punch, motorcycle charge.
+  ujang_l1: {
+    nameKey: 'move_jab', anim: 'jab',
+    startup: 2, active: 3, recovery: 7, step: 5,
+    damage: 3, push: 30, stun: 14, next: 'ujang_l2',
+    hit: { x: 8, w: 25, z: 35, h: 16, depth: 10 }, sfx: 'whoosh',
+  },
+  ujang_l2: {
+    nameKey: 'move_jab', anim: 'palm',
+    startup: 2, active: 3, recovery: 7, step: 5,
+    damage: 3, push: 30, stun: 14, next: 'ujang_l3',
+    hit: { x: 8, w: 25, z: 33, h: 18, depth: 10 }, sfx: 'whoosh',
+  },
+  ujang_l3: {
+    nameKey: 'move_frontkick', anim: 'frontkick',
+    startup: 3, active: 3, recovery: 9, step: 8,
+    damage: 4, push: 40, stun: 16, next: 'ujang_l4',
+    hit: { x: 10, w: 32, z: 8, h: 30, depth: 11 }, sfx: 'whoosh',
+  },
+  ujang_l4: {
+    nameKey: 'move_tendangan_kilat', anim: 'sabit',
+    startup: 5, active: 4, recovery: 16, step: 16,
+    damage: 8, push: 160, launch: 220, knockdown: true,
+    hit: { x: 5, w: 40, z: 25, h: 35, depth: 12 }, sfx: 'whooshBig', shake: 2,
+  },
+  ujang_heavy: {
+    nameKey: 'move_salip', anim: 'jab', lunge: 260,
+    startup: 6, active: 12, recovery: 16, step: 0,
+    damage: 8, push: 140, launch: 120, knockdown: true,
+    hit: { x: 6, w: 30, z: 4, h: 46, depth: 12 }, sfx: 'whooshBig', shake: 2,
+  },
+  ujang_special: {
+    nameKey: 'move_ujang_special', anim: 'ride', special: true, ride: true, lunge: 340,
+    startup: 10, active: 48, recovery: 14, step: 0, rehit: 14, invulnFrames: 60,
+    damage: 9, push: 230, launch: 260, knockdown: true,
+    hit: { x: -10, w: 52, z: 0, h: 46, depth: 18 }, sfx: 'horn', shake: 3, hitstop: 0.06,
+  },
+
+  // Mak Inah: fisherwoman — slow, heavy hits, a net that holds enemies.
+  inah_l1: {
+    nameKey: 'move_tampar', anim: 'palm',
+    startup: 6, active: 4, recovery: 13, step: 5,
+    damage: 7, push: 60, stun: 22, next: 'inah_l2',
+    hit: { x: 8, w: 30, z: 30, h: 20, depth: 11 }, sfx: 'whoosh',
+  },
+  inah_l2: {
+    nameKey: 'move_tampar', anim: 'jab',
+    startup: 6, active: 4, recovery: 13, step: 6,
+    damage: 8, push: 70, stun: 22, next: 'inah_l3',
+    hit: { x: 8, w: 30, z: 32, h: 18, depth: 11 }, sfx: 'whoosh',
+  },
+  inah_l3: {
+    nameKey: 'move_dayung', anim: 'throwPose',
+    startup: 11, active: 5, recovery: 22, step: 8,
+    damage: 15, push: 190, launch: 220, knockdown: true,
+    hit: { x: 6, w: 40, z: 0, h: 52, depth: 13 }, sfx: 'whooshBig', shake: 4, hitstop: 0.08,
+  },
+  inah_heavy: {
+    nameKey: 'move_sweep', anim: 'sweep',
+    startup: 12, active: 6, recovery: 22, step: 8,
+    damage: 13, push: 120, launch: 160, knockdown: true,
+    hit: { x: 0, w: 54, z: 0, h: 16, depth: 13 }, sfx: 'whooshBig', shake: 3,
+  },
+  inah_special: {
+    nameKey: 'move_jala', anim: 'throwPose', special: true, shoot: 'jaring',
+    startup: 10, active: 2, recovery: 22, step: 0, invulnFrames: 30, hit: null, sfx: 'whooshBig',
+  },
   // Preman: slower, telegraphed so the player can react.
   preman_l1: {
     anim: 'jab',

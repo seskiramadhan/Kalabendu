@@ -215,6 +215,20 @@ export function drawHeldWeapon(ctx, pts, id, facing) {
   } else if (w.draw === 'bag') {
     r(ctx, OUT, hx - 7, hy - 7, 14, 14);
     r(ctx, w.color, hx - 6, hy - 6, 12, 12);
+  } else if (w.draw === 'hoe') {
+    // cangkul: wooden handle with a flat iron blade at the far end
+    for (let i = -6; i < w.len; i++) {
+      r(ctx, OUT, hx + dx * i - 1.5, hy + dy * i - 1.5, 3, 3);
+      r(ctx, w.color, hx + dx * i - 0.5, hy + dy * i - 0.5, 2, 2);
+    }
+    const tx = hx + dx * w.len;
+    const ty = hy + dy * w.len;
+    for (let k = 0; k < 9; k++) {
+      const bx = tx - dy * facing * k + dx * 1;
+      const by = ty + dx * facing * k;
+      r(ctx, OUT, bx - 2.5, by - 2.5, 6, 5);
+      r(ctx, w.tip, bx - 1.5, by - 1.5, 4, 3);
+    }
   } else if (w.draw === 'mega') {
     // toa (megaphone): small handle, cone pointing forward
     r(ctx, OUT, hx - 2, hy - 2, 4, 6);
@@ -292,6 +306,23 @@ export function drawShot(ctx, p, camX, time) {
     case 'flame':
       for (let i = 0; i < 6; i++) r(ctx, i % 2 ? '#ffd25a' : '#e0402a', x - p.facing * i * 4 - 4, y - 6 + Math.sin(time * 25 + i) * 3, 8, 8);
       break;
+    case 'net': {
+      // Mak Inah's jala spreading open as it flies
+      const k = Math.min(1, p.t * 4);
+      const half = 6 + 14 * k;
+      ctx.strokeStyle = '#e6e0cc';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = -2; i <= 2; i++) {
+        ctx.moveTo(x - half, y + (i * half) / 2);
+        ctx.lineTo(x + half, y + (i * half) / 2);
+        ctx.moveTo(x + (i * half) / 2, y - half);
+        ctx.lineTo(x + (i * half) / 2, y + half);
+      }
+      ctx.stroke();
+      for (const [cx, cy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) r(ctx, '#5a5a62', x + cx * half - 1, y + cy * half - 1, 3, 3);
+      break;
+    }
     case 'cash':
       r(ctx, OUT, x - 7, y - 4, 14, 8);
       r(ctx, '#4a9a5a', x - 6, y - 3, 12, 6);

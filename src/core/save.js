@@ -15,7 +15,7 @@ const DEFAULT = {
   boosts: {},
   bribePower: false,
   best: {},
-  settings: { volume: 0.6, vibrate: true, tips: true, buttons: 'normal' },
+  settings: { volume: 0.6, vibrate: true, tips: true, buttons: 'normal', p2pad: 1 },
 };
 
 const clone = (o) => JSON.parse(JSON.stringify(o));

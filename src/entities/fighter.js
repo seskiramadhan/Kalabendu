@@ -121,8 +121,9 @@ function startDodge(f, game, dir) {
   let dy = dir.y;
   if (!dx && !dy) dx = f.facing;
   const len = Math.hypot(dx, dy);
-  f.vx = (dx / len) * DODGE_SPEED;
-  f.vy = (dy / len) * DODGE_SPEED * 0.6;
+  const speed = DODGE_SPEED * (f.def.dodgeMul ?? 1);
+  f.vx = (dx / len) * speed;
+  f.vy = (dy / len) * speed * 0.6;
   if (dx) f.facing = dx;
   f.state = 'dodge';
   f.t = 0;
@@ -240,7 +241,10 @@ export function updateFighter(f, game, dt) {
     case 'frozen':
       f.vx = 0;
       f.vy = 0;
-      if (f.t >= f.stun) setState(f, 'idle');
+      if (f.t >= f.stun) {
+        f.netted = false;
+        setState(f, 'idle');
+      }
       break;
     case 'block':
       f.vx *= Math.max(0, 1 - dt * 10);

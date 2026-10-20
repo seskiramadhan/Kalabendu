@@ -28,6 +28,22 @@ const P1_KEYS = {
   ShiftRight: BTN.DODGE,
 };
 
+// Player 2 on the numpad: 8/4/5/6 move, 1 punch, 2 kick, 3 jump, 0 dodge,
+// Enter jurus (and joins the game).
+export const P2_KEYS = {
+  Numpad4: BTN.LEFT,
+  Numpad6: BTN.RIGHT,
+  Numpad8: BTN.UP,
+  Numpad5: BTN.DOWN,
+  Numpad2: BTN.HEAVY,
+  Numpad1: BTN.LIGHT,
+  Numpad3: BTN.JUMP,
+  Numpad0: BTN.DODGE,
+  NumpadDecimal: BTN.DODGE,
+  NumpadEnter: BTN.SPECIAL,
+  NumpadAdd: BTN.SPECIAL,
+};
+
 // Collects key state and turns it into input messages:
 // { type: 'input', playerId, held, pressed } — presses are latched so a
 // quick tap between two logic ticks is never lost.

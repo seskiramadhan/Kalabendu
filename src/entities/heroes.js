@@ -25,12 +25,95 @@ export const HEROES = {
       hair: '#1a1210',
     },
   },
+  // Sri: rice farmer, strong sweeping attacks with a cangkul.
+  sri: {
+    id: 'sri',
+    nameKey: 'hero_sri',
+    maxHp: 105,
+    walkX: 86,
+    walkY: 52,
+    jumpSpeed: 280,
+    canDodge: true,
+    canGrab: true,
+    tool: 'cangkul',
+    light: ['sri_l1', 'sri_l2', 'sri_l3'],
+    heavy: 'sri_heavy',
+    special: 'sri_special',
+    air: { light: 'bayu_air_punch', heavy: 'bayu_air' },
+    look: {
+      skin: '#b8804e',
+      top: '#3f6e3a',
+      pants: '#5a3a24',
+      sleeve: '#3f6e3a',
+      clothLight: '#5a8a4a',
+      sash: '#e0b252',
+      headgear: 'caping',
+      hair: '#1a1210',
+    },
+  },
+  // Ujang: ojol driver, fast dashes and a motorcycle charge.
+  ujang: {
+    id: 'ujang',
+    nameKey: 'hero_ujang',
+    maxHp: 90,
+    walkX: 112,
+    walkY: 64,
+    jumpSpeed: 300,
+    canDodge: true,
+    canGrab: true,
+    dodgeMul: 1.35,
+    light: ['ujang_l1', 'ujang_l2', 'ujang_l3', 'ujang_l4'],
+    heavy: 'ujang_heavy',
+    special: 'ujang_special',
+    air: { light: 'bayu_air_punch', heavy: 'bayu_air' },
+    look: {
+      skin: '#c08a5a',
+      top: '#2f8a3a',
+      pants: '#34405e',
+      sleeve: '#2f8a3a',
+      clothLight: '#4aa84a',
+      sash: '#1e1e22',
+      headgear: 'helmet',
+      helmet: '#2f9a4a',
+      hair: '#1a1210',
+    },
+  },
+  // Mak Inah: fisherwoman, slow but heavy hits and a net throw.
+  inah: {
+    id: 'inah',
+    nameKey: 'hero_inah',
+    maxHp: 130,
+    walkX: 76,
+    walkY: 46,
+    jumpSpeed: 250,
+    canDodge: true,
+    canGrab: true,
+    light: ['inah_l1', 'inah_l2', 'inah_l3'],
+    heavy: 'inah_heavy',
+    special: 'inah_special',
+    air: { light: 'bayu_air_punch', heavy: 'bayu_air' },
+    look: {
+      skin: '#a8744a',
+      top: '#c8643a',
+      pants: '#2a3a5a',
+      sleeve: '#c8643a',
+      clothLight: '#e08a5a',
+      sash: '#2a3a5a',
+      headgear: 'kerudung',
+      kerudung: '#3a6a9a',
+      hair: '#1a1210',
+    },
+  },
 };
 
-// Character select order. Locked heroes arrive in milestone 10.
+// Heroes join as the story goes: Sri after the forest, Ujang after the
+// factory, Mak Inah after the market (unlocked when that stage is cleared).
+export const HERO_UNLOCKS = { sri: 'stage1', ujang: 'stage2', inah: 'stage3' };
+
+// Character select order.
 export const ROSTER = [
   { id: 'bayu', descKey: 'hero_bayu_desc' },
-  { id: 'sri', nameKey: 'hero_sri', descKey: 'hero_sri_desc', locked: true },
-  { id: 'ujang', nameKey: 'hero_ujang', descKey: 'hero_ujang_desc', locked: true },
-  { id: 'inah', nameKey: 'hero_inah', descKey: 'hero_inah_desc', locked: true },
+  { id: 'sri', descKey: 'hero_sri_desc' },
+  { id: 'ujang', descKey: 'hero_ujang_desc' },
+  { id: 'inah', descKey: 'hero_inah_desc' },
 ];

@@ -37,6 +37,7 @@ export const POSES = {
   knee: { ...stance, t: 18, bu: 80, bf: 100, fu: 85, ff: 100, bt: -14, bs: -6, ft: 100, fs: 10 },
   throwPose: { ...stance, t: -24, bu: 150, bf: 170, fu: 140, ff: 165, bt: -36, bs: -10, ft: 40, fs: 8 },
   dizzy: { ...stance, t: -6, hd: 14, bu: 10, bf: 20, fu: 5, ff: 15, bt: -12, bs: -4, ft: 12, fs: 4 },
+  ride: { ...stance, t: 14, bu: 70, bf: 85, fu: 75, ff: 88, bt: 80, bs: -80, ft: 85, fs: -85 },
   roll: { t: 50, hd: 20, bu: 70, bf: 130, fu: 60, ff: 120, bt: 85, bs: -40, ft: 95, fs: -50, spinPivot: 'center' },
 };
 
@@ -49,6 +50,7 @@ const ATTACK = {
   airkick: ['airkick', 'airkick'],
   airpunch: ['airpunch', 'airpunch'],
   throwPose: ['grab', 'throwPose'],
+  ride: ['ride', 'ride'],
 };
 
 const LOOPS = {

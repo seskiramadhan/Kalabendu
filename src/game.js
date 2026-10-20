@@ -93,10 +93,12 @@ export class Game {
     this.director = stage.sections ? new Director(this) : null;
   }
 
-  addHero(playerId, heroId) {
+  // look: an optional colour swap so two copies of one hero can be told apart.
+  addHero(playerId, heroId, { look } = {}) {
     const { x, y } = this.stage.spawn;
     const hero = createFighter(HEROES[heroId], 'hero', x + this.heroes.size * 30, y + this.heroes.size * 14);
     hero.playerId = playerId;
+    if (look) hero.look = { ...hero.def.look, ...look };
     this.heroes.set(playerId, hero);
     this.entities.push(hero);
     return hero;
@@ -263,10 +265,14 @@ export class Game {
   }
 
   checkHeroDown(h) {
-    if (h.state !== 'dead' || h.t < RESPAWN_DELAY || this.over) return;
+    if (h.state !== 'dead' || h.t < RESPAWN_DELAY || this.over || h.out) return;
     if (h.lives > 0) {
       h.lives--;
       this.respawn(h);
+    } else if ([...this.heroes.values()].some((o) => o !== h && !o.out)) {
+      // Co-op: this player sits out until they press to continue.
+      h.out = true;
+      this.emit({ type: 'heroOut', who: h });
     } else {
       this.over = true;
       this.continueTimer = CONTINUE_TIME;
@@ -315,12 +321,26 @@ export class Game {
   }
 
   continueGame(h) {
-    if (!this.over || this.continueTimer <= 0) return;
+    if (!this.over) {
+      // Co-op: a player who is out jumps back in while the partner fights on.
+      if (!h.out) return;
+      h.out = false;
+      h.lives = 3;
+      h.semangat = 100;
+      this.respawn(h);
+      this.emit({ type: 'continued' });
+      return;
+    }
+    if (this.continueTimer <= 0) return;
     this.over = false;
     this.score = 0;
-    h.lives = 3;
-    h.semangat = 100;
-    this.respawn(h);
+    for (const o of this.heroes.values()) {
+      if (o !== h && !o.out && o.state !== 'dead') continue;
+      o.out = false;
+      o.lives = 3;
+      o.semangat = 100;
+      this.respawn(o);
+    }
     this.emit({ type: 'continued' });
   }
 
@@ -638,8 +658,14 @@ export class Game {
   updateCamera(dt) {
     if (!this.heroes.size) return;
     let sum = 0;
-    for (const h of this.heroes.values()) sum += h.x + h.facing * 24;
-    const target = sum / this.heroes.size - VIEW_W / 2;
+    let n = 0;
+    for (const h of this.heroes.values()) {
+      if (h.out) continue;
+      sum += h.x + h.facing * 24;
+      n++;
+    }
+    if (!n) return;
+    const target = sum / n - VIEW_W / 2;
     const cam = this.camera;
     cam.x += (target - cam.x) * Math.min(1, dt * 5);
     const maxX = Math.min(this.stage.width - VIEW_W, cam.lockRight);

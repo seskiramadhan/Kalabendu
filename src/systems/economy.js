@@ -43,11 +43,16 @@ export function buy(item, save) {
 }
 
 // Applies upgrades and one-stage boosts to a fresh hero; boosts are used up.
-export function applyToHero(hero, save) {
+// Permanent upgrades (and the bribe's power) for any hero, player 2 included.
+export function applyUpgrades(hero, save) {
   const up = save.upgrades ?? {};
   hero.def = { ...hero.def, maxHp: hero.def.maxHp + (up.hp ?? 0) * HP_PER_JAMU };
   hero.hp = hero.def.maxHp;
   hero.dmgMul = 1 + (up.dmg ?? 0) * DMG_PER_SABUK + (save.bribePower ? 0.3 : 0);
+}
+
+export function applyToHero(hero, save) {
+  applyUpgrades(hero, save);
   const b = save.boosts ?? {};
   if (b.semangat) hero.semangat = 100;
   if (b.life) hero.lives += b.life;

@@ -130,15 +130,19 @@ export class Renderer {
       if (m?.telegraph && e.state === 'attack' && e.t < m.startup / 60 && Math.floor(time * 12) % 2) this.drawAlert(ctx, fx, top);
       return;
     }
+    const riding = e.move?.ride && e.state === 'attack';
+    if (riding) this.drawMotor(ctx, e, fx, time, false);
     if (size === 1) {
-      const pts = drawFigure(ctx, pose, e.def.look, fx, e.y, e.z, e.facing);
-      if (e.weapon) drawHeldWeapon(ctx, pts, e.weapon.id, e.facing);
+      const pts = drawFigure(ctx, pose, e.look ?? e.def.look, fx, e.y, e.z + (riding ? 10 : 0), e.facing);
+      const held = e.weapon?.id ?? (riding ? null : e.def.tool);
+      if (held) drawHeldWeapon(ctx, pts, held, e.facing);
+      if (riding) this.drawMotor(ctx, e, fx, time, true);
       if (e.def.shieldColor && e.state !== 'airborne' && e.state !== 'knockdown' && e.state !== 'dead') this.drawShield(ctx, e, fx);
     } else {
       // Bigger fighters: draw at normal size, then scale up the pixels.
       const f = this.fctx;
       f.clearRect(0, 0, FIG, FIG);
-      const pts = drawFigure(f, pose, e.def.look, FIG / 2, FIG - 4, 0, e.facing);
+      const pts = drawFigure(f, pose, e.look ?? e.def.look, FIG / 2, FIG - 4, 0, e.facing);
       if (e.weapon) drawHeldWeapon(f, pts, e.weapon.id, e.facing);
       const w = Math.round(FIG * size);
       ctx.drawImage(this.fig, Math.round(fx - w / 2), Math.round(e.y - e.z - (FIG - 4) * size), w, w);
@@ -151,10 +155,12 @@ export class Renderer {
       ctx.fillStyle = 'rgba(120,220,90,0.8)';
       for (let i = 0; i < 3; i++) ctx.fillRect(Math.round(fx - 8 + i * 7), Math.round(headY + 8 - ((time * 20 + i * 7) % 18)), 2, 2);
     }
-    if (e.state === 'frozen') {
+    if (e.state === 'frozen' && e.netted) this.drawNet(ctx, fx, e.y - e.z, size);
+    else if (e.state === 'frozen') {
       ctx.fillStyle = 'rgba(160,210,255,0.45)';
       ctx.fillRect(Math.round(fx - 12), Math.round(e.y - e.z - 64), 24, 64);
     }
+    if (e.kind === 'hero' && game.heroes.size > 1 && e.state !== 'dead') this.drawTag(ctx, e, fx, headY);
     if (game.slowAt?.(e) < 1) this.drawWading(ctx, fx, e.y, time);
     if (e.state === 'dizzy') {
       for (let i = 0; i < 3; i++) {
@@ -226,6 +232,71 @@ export class Renderer {
       const idx = Math.max(1000, Math.round(7000 - ((time * 37) % 3000)));
       ctx.fillText(`INDEKS ${idx.toLocaleString('id-ID')} ▼`, x + 4, 128);
     }
+  }
+
+  // Ujang's motorbike: the back half is drawn before him, the front after.
+  drawMotor(ctx, e, fx, time, front) {
+    const f = e.facing;
+    const x = Math.round(fx);
+    const y = Math.round(e.y - e.z);
+    const wheel = (wx) => {
+      ctx.fillStyle = '#120c0a';
+      ctx.fillRect(wx - 6, y - 12, 12, 12);
+      ctx.fillStyle = '#3a3a3a';
+      ctx.fillRect(wx - 5, y - 11, 10, 10);
+      ctx.fillStyle = Math.floor(time * 30) % 2 ? '#9a9a9a' : '#6a6a6a';
+      ctx.fillRect(wx - 1, y - 7, 2, 2);
+    };
+    if (!front) {
+      wheel(x - 16 * f);
+      ctx.fillStyle = '#120c0a';
+      ctx.fillRect(x - 20, y - 24, 36, 12);
+      ctx.fillStyle = '#2f9a4a';
+      ctx.fillRect(x - 19, y - 23, 34, 10);
+      ctx.fillStyle = '#e6e0cc';
+      ctx.fillRect(x - 22 * f - 4, y - 30, 8, 8);
+      // exhaust puffs
+      ctx.fillStyle = 'rgba(120,120,120,0.5)';
+      for (let i = 0; i < 3; i++) ctx.fillRect(Math.round(x - f * (26 + i * 7 + ((time * 60) % 7))), y - 10 - i * 2, 5, 5);
+      return;
+    }
+    wheel(x + 16 * f);
+    ctx.fillStyle = '#120c0a';
+    ctx.fillRect(x + 12 * f - 2, y - 36, 4, 22);
+    ctx.fillRect(x + 8 * f - 4, y - 38, 10, 3);
+    ctx.fillStyle = '#ffe9a0';
+    ctx.fillRect(x + 18 * f - 2, y - 30, 4, 4);
+  }
+
+  drawNet(ctx, fx, footY, size) {
+    const x0 = Math.round(fx - 14 * size);
+    const y0 = Math.round(footY - 66 * size);
+    const w = Math.round(28 * size);
+    const h = Math.round(66 * size);
+    ctx.strokeStyle = 'rgba(230,224,204,0.9)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = 0; i <= w; i += 5) {
+      ctx.moveTo(x0 + i + 0.5, y0);
+      ctx.lineTo(x0 + i + 0.5, y0 + h);
+    }
+    for (let j = 0; j <= h; j += 5) {
+      ctx.moveTo(x0, y0 + j + 0.5);
+      ctx.lineTo(x0 + w, y0 + j + 0.5);
+    }
+    ctx.stroke();
+  }
+
+  drawTag(ctx, e, fx, headY) {
+    const p2 = e.playerId === 'p2';
+    const x = Math.round(fx);
+    const y = Math.round(headY - 16);
+    ctx.fillStyle = p2 ? '#3a7ad8' : '#c8322a';
+    ctx.fillRect(x - 6, y - 4, 12, 7);
+    ctx.fillRect(x - 1, y + 3, 2, 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 6px monospace';
+    ctx.fillText(p2 ? 'P2' : 'P1', x - 5, y + 2);
   }
 
   // "Kebal hukum": a golden bubble while a Makelar Kasus protects the boss.

@@ -65,7 +65,7 @@ export function resolveHits(game) {
       };
       if (target.kind === 'prop') hitProp(game, attacker, target, move, contact);
       else react(game, attacker, target, move, contact);
-      if (attacker.kind === 'projectile') {
+      if (attacker.kind === 'projectile' && !move.pierce) {
         attacker.spent = true;
         break;
       }
@@ -148,6 +148,8 @@ export function react(game, attacker, target, m, contact, opts = {}) {
   game.emit({ type: 'shake', amount: m.shake ?? (heavy ? 3 : 1) });
 
   if (armored) return;
+  // Caught in the jala: light hits land without freeing them.
+  if (target.state === 'frozen' && target.netted && !m.knockdown && target.hp > 0) return;
   if (opts.keepGrabbed && target.hp > 0) return;
   // Machines and giants never flinch; haze spirits only drift back.
   if (target.def.immovable || target.def.float) {
@@ -200,6 +202,18 @@ export function react(game, attacker, target, m, contact, opts = {}) {
 // Extra effects carried by some shots: freeze ("fines"), pull (debt chain),
 // fine (takes rupiah).
 function applyEffect(game, attacker, target, m) {
+  if (m.effect === 'net' && target.team !== 'hero') {
+    // Mak Inah's jala: holds enemies in place; bosses shrug it off sooner.
+    if (target.state === 'dead') return;
+    target.state = 'frozen';
+    target.t = 0;
+    target.stun = target.def.boss ? 0.9 : m.freeze;
+    target.netted = true;
+    target.vx = 0;
+    target.z = 0;
+    game.emit({ type: 'frozen', who: target });
+    return;
+  }
   if (!m.effect || target.team !== 'hero') return;
   if (m.effect === 'freeze') {
     target.state = 'frozen';

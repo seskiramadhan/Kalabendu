@@ -24,6 +24,7 @@ export const WEAPONS = {
   pentungan: { light: ['pentungan_l1', 'pentungan_l2'], durability: 999, fixed: true, draw: 'pole', len: 18, color: '#2a2a2a', tip: '#4a4a4a' },
   map_kertas: { light: ['cambuk_l1'], durability: 999, fixed: true, draw: 'whip', color: '#f6f2e4' },
   karung_beras: { light: ['preman_l1'], durability: 999, fixed: true, draw: 'sack', color: '#e6dcc0' },
+  cangkul: { light: [], durability: 999, fixed: true, draw: 'hoe', len: 24, color: '#7a4e24', tip: '#9aa0a8' },
   toa: { light: ['preman_l1'], durability: 999, fixed: true, draw: 'mega', color: '#e6e0cc' },
   koper: { light: ['koper_l1'], durability: 999, fixed: true, draw: 'case', color: '#5a3a1a' },
   tongkat: {

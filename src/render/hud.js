@@ -55,7 +55,10 @@ export class Hud {
     ctx.textBaseline = 'middle';
 
     const hero = game.heroes.get('p1');
-    if (hero) this.drawHeroPanel(ctx, hero, game, X, Y, u);
+    if (hero) this.drawHeroPanel(ctx, hero, game, X, Y, u, 0);
+    const p2 = game.heroes.get('p2');
+    if (p2) this.drawHeroPanel(ctx, p2, game, (v) => X(v + 130), Y, u, 1);
+    else if (this.p2Hint && game.time < 12) this.drawP2Hint(ctx, X, Y, u, time);
     if (this.flash > 0) {
       ctx.fillStyle = `rgba(255,244,210,${this.flash * 0.45})`;
       ctx.fillRect(X(0), Y(0), 480 * u, 270 * u);
@@ -71,17 +74,14 @@ export class Hud {
     ctx.restore();
   }
 
-  drawHeroPanel(ctx, hero, game, X, Y, u) {
+  drawHeroPanel(ctx, hero, game, X, Y, u, slot) {
     batikBox(ctx, X(6), Y(6), 124 * u, 36 * u, u);
-    // portrait: Bayu's face with udeng
-    ctx.fillStyle = '#3a2619';
-    ctx.fillRect(X(10), Y(10), 22 * u, 22 * u);
-    ctx.fillStyle = hero.def.look.skin;
-    ctx.fillRect(X(14), Y(15), 14 * u, 14 * u);
-    ctx.fillStyle = hero.def.look.udeng ?? '#444';
-    ctx.fillRect(X(13), Y(13), 16 * u, 5 * u);
-    ctx.fillStyle = '#120c0a';
-    ctx.fillRect(X(23), Y(21), 2 * u, 2 * u);
+    this.drawPortrait(ctx, hero.look ?? hero.def.look, X, Y, u);
+    if (slot) {
+      ctx.fillStyle = '#6aa0f0';
+      ctx.font = `900 ${Math.round(6 * u)}px system-ui, sans-serif`;
+      ctx.fillText('P2', X(24), Y(37));
+    }
     ctx.fillStyle = '#f2c94c';
     ctx.font = `900 ${Math.round(7 * u)}px system-ui, sans-serif`;
     ctx.fillText(`x${hero.lives}`, X(12), Y(37));
@@ -89,7 +89,7 @@ export class Hud {
     ctx.fillStyle = '#f3e3c3';
     ctx.font = `bold ${Math.round(8 * u)}px system-ui, sans-serif`;
     ctx.fillText(t(hero.def.nameKey).toUpperCase(), X(36), Y(13));
-    if (game.evidence) {
+    if (game.evidence && !slot) {
       ctx.fillStyle = '#e6d6a0';
       ctx.fillRect(X(104), Y(9), 8 * u, 6 * u);
       ctx.fillStyle = '#c8322a';
@@ -102,8 +102,40 @@ export class Hud {
     this.drawSemangat(ctx, hero, X(36), Y(26), 88 * u, 3 * u, u);
     ctx.font = `${Math.round(6.5 * u)}px system-ui, sans-serif`;
     ctx.fillStyle = '#e0b252';
+    if (hero.out) {
+      ctx.fillText(t('heroOut'), X(36), Y(36));
+      return;
+    }
+    if (slot) return;
     ctx.fillText(`${t('score')} ${String(game.score).padStart(6, '0')}`, X(36), Y(36));
     ctx.fillText(`Rp ${game.rupiah.toLocaleString('id-ID')}`, X(90), Y(36));
+  }
+
+  // Face with the hero's headgear colour.
+  drawPortrait(ctx, look, X, Y, u) {
+    ctx.fillStyle = '#3a2619';
+    ctx.fillRect(X(10), Y(10), 22 * u, 22 * u);
+    ctx.fillStyle = look.skin;
+    ctx.fillRect(X(14), Y(15), 14 * u, 14 * u);
+    const cap = { udeng: look.udeng, caping: '#d8b56a', helmet: look.helmet, kerudung: look.kerudung }[look.headgear] ?? '#444';
+    ctx.fillStyle = cap;
+    if (look.headgear === 'caping') ctx.fillRect(X(11), Y(12), 20 * u, 4 * u);
+    else ctx.fillRect(X(13), Y(13), 16 * u, 5 * u);
+    if (look.headgear === 'kerudung') {
+      ctx.fillRect(X(13), Y(15), 3 * u, 14 * u);
+      ctx.fillRect(X(26), Y(15), 3 * u, 14 * u);
+    }
+    ctx.fillStyle = '#120c0a';
+    ctx.fillRect(X(23), Y(21), 2 * u, 2 * u);
+  }
+
+  drawP2Hint(ctx, X, Y, u, time) {
+    if (Math.floor(time * 1.5) % 2) return;
+    ctx.fillStyle = 'rgba(18,12,10,0.6)';
+    ctx.fillRect(X(140), Y(8), 150 * u, 12 * u);
+    ctx.fillStyle = '#9ac0ff';
+    ctx.font = `bold ${Math.round(5.5 * u)}px system-ui, sans-serif`;
+    ctx.fillText(t('p2JoinShort'), X(144), Y(14));
   }
 
   // Two segments; each full segment is one Jurus.
