@@ -1,0 +1,34 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #2b1d14;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#game {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  display: block;
+  image-rendering: pixelated;
+}
+
+#hint {
+  position: fixed;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgba(43, 29, 20, 0.75);
+  color: #f3e3c3;
+  font: 14px/1.3 system-ui, sans-serif;
+  text-align: center;
+  pointer-events: none;
+  max-width: 90vw;
+}
