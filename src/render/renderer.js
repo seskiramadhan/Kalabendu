@@ -29,17 +29,22 @@ export class Renderer {
     this.canvas.width = Math.round(window.innerWidth * dpr);
     this.canvas.height = Math.round(window.innerHeight * dpr);
     const fit = Math.min(this.canvas.width / VIEW_W, this.canvas.height / VIEW_H);
-    const scale = fit >= 2 ? Math.floor(fit) : fit;
-    const w = VIEW_W * scale;
-    const h = VIEW_H * scale;
-    // Portrait: stage at the top, leaving room below for touch controls.
-    const portrait = this.canvas.height > this.canvas.width;
+    // Whole-number scaling is sharpest, but only when it doesn't waste much screen.
+    const scale = fit >= 2 && fit - Math.floor(fit) < 0.2 ? Math.floor(fit) : fit;
+    const w = Math.round(VIEW_W * scale);
+    const h = Math.round(VIEW_H * scale);
+    const portrait = this.canvas.height > this.canvas.width * 1.1;
+    const top = Math.round(Math.max(60 * dpr, this.canvas.height * 0.1));
     this.view = {
       scale,
+      w,
+      h,
       x: Math.round((this.canvas.width - w) / 2),
-      y: portrait ? Math.round(Math.min((this.canvas.height - h) / 2, this.canvas.height * 0.08)) : Math.round((this.canvas.height - h) / 2),
+      y: portrait ? Math.min(top, this.canvas.height - h) : Math.round((this.canvas.height - h) / 2),
       dpr,
+      portrait,
     };
+    return { portrait, stageBottomCss: (this.view.y + h) / dpr };
   }
 
   draw(game, time, dt, debug) {
@@ -66,8 +71,8 @@ export class Renderer {
     main.imageSmoothingEnabled = false;
     main.fillStyle = '#120c0a';
     main.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    const { x, y, scale } = this.view;
-    main.drawImage(this.buffer, x, y, VIEW_W * scale, VIEW_H * scale);
+    const { x, y } = this.view;
+    main.drawImage(this.buffer, x, y, this.view.w, this.view.h);
   }
 
   drawShadow(ctx, e, camX) {

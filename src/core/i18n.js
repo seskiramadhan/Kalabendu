@@ -25,6 +25,12 @@ const STRINGS = {
     upToDate: 'Sudah versi terbaru.',
     whatsNew: 'Yang baru:',
     menuHint: 'Esc untuk buka / tutup menu',
+    hintTouch: 'Joystick kiri untuk gerak · tombol kanan untuk bertarung',
+    btnLight: 'Pukul',
+    btnHeavy: 'Tendang',
+    btnJump: 'Lompat',
+    btnDodge: 'Hindar',
+    btnSpecial: 'Jurus',
   },
   en: {
     hintDesktop: 'Arrows/WASD move · J punch · K heavy kick · L jump · Shift dodge · Esc menu · F3 debug',
@@ -52,6 +58,12 @@ const STRINGS = {
     upToDate: 'You have the newest version.',
     whatsNew: "What's new:",
     menuHint: 'Esc to open / close the menu',
+    hintTouch: 'Left stick to move · right buttons to fight',
+    btnLight: 'Punch',
+    btnHeavy: 'Kick',
+    btnJump: 'Jump',
+    btnDodge: 'Dodge',
+    btnSpecial: 'Special',
   },
 };
 

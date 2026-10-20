@@ -222,3 +222,90 @@ html, body {
   color: #9be07a;
   font-size: 13px;
 }
+
+/* Touch controls */
+.touch {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 230px;
+  padding: 0 max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  pointer-events: none;
+  opacity: 0.75;
+}
+
+body.portrait .touch {
+  top: var(--stage-bottom);
+  height: auto;
+  align-items: center;
+  opacity: 1;
+}
+
+.stick {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(243, 227, 195, 0.12) 0 55%, rgba(243, 227, 195, 0.05) 56%);
+  border: 3px solid rgba(224, 178, 82, 0.55);
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.knob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border-radius: 50%;
+  background: rgba(168, 105, 46, 0.85);
+  border: 3px solid var(--gold);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.pad {
+  position: relative;
+  width: 230px;
+  height: 200px;
+  pointer-events: none;
+}
+
+.tbtn {
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font: 700 13px system-ui, sans-serif;
+  text-shadow: 0 1px 2px #000;
+  pointer-events: auto;
+  touch-action: none;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.45);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tbtn.down {
+  transform: translateY(3px) scale(0.95);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+  filter: brightness(1.25);
+}
+
+.tbtn.light { left: 56px; top: 104px; width: 80px; height: 80px; background: #c8322a; }
+.tbtn.jump { left: 150px; top: 120px; width: 70px; height: 70px; background: #2f7a2c; }
+.tbtn.heavy { left: 146px; top: 30px; width: 70px; height: 70px; background: #a8692e; }
+.tbtn.special { left: 64px; top: 22px; width: 58px; height: 58px; background: #5b3a8a; }
+.tbtn.dodge { left: 0; top: 136px; width: 52px; height: 52px; background: #3a4a6a; font-size: 11px; }
+
+body.is-touch #hint {
+  bottom: auto;
+  top: calc(var(--stage-bottom, 50%) + 8px);
+}
+
+body.is-touch:not(.portrait) #hint {
+  top: max(8px, env(safe-area-inset-top));
+}

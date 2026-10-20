@@ -4,6 +4,7 @@ import { startLoop } from './core/loop.js';
 import { audio } from './core/audio.js';
 import { t } from './core/i18n.js';
 import { Renderer } from './render/renderer.js';
+import { TouchControls, isTouchDevice } from './core/touch.js';
 import { Menu, fetchVersion } from './ui/menu.js';
 import { PADEPOKAN } from './stages/padepokan.js';
 
@@ -16,6 +17,8 @@ const hint = document.getElementById('hint');
 const moveLabel = document.getElementById('move-label');
 const renderer = new Renderer(canvas);
 const keyboard = new Keyboard();
+const touch = isTouchDevice() ? new TouchControls(document.getElementById('ui')) : null;
+if (touch) document.body.classList.add('is-touch');
 
 let game;
 function newGame() {
@@ -40,19 +43,22 @@ const menu = new Menu(document.getElementById('ui'), {
     menu.close();
   },
   onLanguage: () => {
-    hint.textContent = t('hintDesktop');
+    hint.textContent = t(touch ? 'hintTouch' : 'hintDesktop');
+    touch?.labels();
   },
 });
 
 function openMenu() {
   paused = true;
   keyboard.releaseAll();
+  touch?.releaseAll();
   menu.open();
 }
 menu.button.addEventListener('click', () => {
   if (menu.isOpen) {
     paused = true;
     keyboard.releaseAll();
+    touch?.releaseAll();
   }
 });
 
@@ -69,7 +75,9 @@ keyboard.onKey = (e) => {
 };
 
 function resize() {
-  renderer.resize();
+  const { portrait, stageBottomCss } = renderer.resize();
+  document.body.classList.toggle('portrait', portrait);
+  document.documentElement.style.setProperty('--stage-bottom', stageBottomCss + 'px');
 }
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', resize);
@@ -78,7 +86,13 @@ resize();
 const loop = startLoop({
   isPaused: () => paused,
   update(dt) {
-    game.applyInput(keyboard.message('p1'));
+    const msg = keyboard.message('p1');
+    if (touch) {
+      const tin = touch.take();
+      msg.held |= tin.held;
+      msg.pressed |= tin.pressed;
+    }
+    game.applyInput(msg);
     game.step(dt);
   },
   render(time, dt) {
@@ -102,5 +116,5 @@ const loop = startLoop({
 });
 
 newGame();
-hint.textContent = t('hintDesktop');
+hint.textContent = t(touch ? 'hintTouch' : 'hintDesktop');
 setTimeout(() => (hint.style.opacity = '0'), 10000);

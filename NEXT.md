@@ -16,9 +16,10 @@ Status line: **Milestone 1 done, Milestone 2 next** (2026-10-20)
 | 9 | Sri, Ujang, Mak Inah; local 2-player co-op | todo |
 | — | README in English + Indonesian | todo |
 
-## Already in place (kept from the sandbox)
+## Already in place
+- Touch controls (joystick + Pukul/Tendang/Lompat/Hindar/Jurus) and phone scaling, pulled forward from M5 at the user's request (v0.4.1). M5 still adds gamepad, menus and save.
 - Esc / ☰ menu with language switch and one-click Update (version.json + sw.js network-first).
-- GitHub Pages: waiting for the user to enable it.
+- GitHub Pages is live: https://seskiramadhan.github.io/Kalabendu/
 
 ## Ideas to keep in mind
 - Karhutla (forest fire) and haze visuals for Stage 2 Hutan Terbakar: flames on trees, drifting smoke, lower visibility.
