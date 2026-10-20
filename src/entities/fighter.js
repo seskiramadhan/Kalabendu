@@ -7,11 +7,20 @@ const DODGE_TIME = 0.32;
 const DODGE_SPEED = 230;
 const DODGE_INVULN = 0.26;
 const LAND_TIME = 0.08;
+const KNOCKDOWN_TIME = 0.6;
+const GETUP_TIME = 0.35;
+const GETUP_INVULN = 0.9;
+const DEAD_TIME = 1.4;
 
-export function createHero(def, playerId, x, y) {
+let nextUid = 1;
+
+// Heroes and enemies share this body. Heroes read input from players,
+// enemies from their AI; both arrive as held/pressed button bits.
+export function createFighter(def, team, x, y) {
   return {
-    kind: 'hero',
-    playerId,
+    uid: nextUid++,
+    kind: team === 'hero' ? 'hero' : 'enemy',
+    team,
     def,
     x,
     y,
@@ -27,14 +36,21 @@ export function createHero(def, playerId, x, y) {
     queued: null,
     activeEmitted: false,
     airAttacked: false,
+    hitIds: new Set(),
     invuln: 0,
+    stun: 0,
+    juggles: 0,
+    bounced: false,
+    hurtFrame: 0,
     hp: def.maxHp,
+    lastHitAt: -10,
     walkDist: 0,
+    remove: false,
     input: { held: 0, pressed: 0 },
   };
 }
 
-function setState(f, state) {
+export function setState(f, state) {
   if (f.state === state) return;
   f.state = state;
   f.t = 0;
@@ -47,6 +63,14 @@ function axes(held) {
   };
 }
 
+export function isAirState(state) {
+  return state === 'jump' || state === 'jumpAttack' || state === 'airborne';
+}
+
+export function canAct(f) {
+  return f.state === 'idle' || f.state === 'walk';
+}
+
 function startMove(f, game, moveId, chain = 0) {
   const dir = axes(f.input.held).x;
   if (dir) f.facing = dir;
@@ -54,6 +78,7 @@ function startMove(f, game, moveId, chain = 0) {
   f.chain = chain;
   f.queued = null;
   f.activeEmitted = false;
+  f.hitIds.clear();
   f.state = 'attack';
   f.t = 0;
   f.vx = 0;
@@ -86,7 +111,16 @@ function startDodge(f, game, dir) {
   game.emit({ type: 'dust', x: f.x, y: f.y, size: 1 });
 }
 
-export function updateHero(f, game, dt) {
+function startAirAttack(f, game, moveId) {
+  f.airAttacked = true;
+  f.move = MOVES[moveId];
+  f.activeEmitted = false;
+  f.hitIds.clear();
+  f.state = 'jumpAttack';
+  f.t = 0;
+}
+
+export function updateFighter(f, game, dt) {
   const { held, pressed } = f.input;
   const dir = axes(held);
   const def = f.def;
@@ -96,10 +130,10 @@ export function updateHero(f, game, dt) {
   switch (f.state) {
     case 'idle':
     case 'walk': {
-      if (pressed & BTN.JUMP) startJump(f, game, dir.x);
-      else if (pressed & BTN.DODGE) startDodge(f, game, dir);
+      if (pressed & BTN.JUMP && def.jumpSpeed) startJump(f, game, dir.x);
+      else if (pressed & BTN.DODGE && def.canDodge) startDodge(f, game, dir);
       else if (pressed & BTN.LIGHT) startMove(f, game, def.light[0]);
-      else if (pressed & BTN.HEAVY) startMove(f, game, def.heavy);
+      else if (pressed & BTN.HEAVY && def.heavy) startMove(f, game, def.heavy);
       else {
         f.vx = dir.x * def.walkX;
         f.vy = dir.y * def.walkY;
@@ -114,7 +148,7 @@ export function updateHero(f, game, dt) {
       const a = m.active * FRAME;
       const r = m.recovery * FRAME;
       if (pressed & BTN.LIGHT && f.t > s * 0.5 && m.next) f.queued = 'light';
-      if (pressed & BTN.HEAVY && f.t > s && m.id !== def.heavy) f.queued = 'heavy';
+      if (pressed & BTN.HEAVY && f.t > s && def.heavy && m.id !== def.heavy) f.queued = 'heavy';
       if (!f.activeEmitted && f.t >= s) {
         f.activeEmitted = true;
         game.emit({ type: 'sfx', name: m.sfx ?? 'whoosh', power: f.chain });
@@ -123,7 +157,7 @@ export function updateHero(f, game, dt) {
       f.vx = f.t < s + a ? (f.facing * m.step) / (s + a) : 0;
       f.vy = 0;
       if (f.t >= s + a) {
-        if (pressed & BTN.DODGE) {
+        if (pressed & BTN.DODGE && def.canDodge) {
           startDodge(f, game, dir);
           break;
         }
@@ -141,17 +175,18 @@ export function updateHero(f, game, dt) {
     }
     case 'jump': {
       f.vx += (dir.x * def.walkX - f.vx) * Math.min(1, dt * 4);
-      if (pressed & (BTN.LIGHT | BTN.HEAVY) && !f.airAttacked) {
-        f.airAttacked = true;
-        f.move = MOVES[def.air];
-        f.activeEmitted = true;
-        f.state = 'jumpAttack';
-        f.t = 0;
-        game.emit({ type: 'sfx', name: 'whoosh', power: 1 });
+      if (!f.airAttacked && def.air) {
+        if (pressed & BTN.LIGHT) startAirAttack(f, game, def.air.light);
+        else if (pressed & BTN.HEAVY) startAirAttack(f, game, def.air.heavy);
       }
       break;
     }
     case 'jumpAttack':
+      if (!f.activeEmitted && f.t >= f.move.startup * FRAME) {
+        f.activeEmitted = true;
+        game.emit({ type: 'sfx', name: f.move.sfx ?? 'whoosh', power: 1 });
+        game.emit({ type: 'swing', who: f, move: f.move });
+      }
       break;
     case 'dodge':
       if (f.t >= DODGE_TIME) {
@@ -165,23 +200,70 @@ export function updateHero(f, game, dt) {
       f.vy = 0;
       if (f.t >= LAND_TIME) setState(f, 'idle');
       break;
+    case 'hurt':
+      f.vx *= Math.max(0, 1 - dt * 9);
+      f.vy = 0;
+      if (f.t >= f.stun) setState(f, 'idle');
+      break;
+    case 'airborne':
+      break;
+    case 'knockdown':
+      f.vx *= Math.max(0, 1 - dt * 10);
+      if (f.t >= KNOCKDOWN_TIME) {
+        if (f.hp <= 0) {
+          setState(f, 'dead');
+        } else {
+          setState(f, 'getup');
+          f.invuln = GETUP_INVULN;
+        }
+      }
+      break;
+    case 'getup':
+      f.vx = 0;
+      if (f.t >= GETUP_TIME) {
+        f.juggles = 0;
+        setState(f, 'idle');
+      }
+      break;
+    case 'dead':
+      f.vx = 0;
+      if (f.t >= DEAD_TIME) f.remove = true;
+      break;
   }
 
   f.x += f.vx * dt;
   f.y += f.vy * dt;
   if (f.state === 'walk') f.walkDist += Math.hypot(f.vx, f.vy) * dt;
 
-  if (f.state === 'jump' || f.state === 'jumpAttack') {
+  if (isAirState(f.state)) {
     f.vz -= GRAVITY * dt;
     f.z += f.vz * dt;
-    if (f.z <= 0) {
-      f.z = 0;
-      f.vz = 0;
-      f.vx = 0;
-      f.state = 'land';
-      f.t = 0;
-      game.emit({ type: 'sfx', name: 'land' });
-      game.emit({ type: 'dust', x: f.x, y: f.y, size: 2 });
-    }
+    if (f.z <= 0) land(f, game);
   }
+}
+
+function land(f, game) {
+  f.z = 0;
+  if (f.state === 'airborne') {
+    if (!f.bounced && f.vz < -150) {
+      f.bounced = true;
+      f.vz = -f.vz * 0.3;
+      f.vx *= 0.5;
+      game.emit({ type: 'sfx', name: 'thud' });
+      game.emit({ type: 'dust', x: f.x, y: f.y, size: 2 });
+      game.emit({ type: 'shake', amount: 2 });
+      return;
+    }
+    f.vz = 0;
+    f.state = 'knockdown';
+    f.t = 0;
+    game.emit({ type: 'dust', x: f.x, y: f.y, size: 1 });
+    return;
+  }
+  f.vz = 0;
+  f.vx = 0;
+  f.state = 'land';
+  f.t = 0;
+  game.emit({ type: 'sfx', name: 'land' });
+  game.emit({ type: 'dust', x: f.x, y: f.y, size: 2 });
 }

@@ -33,11 +33,37 @@ export const MOVES = {
     damage: 9, push: 70, launch: 150, knockdown: true,
     hit: { x: 3, w: 46, z: 0, h: 14, depth: 12 }, sfx: 'whooshBig', shake: 2,
   },
+  bayu_air_punch: {
+    nameKey: 'move_airpunch', anim: 'airpunch',
+    startup: 3, active: 600, recovery: 0,
+    damage: 6, push: 70, stun: 20, air: true,
+    hit: { x: 6, w: 24, z: 18, h: 22, depth: 11 }, sfx: 'whoosh',
+  },
   bayu_air: {
     nameKey: 'move_airkick', anim: 'airkick',
     startup: 3, active: 600, recovery: 0,
     damage: 8, push: 130, launch: 120, knockdown: true, air: true,
     hit: { x: 5, w: 30, z: 5, h: 24, depth: 11 }, sfx: 'whoosh',
+  },
+
+  // Preman: slower, telegraphed so the player can react.
+  preman_l1: {
+    anim: 'jab',
+    startup: 11, active: 3, recovery: 16, step: 6,
+    damage: 6, push: 50, stun: 18, next: 'preman_l2',
+    hit: { x: 8, w: 26, z: 34, h: 16, depth: 9 }, sfx: 'whoosh',
+  },
+  preman_l2: {
+    anim: 'palm',
+    startup: 9, active: 3, recovery: 24, step: 8,
+    damage: 7, push: 90, stun: 22,
+    hit: { x: 8, w: 28, z: 30, h: 18, depth: 9 }, sfx: 'whoosh',
+  },
+  preman_heavy: {
+    anim: 'frontkick',
+    startup: 18, active: 4, recovery: 26, step: 10,
+    damage: 10, push: 140, launch: 190, knockdown: true,
+    hit: { x: 10, w: 34, z: 16, h: 22, depth: 10 }, sfx: 'whooshBig', shake: 2,
   },
 };
 

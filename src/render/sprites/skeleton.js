@@ -82,25 +82,26 @@ export function drawFigure(ctx, pose, look, x, groundY, z, facing) {
   for (const k in p) p[k] = [p[k][0] + ox, p[k][1] + oy];
 
   const backSkin = shade(look.skin, 0.8);
-  const backCloth = shade(look.cloth, 0.75);
+  const backPants = shade(look.pants, 0.75);
+  const backSleeve = shade(look.sleeve, 0.75);
 
   // back arm and leg
-  part(ctx, p.shoulder, p.bElbow, 5, backCloth);
+  part(ctx, p.shoulder, p.bElbow, 5, backSleeve);
   part(ctx, p.bElbow, p.bHand, 4, backSkin);
   disc(ctx, p.bHand, 2, backSkin);
-  part(ctx, p.hip, p.bKnee, 7, backCloth);
-  part(ctx, p.bKnee, p.bFoot, 6, backCloth);
+  part(ctx, p.hip, p.bKnee, 7, backPants);
+  part(ctx, p.bKnee, p.bFoot, 6, backPants);
   seg(ctx, p.bFoot, [p.bFoot[0] + 4 * facing, p.bFoot[1]], 3, backSkin);
 
   // torso with sash
-  part(ctx, p.hip, p.neck, 11, look.cloth);
+  part(ctx, p.hip, p.neck, 11, look.top);
   seg(ctx, [p.neck[0] + 2 * facing, p.neck[1] + 3], [p.hip[0] + 2 * facing, p.hip[1] - 5], 2, look.clothLight);
   seg(ctx, [p.hip[0] - 5, p.hip[1] - 2], [p.hip[0] + 5, p.hip[1] - 2], 4, look.sash);
   seg(ctx, [p.hip[0] - 4 * facing, p.hip[1]], [p.hip[0] - 8 * facing, p.hip[1] + 8], 3, look.sash);
 
   // front leg
-  part(ctx, p.hip, p.fKnee, 7, look.cloth);
-  part(ctx, p.fKnee, p.fFoot, 6, look.cloth);
+  part(ctx, p.hip, p.fKnee, 7, look.pants);
+  part(ctx, p.fKnee, p.fFoot, 6, look.pants);
   seg(ctx, p.fFoot, [p.fFoot[0] + 4 * facing, p.fFoot[1]], 3, look.skin);
 
   // head with udeng (batik headband)
@@ -108,23 +109,38 @@ export function drawFigure(ctx, pose, look, x, groundY, z, facing) {
   disc(ctx, p.head, HEAD, look.skin);
   const hx = Math.round(p.head[0]);
   const hy = Math.round(p.head[1]);
-  ctx.fillStyle = look.hair;
-  ctx.fillRect(hx - 6, hy - 7, 12, 3);
-  ctx.fillRect(hx - 6 * facing - (facing > 0 ? 0 : 2), hy - 5, 3, 6);
-  ctx.fillStyle = look.udeng;
-  ctx.fillRect(hx - 7, hy - 5, 15, 4);
-  ctx.fillStyle = look.udengDots;
-  for (let i = -5; i <= 5; i += 3) ctx.fillRect(hx + i, hy - 4, 1, 1);
-  ctx.fillStyle = look.udeng;
-  ctx.fillRect(facing > 0 ? hx - 11 : hx + 8, hy - 4, 4, 2);
-  ctx.fillRect(facing > 0 ? hx - 12 : hx + 10, hy - 2, 3, 2);
+  drawHeadgear(ctx, look, hx, hy, facing);
   ctx.fillStyle = OUTLINE;
   ctx.fillRect(hx + 3 * facing, hy, 1, 2);
 
   // front arm last so strikes read clearly
-  part(ctx, p.shoulder, p.fElbow, 5, look.cloth);
+  part(ctx, p.shoulder, p.fElbow, 5, look.sleeve);
   part(ctx, p.fElbow, p.fHand, 4, look.skin);
   disc(ctx, p.fHand, 2, look.skin);
 
   return p;
+}
+
+function drawHeadgear(ctx, look, hx, hy, facing) {
+  ctx.fillStyle = look.hair;
+  ctx.fillRect(hx - 6, hy - 7, 12, 3);
+  ctx.fillRect(hx - 6 * facing - (facing > 0 ? 0 : 2), hy - 5, 3, 6);
+  const back = facing > 0 ? hx - 11 : hx + 8;
+  if (look.headgear === 'udeng') {
+    ctx.fillStyle = look.udeng;
+    ctx.fillRect(hx - 7, hy - 5, 15, 4);
+    ctx.fillStyle = look.udengDots;
+    for (let i = -5; i <= 5; i += 3) ctx.fillRect(hx + i, hy - 4, 1, 1);
+    ctx.fillStyle = look.udeng;
+    ctx.fillRect(back, hy - 4, 4, 2);
+    ctx.fillRect(facing > 0 ? hx - 12 : hx + 10, hy - 2, 3, 2);
+  } else if (look.headgear === 'bandana') {
+    ctx.fillStyle = look.bandana;
+    ctx.fillRect(hx - 7, hy - 8, 15, 5);
+    ctx.fillRect(back, hy - 6, 4, 3);
+    ctx.fillRect(facing > 0 ? hx - 13 : hx + 11, hy - 4, 3, 4);
+    ctx.fillStyle = '#f6f2e4';
+    ctx.fillRect(hx - 2, hy - 7, 1, 1);
+    ctx.fillRect(hx + 3, hy - 6, 1, 1);
+  }
 }

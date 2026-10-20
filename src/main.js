@@ -99,7 +99,7 @@ const loop = startLoop({
     renderer.draw(game, time, dt, debug);
     for (const ev of game.events) {
       if (ev.type === 'sfx') audio.play(ev.name, ev.power ?? 1);
-      if (ev.type === 'swing') {
+      if (ev.type === 'swing' && ev.who.team === 'hero') {
         moveLabel.textContent = t(ev.move.nameKey);
         moveLabel.style.opacity = '1';
         moveLabelTimer = 0.9;

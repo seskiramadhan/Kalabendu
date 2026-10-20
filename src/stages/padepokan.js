@@ -8,6 +8,8 @@ export const PADEPOKAN = {
   floorBottom: 262,
   spawn: { x: 90, y: 215 },
   theme: 'padepokan',
+  // Training: keep this many Preman sparring partners on screen.
+  training: { enemies: 3 },
   sky: ['#f6c58a', '#f2a46b', '#b8705a'],
   props: [
     { type: 'pendopo', x: 260 },

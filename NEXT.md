@@ -1,12 +1,12 @@
 # NEXT — Kalabendu (beat 'em up) plan
 
-Status line: **Milestone 1 done, Milestone 2 next** (2026-10-20)
+Status line: **Milestone 2 done, Milestone 3 next** (2026-10-20)
 
 ## Milestones (each playable before the next)
 | # | Milestone | Status |
 |---|---|---|
 | 1 | Bayu on a 2.5D floor (move, depth sort), light combo, heavy, jump + jump attack, dodge, procedural pose art, camera, training stage | done (v0.4.0) |
-| 2 | Hitboxes/hurtboxes, hitstop, screen shake, knockback, juggles, knockdown + get-up invincibility, one Preman with basic AI | todo |
+| 2 | Hitboxes/hurtboxes, hitstop, screen shake, knockback, juggles, knockdown + get-up invincibility, one Preman with basic AI | done (v0.5.0) |
 | 3 | Stage 1 Kampung Diserbu: go-arrow sections, enemy waves, pickups (nasi bungkus, es teh, weapons), breakables, boss | todo |
 | 4 | HUD (health, Semangat, special), combo counter, score, enemy health bars, game over + continue | todo |
 | 5 | Touch controls, gamepad, portrait/landscape layout, menus (Mulai, Lanjutkan, Pilih Jagoan, Pengaturan), save | todo |
@@ -27,5 +27,7 @@ Status line: **Milestone 1 done, Milestone 2 next** (2026-10-20)
 - Online co-op (PeerJS/WebRTC) using the input-message design.
 
 ## Notes
+- Hero hp 0 currently just gets back up with full hp (placeholder until M4 game over).
+- Training yard keeps 3 Preman on screen (stage.training.enemies); Stage 1 replaces this with waves.
 - Full original request: CLAUDE.md.
 - Old sandbox game: branch sandbox-v0.3.1.

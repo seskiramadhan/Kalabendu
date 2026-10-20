@@ -3,7 +3,7 @@ import { buildStageArt } from './parallax.js';
 import { Effects } from './effects.js';
 import { drawFigure } from './sprites/skeleton.js';
 import { poseFor, animState } from './sprites/poses.js';
-import { FRAME } from '../entities/fighter.js';
+import { activeHitbox, hurtbox } from '../combat/hits.js';
 
 // Draws the game into a fixed 480x270 buffer, then scales it to the screen
 // with nearest-neighbour pixels.
@@ -18,6 +18,7 @@ export class Renderer {
     this.effects = new Effects();
     this.art = null;
     this.view = { x: 0, y: 0, scale: 1 };
+    this.shake = 0;
   }
 
   setStage(stage) {
@@ -48,8 +49,12 @@ export class Renderer {
   }
 
   draw(game, time, dt, debug) {
-    for (const ev of game.events) this.effects.handle(ev);
+    for (const ev of game.events) {
+      this.effects.handle(ev);
+      if (ev.type === 'shake') this.shake = Math.max(this.shake, ev.amount);
+    }
     this.effects.update(dt);
+    this.shake = Math.max(0, this.shake - dt * 18);
 
     const ctx = this.bctx;
     const camX = Math.round(game.camera.x);
@@ -61,9 +66,13 @@ export class Renderer {
     const sorted = [...game.entities].sort((a, b) => a.y - b.y);
     for (const e of sorted) this.drawShadow(ctx, e, camX);
     for (const e of sorted) {
+      const blinking = (e.invuln > 0 && e.state !== 'dodge') || (e.state === 'dead' && e.t > 0.5);
+      if (blinking && Math.floor(time * 20) % 2) continue;
       const pose = poseFor(e, time);
-      drawFigure(ctx, pose, e.def.look, e.x - camX, e.y, e.z, e.facing);
+      const jitter = game.hitstop > 0 && game.time - e.lastHitAt < 0.15 ? (Math.floor(time * 60) % 2 ? 1 : -1) : 0;
+      drawFigure(ctx, pose, e.def.look, e.x - camX + jitter, e.y, e.z, e.facing);
     }
+    for (const e of sorted) if (e.team === 'enemy') this.drawEnemyBar(ctx, e, game, camX);
     this.effects.draw(ctx, camX);
     if (debug) this.drawDebugBoxes(ctx, game, camX);
 
@@ -71,8 +80,23 @@ export class Renderer {
     main.imageSmoothingEnabled = false;
     main.fillStyle = '#120c0a';
     main.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    const { x, y } = this.view;
-    main.drawImage(this.buffer, x, y, this.view.w, this.view.h);
+    const { x, y, scale } = this.view;
+    const sx = this.shake > 0 ? Math.round((Math.random() * 2 - 1) * this.shake) * scale : 0;
+    const sy = this.shake > 0 ? Math.round((Math.random() * 2 - 1) * this.shake) * scale : 0;
+    main.drawImage(this.buffer, x + sx, y + sy, this.view.w, this.view.h);
+  }
+
+  drawEnemyBar(ctx, e, game, camX) {
+    if (game.time - e.lastHitAt > 2.5 || e.state === 'dead') return;
+    const w = 26;
+    const x = Math.round(e.x - camX - w / 2);
+    const y = Math.round(e.y - e.z - 76);
+    ctx.fillStyle = '#120c0a';
+    ctx.fillRect(x - 1, y - 1, w + 2, 5);
+    ctx.fillStyle = '#5a1a14';
+    ctx.fillRect(x, y, w, 3);
+    ctx.fillStyle = '#e8571e';
+    ctx.fillRect(x, y, Math.round((w * e.hp) / e.def.maxHp), 3);
   }
 
   drawShadow(ctx, e, camX) {
@@ -85,17 +109,15 @@ export class Renderer {
 
   drawDebugBoxes(ctx, game, camX) {
     for (const e of game.entities) {
-      ctx.fillStyle = 'rgba(80,160,255,0.35)';
-      ctx.fillRect(Math.round(e.x - camX - 10), Math.round(e.y - e.z - 60), 20, 60);
-      const m = e.move;
-      if (m && (e.state === 'attack' || e.state === 'jumpAttack')) {
-        const s = m.startup * FRAME;
-        const active = e.state === 'jumpAttack' || (e.t >= s && e.t < s + m.active * FRAME);
-        if (!active) continue;
-        const h = m.hit;
-        const x0 = e.facing > 0 ? e.x + h.x : e.x - h.x - h.w;
-        ctx.fillStyle = 'rgba(255,60,40,0.45)';
-        ctx.fillRect(Math.round(x0 - camX), Math.round(e.y - e.z - h.z - h.h), h.w, h.h);
+      const hb = hurtbox(e);
+      if (hb) {
+        ctx.fillStyle = 'rgba(80,160,255,0.35)';
+        ctx.fillRect(Math.round(hb.x0 - camX), Math.round(e.y - hb.z1), Math.round(hb.x1 - hb.x0), Math.round(hb.z1 - hb.z0));
+      }
+      const ab = activeHitbox(e);
+      if (ab) {
+        ctx.fillStyle = 'rgba(255,60,40,0.5)';
+        ctx.fillRect(Math.round(ab.x0 - camX), Math.round(e.y - ab.z1), Math.round(ab.x1 - ab.x0), Math.round(ab.z1 - ab.z0));
       }
       ctx.fillStyle = '#fff';
       ctx.font = '8px monospace';

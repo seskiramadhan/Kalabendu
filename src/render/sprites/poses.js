@@ -27,6 +27,12 @@ export const POSES = {
   jump_down: { ...stance, t: 5, bu: 60, bf: 100, fu: 75, ff: 120, bt: -12, bs: -22, ft: 32, fs: 2 },
   airkick: { ...stance, t: -22, bu: 120, bf: 150, fu: 40, ff: 120, bt: 12, bs: -82, ft: 76, fs: 82 },
   land: { ...stance, t: 14, bt: -46, bs: 10, ft: 52, fs: -12 },
+  airpunch: { ...stance, t: 18, bu: 140, bf: 170, fu: 70, ff: 65, bt: -10, bs: -60, ft: 50, fs: -10 },
+  hurt1: { ...stance, t: -22, hd: -18, bu: -40, bf: 10, fu: -20, ff: 40, bt: -20, bs: -8, ft: 20, fs: 4 },
+  hurt2: { ...stance, t: 28, hd: 20, bu: 30, bf: 20, fu: 40, ff: 30, bt: -30, bs: -10, ft: 26, fs: 6 },
+  airhit: { ...stance, t: -30, hd: -20, bu: -120, bf: -150, fu: -100, ff: -140, bt: 30, bs: 10, ft: 50, fs: 30, spin: -35 },
+  lying: { t: 0, hd: 0, bu: 170, bf: 175, fu: 160, ff: 175, bt: 4, bs: 4, ft: -4, fs: -4, spin: -90 },
+  getup: { ...stance, t: 40, hd: 10, bu: 60, bf: 40, fu: 80, ff: 60, bt: -60, bs: 30, ft: 70, fs: -40 },
   roll: { t: 50, hd: 20, bu: 70, bf: 130, fu: 60, ff: 120, bt: 85, bs: -40, ft: 95, fs: -50, spinPivot: 'center' },
 };
 
@@ -37,6 +43,7 @@ const ATTACK = {
   sabit: ['sabit_wind', 'sabit_hit'],
   sweep: ['sweep_wind', 'sweep_hit'],
   airkick: ['airkick', 'airkick'],
+  airpunch: ['airpunch', 'airpunch'],
 };
 
 const LOOPS = {
@@ -85,6 +92,7 @@ function attackPose(f) {
 // Named animation state, as a sprite sheet would use: idle, walk, attack1..4,
 // heavy, jump, jumpAttack, dodge, land.
 export function animState(f) {
+  if (f.state === 'airborne') return 'knockdown';
   if (f.state === 'attack') {
     if (f.move.id === f.def.heavy) return 'heavy';
     return 'attack' + (f.chain + 1);
@@ -105,7 +113,20 @@ export function poseFor(f, time) {
       return lerpPose(POSES.jump_up, POSES.jump_down, k);
     }
     case 'jumpAttack':
-      return lerpPose(POSES.jump_down, POSES.airkick, Math.min(1, f.t / (FRAME * 3)));
+      return lerpPose(POSES.jump_down, POSES[f.move.anim], Math.min(1, f.t / (FRAME * 3)));
+    case 'hurt':
+      return POSES[f.hurtFrame ? 'hurt2' : 'hurt1'];
+    case 'airborne': {
+      const k = Math.max(0, Math.min(1, 0.5 - f.vz / 400));
+      return lerpPose(POSES.airhit, POSES.lying, k * 0.8);
+    }
+    case 'knockdown':
+    case 'dead':
+      return POSES.lying;
+    case 'getup': {
+      const k = Math.min(1, f.t / 0.35);
+      return k < 0.5 ? lerpPose(POSES.lying, POSES.getup, ease(k * 2)) : lerpPose(POSES.getup, POSES.stance, ease((k - 0.5) * 2));
+    }
     case 'land':
       return POSES.land;
     case 'dodge':

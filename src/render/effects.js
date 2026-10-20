@@ -19,6 +19,13 @@ export class Effects {
           r: 1 + Math.floor(Math.random() * 2) + (ev.size > 1 ? 1 : 0),
         });
       }
+    } else if (ev.type === 'hit') {
+      this.items.push({ kind: 'spark', x: ev.x, y: ev.y, z: ev.z, heavy: ev.heavy, age: 0, life: ev.heavy ? 0.2 : 0.14, rot: Math.random() });
+      for (let i = 0; i < (ev.heavy ? 8 : 4); i++) {
+        const a = Math.random() * Math.PI * 2;
+        const sp = 60 + Math.random() * (ev.heavy ? 140 : 80);
+        this.items.push({ kind: 'chip', x: ev.x, y: ev.y, z: ev.z, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, age: 0, life: 0.25 });
+      }
     } else if (ev.type === 'swing') {
       this.items.push({ kind: 'swing', who: ev.who, move: ev.move, age: 0, life: 0.12 });
     }
@@ -27,9 +34,10 @@ export class Effects {
   update(dt) {
     for (const e of this.items) {
       e.age += dt;
-      if (e.kind === 'dust') {
+      if (e.kind === 'dust' || e.kind === 'chip') {
         e.x += e.vx * dt;
         e.z += e.vz * dt;
+        if (e.kind === 'chip') e.vz -= 500 * dt;
       }
     }
     this.items = this.items.filter((e) => e.age < e.life);
@@ -41,6 +49,21 @@ export class Effects {
       if (e.kind === 'dust') {
         ctx.fillStyle = `rgba(214,190,150,${0.7 * k})`;
         ctx.fillRect(Math.round(e.x - camX - e.r), Math.round(e.y - e.z - e.r), e.r * 2, e.r * 2);
+      } else if (e.kind === 'spark') {
+        const x = Math.round(e.x - camX);
+        const y = Math.round(e.y - e.z);
+        const r = Math.round((e.heavy ? 14 : 9) * (0.6 + 0.4 * (1 - k)));
+        ctx.fillStyle = `rgba(255,255,255,${k})`;
+        ctx.fillRect(x - 2, y - 2, 5, 5);
+        ctx.fillStyle = `rgba(255,214,90,${k})`;
+        for (let i = 0; i < 8; i++) {
+          const a = e.rot * 6 + (i * Math.PI) / 4;
+          const len = i % 2 ? r * 0.55 : r;
+          for (let d = 3; d < len; d++) ctx.fillRect(Math.round(x + Math.cos(a) * d), Math.round(y + Math.sin(a) * d), 2, 2);
+        }
+      } else if (e.kind === 'chip') {
+        ctx.fillStyle = `rgba(255,236,170,${k})`;
+        ctx.fillRect(Math.round(e.x - camX), Math.round(e.y - e.z), 2, 2);
       } else if (e.kind === 'swing') {
         const f = e.who;
         const h = e.move.hit;
