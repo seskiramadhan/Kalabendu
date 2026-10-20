@@ -19,6 +19,18 @@ export const T = {
   LUMPUR: 17,
   BIBIT: 18,
   BATU_CANDI: 19,
+  BATANG_JATI: 20,
+  DAUN_HUTAN: 21,
+  BATANG_KELAPA: 22,
+  BATANG_BAMBU: 23,
+  PADI: 24,
+  BATU_VULKANIK: 25,
+  MAGMA: 26,
+  BATU_KAPUR: 27,
+  DINDING_ANYAMAN: 28,
+  GENTENG: 29,
+  BATANG_SAWIT: 30,
+  DAUN_SAWIT: 31,
 };
 
 // hardness = seconds to mine by hand; drop = item id given when mined.
@@ -44,6 +56,18 @@ const DEFS = [
   [T.LUMPUR, 'lumpur', { hardness: 0.3 }],
   [T.BIBIT, 'bibit', { solid: false, hardness: 0.1, needsGround: true }],
   [T.BATU_CANDI, 'batu_candi', { hardness: 1.2 }],
+  [T.BATANG_JATI, 'batang_jati', { solid: false, hardness: 0.8, drop: T.KAYU_JATI, tree: true }],
+  [T.DAUN_HUTAN, 'daun_hutan', { solid: false, hardness: 0.1, drop: 0, tree: true }],
+  [T.BATANG_KELAPA, 'batang_kelapa', { solid: false, hardness: 0.7, drop: T.KAYU_JATI, tree: true }],
+  [T.BATANG_BAMBU, 'batang_bambu', { solid: false, hardness: 0.4, drop: T.BAMBU, tree: true }],
+  [T.PADI, 'padi', { solid: false, hardness: 0.1, needsGround: true }],
+  [T.BATU_VULKANIK, 'batu_vulkanik', { hardness: 1.4 }],
+  [T.MAGMA, 'magma', { solid: false, hardness: 0, drop: 0, mineable: false }],
+  [T.BATU_KAPUR, 'batu_kapur', { hardness: 0.8 }],
+  [T.DINDING_ANYAMAN, 'dinding_anyaman', { solid: false, hardness: 0.3 }],
+  [T.GENTENG, 'genteng', { hardness: 0.6 }],
+  [T.BATANG_SAWIT, 'batang_sawit', { solid: false, hardness: 0.7, drop: 0, tree: true }],
+  [T.DAUN_SAWIT, 'daun_sawit', { solid: false, hardness: 0.1, drop: 0, tree: true }],
 ];
 
 export const TILE_COUNT = DEFS.length;
@@ -56,8 +80,12 @@ for (const [id, key, opts] of DEFS) {
     hardness: opts.hardness,
     drop: opts.drop ?? id,
     needsGround: !!opts.needsGround,
+    tree: !!opts.tree,
+    mineable: opts.mineable ?? id !== 0,
   };
 }
+TILES[T.DAUN_KELAPA].tree = true;
+TILES[T.POHON_SAWIT].tree = true;
 
 export const SOLID = new Uint8Array(256);
 for (const def of TILES) if (def.solid) SOLID[def.id] = 1;

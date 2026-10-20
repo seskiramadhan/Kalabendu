@@ -4,7 +4,7 @@ const S = 16;
 export const VARIANTS = 4;
 
 // Uniform sawit rows on purpose: every oil palm looks the same.
-const UNIFORM = new Set([T.POHON_SAWIT]);
+const UNIFORM = new Set([T.POHON_SAWIT, T.BATANG_SAWIT, T.DAUN_SAWIT]);
 
 function rng(seed) {
   let s = seed >>> 0 || 1;
@@ -216,6 +216,103 @@ const PAINT = {
       p.px(0, i, dark);
     }
     if (r() < 0.3) p.px(13, 2, dark);
+  },
+  [T.BATANG_JATI](p, r) {
+    const bark = C('#6e4724', '#5e3b1a', '#7a5029');
+    for (let y = 0; y < S; y++)
+      for (let x = 4; x < 12; x++) p.px(x, y, x === 4 || x === 11 ? hex('#4a2e14') : p.pick(bark));
+    for (let i = 0; i < 3; i++) {
+      const x = 5 + Math.floor(r() * 6);
+      const y = Math.floor(r() * 13);
+      p.px(x, y, hex('#4a2e14'));
+      p.px(x, y + 1, hex('#4a2e14'));
+    }
+  },
+  [T.DAUN_HUTAN](p, r) {
+    // a mix of greens and the odd flower: diverse natural forest
+    const greens = C('#2f7a2c', '#3c8f34', '#25662a', '#4aa03c', '#1f5a26');
+    for (let y = 0; y < S; y++)
+      for (let x = 0; x < S; x++) if (r() < 0.97) p.px(x, y, p.pick(greens));
+    if (r() < 0.35) p.px(2 + Math.floor(r() * 12), 2 + Math.floor(r() * 12), hex('#e86a5a'));
+    if (r() < 0.25) p.px(2 + Math.floor(r() * 12), 2 + Math.floor(r() * 12), hex('#f2d55c'));
+  },
+  [T.BATANG_KELAPA](p) {
+    for (let y = 0; y < S; y++) {
+      const ring = y % 4 === 0;
+      for (let x = 6; x < 10; x++) p.px(x, y, ring ? hex('#6b5638') : x === 6 ? hex('#a8875a') : hex('#8f7149'));
+    }
+  },
+  [T.BATANG_BAMBU](p) {
+    for (let y = 0; y < S; y++)
+      for (let x = 6; x < 10; x++) {
+        const node = y === 5 || y === 13;
+        p.px(x, y, node ? hex('#6d7a2c') : x === 6 ? hex('#c7cf6a') : hex('#9fb048'));
+      }
+    p.px(10, 5, hex('#7d9a36'));
+    p.px(11, 4, hex('#7d9a36'));
+    p.px(5, 13, hex('#7d9a36'));
+    p.px(4, 12, hex('#7d9a36'));
+  },
+  [T.PADI](p, r) {
+    const stalk = C('#8fb34a', '#a6c35a', '#7a9e3c');
+    for (let i = 0; i < 5; i++) {
+      const x = 1 + i * 3 + Math.floor(r() * 2);
+      const top = 3 + Math.floor(r() * 4);
+      for (let y = top; y < S; y++) p.px(x, y, p.pick(stalk));
+      p.px(x + 1, top, hex('#e3c25a'));
+      p.px(x + 1, top + 1, hex('#d4ad45'));
+    }
+  },
+  [T.BATU_VULKANIK](p, r) {
+    p.fill(C('#2a2624', '#231f1d', '#332e2b'), [5, 3, 2]);
+    for (let i = 0; i < 3; i++) p.px(Math.floor(r() * S), Math.floor(r() * S), hex('#5a3a2a'));
+  },
+  [T.MAGMA](p, r) {
+    p.fill(C('#e8571e', '#f07a26', '#d1401a'), [4, 3, 2]);
+    for (let i = 0; i < 6; i++) p.px(Math.floor(r() * S), Math.floor(r() * S), hex('#ffd25a'));
+  },
+  [T.BATU_KAPUR](p, r) {
+    p.fill(C('#cfc6b0', '#c4baa2', '#d8d0bc'), [5, 3, 2]);
+    for (let i = 0; i < 2; i++) p.blob(2 + Math.floor(r() * 12), 2 + Math.floor(r() * 12), 1, C('#b8ad93'));
+  },
+  [T.DINDING_ANYAMAN](p) {
+    // woven bamboo wall, dark so it reads as a backdrop
+    for (let y = 0; y < S; y++)
+      for (let x = 0; x < S; x++) {
+        const over = (Math.floor(x / 4) + Math.floor(y / 4)) % 2 === 0;
+        const edge = over ? y % 4 === 0 : x % 4 === 0;
+        p.px(x, y, edge ? hex('#4d3a22') : over ? hex('#7d6440') : hex('#6c5536'));
+      }
+  },
+  [T.GENTENG](p) {
+    for (let y = 0; y < S; y++)
+      for (let x = 0; x < S; x++) {
+        const row = Math.floor(y / 4);
+        const lx = (x + (row % 2) * 2) % 4;
+        const shade = y % 4 === 3 ? hex('#6e2a17') : lx === 0 ? hex('#8c3a20') : hex('#b5532e');
+        p.px(x, y, shade);
+      }
+  },
+  [T.DAUN_SAWIT](p) {
+    // one dull green, no flowers: monoculture
+    const leaf = hex('#6f7f3a');
+    const rib = hex('#5c6a30');
+    for (let k = 0; k < 3; k++) {
+      for (let x = 0; x < S; x++) {
+        const d = Math.abs(x - 7.5);
+        const y = Math.round(2 + k * 4 + (d * d) / 12);
+        if (y >= S) continue;
+        p.px(x, y, rib);
+        if (x % 2 === 0) {
+          p.px(x, y + 1, leaf);
+          p.px(x, y + 2, leaf);
+        }
+      }
+    }
+  },
+  [T.BATANG_SAWIT](p) {
+    for (let y = 0; y < S; y++)
+      for (let x = 5; x < 11; x++) p.px(x, y, (x + y) % 3 === 0 ? hex('#544629') : hex('#6b5a3a'));
   },
 };
 

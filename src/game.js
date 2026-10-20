@@ -14,6 +14,7 @@ export class Game {
     this.spawn = spawn;
     this.players = new Map();
     this.tick = 0;
+    this.rngState = (world.seed ^ 0x5bd1e995) >>> 0;
   }
 
   addPlayer(id) {
@@ -61,7 +62,7 @@ export class Game {
   }
 
   canMine(p, tx, ty) {
-    return this.world.inBounds(tx, ty) && this.world.get(tx, ty) !== T.AIR && this.inReach(p, tx, ty);
+    return this.world.inBounds(tx, ty) && TILES[this.world.get(tx, ty)].mineable && this.inReach(p, tx, ty);
   }
 
   updateMining(p, dt) {
@@ -83,12 +84,50 @@ export class Game {
 
   breakTile(p, tx, ty) {
     const id = this.world.get(tx, ty);
-    if (id === T.AIR) return;
+    if (!TILES[id].mineable) return;
+    if (TILES[id].tree) {
+      this.fellTree(p, tx, ty);
+      return;
+    }
     this.world.set(tx, ty, T.AIR);
     const drop = TILES[id].drop;
     if (drop) p.inventory.add(drop, 1);
     const above = this.world.get(tx, ty - 1);
-    if (TILES[above]?.needsGround) this.breakTile(p, tx, ty - 1);
+    if (TILES[above].needsGround || TILES[above].tree) this.breakTile(p, tx, ty - 1);
+  }
+
+  // Removes the connected trunk and canopy. A felled teak leaves a stump.
+  fellTree(p, tx, ty) {
+    const world = this.world;
+    const seen = new Set();
+    const stack = [[tx, ty]];
+    let base = null;
+    let jati = false;
+    while (stack.length && seen.size < 300) {
+      const [x, y] = stack.pop();
+      const key = y * world.w + x;
+      if (seen.has(key) || Math.abs(x - tx) > 5) continue;
+      const id = world.get(x, y);
+      if (!TILES[id]?.tree) continue;
+      seen.add(key);
+      world.set(x, y, T.AIR);
+      if (id === T.BATANG_JATI) jati = true;
+      if (!base || y > base.y) base = { x, y, id };
+      if (id === T.DAUN_HUTAN || id === T.DAUN_KELAPA) {
+        if (this.chance(0.05)) p.inventory.add(T.BIBIT, 1);
+      } else if (TILES[id].drop) {
+        p.inventory.add(TILES[id].drop, 1);
+      }
+      for (let dy = -1; dy <= 1; dy++)
+        for (let dx = -1; dx <= 1; dx++) if (dx || dy) stack.push([x + dx, y + dy]);
+    }
+    if (jati && base && isFertile(world.get(base.x, base.y + 1))) world.set(base.x, base.y, T.TUNGGUL);
+  }
+
+  // Deterministic per tick so a host and its clients agree.
+  chance(p) {
+    this.rngState = (Math.imul(this.rngState ^ (this.rngState >>> 15), 2246822507) + 0x9e3779b9) >>> 0;
+    return this.rngState / 4294967296 < p;
   }
 
   canPlace(p, id, tx, ty) {

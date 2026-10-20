@@ -1,4 +1,4 @@
-import { generateFlatWorld } from './worldgen.js';
+import { generateWorld } from './worldgen.js';
 import { Game } from './game.js';
 import { Input } from './input.js';
 import { Camera } from './camera.js';
@@ -6,27 +6,38 @@ import { Renderer } from './render.js';
 import { Hud } from './ui.js';
 import { t } from './i18n.js';
 import { HOTBAR_SIZE } from './inventory.js';
+import { TILE } from './world.js';
 
 const STEP = 1 / 60;
 const MAX_STEPS = 5;
 const LOCAL_ID = 'local';
 
 const canvas = document.getElementById('game');
+const hint = document.getElementById('hint');
 const renderer = new Renderer(canvas);
 const camera = new Camera();
 const input = new Input(canvas);
 
-const { world, spawn } = generateFlatWorld();
+hint.textContent = t('loading');
+await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+
+const seedParam = new URLSearchParams(location.search).get('seed');
+const genStart = performance.now();
+const { world, spawn } = generateWorld(seedParam ? Number(seedParam) >>> 0 : undefined);
+const genMs = Math.round(performance.now() - genStart);
+
 const game = new Game(world, spawn);
 const player = game.addPlayer(LOCAL_ID);
+renderer.setWorld(world);
 const hud = new Hud(document.getElementById('ui'), renderer.atlas, (slot) =>
   game.applyAction({ type: 'select', playerId: LOCAL_ID, slot }),
 );
-globalThis.kalabendu = { game, camera, renderer, input };
+globalThis.kalabendu = { game, camera, renderer, input, genMs };
 
-let showFps = false;
-input.onToggleFps = () => (showFps = !showFps);
-document.getElementById('hint').textContent = t('hintDesktop');
+let showDebug = false;
+input.onToggleFps = () => (showDebug = !showDebug);
+hint.textContent = t('hintDesktop');
+setTimeout(() => (hint.style.opacity = '0'), 8000);
 
 function resize() {
   renderer.resize();
@@ -80,7 +91,7 @@ function frame(now) {
   if (steps === MAX_STEPS) acc = 0;
 
   camera.follow(player, world);
-  renderer.draw(game, camera, LOCAL_ID, hoverInfo(pointerTile()));
+  renderer.draw(game, camera, LOCAL_ID, hoverInfo(pointerTile()), now / 1000);
   hud.update(player, elapsed);
 
   frames++;
@@ -90,7 +101,16 @@ function frame(now) {
     frames = 0;
     fpsTime = 0;
   }
-  if (showFps) renderer.drawFps(fps);
+  if (showDebug) {
+    const tx = Math.floor((player.x + player.w / 2) / TILE);
+    const ty = Math.floor((player.y + player.h) / TILE);
+    renderer.drawDebug([
+      `FPS ${fps}`,
+      `x ${tx}  y ${ty}`,
+      t('biome_' + world.biome[Math.max(0, Math.min(world.w - 1, tx))]),
+      `seed ${world.seed}`,
+    ]);
+  }
 
   requestAnimationFrame(frame);
 }

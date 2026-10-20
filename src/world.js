@@ -1,12 +1,27 @@
 import { T, SOLID } from './tiles.js';
 
 export const TILE = 16;
+export const CHUNK = 32;
+
+export const BIOME = {
+  PANTAI: 0,
+  HUTAN: 1,
+  SAWAH: 2,
+  BAMBU: 3,
+  GUNUNG: 4,
+  KAMPUNG: 5,
+  SAWIT: 6,
+};
 
 export class World {
-  constructor(w, h) {
+  constructor(w, h, seed = 0) {
     this.w = w;
     this.h = h;
+    this.seed = seed;
     this.tiles = new Uint8Array(w * h);
+    this.surface = new Int16Array(w);
+    this.biome = new Uint8Array(w);
+    this.kampungs = [];
     this.listeners = [];
   }
 

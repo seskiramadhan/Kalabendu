@@ -125,6 +125,7 @@ html, body {
   text-align: center;
   pointer-events: none;
   max-width: min(70vw, 640px);
+  transition: opacity 1s;
 }
 
 @media (max-width: 520px) {
