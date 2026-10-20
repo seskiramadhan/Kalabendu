@@ -12,6 +12,10 @@ import { Director } from './systems/director.js';
 import { updateEnvironment, spawnFire, spawnFireAhead, throwBag, landBag, rescue, zoneAt } from './systems/environment.js';
 import { thinkArsonist, thinkHaze, thinkDozer, thinkRajaSawit } from './ai/stage1.js';
 import { VIEW_W } from './core/view.js';
+import { SHOTS } from './combat/shots.js';
+import { ALLIES } from './entities/allies.js';
+import { thinkRanged, thinkAlly, thinkThief, thinkSupport, thinkProvokator, thinkBoss } from './ai/common.js';
+import { spawnCandles } from './systems/environment.js';
 
 const EDGE = 14;
 const BRAINS = {
@@ -21,6 +25,12 @@ const BRAINS = {
   haze: thinkHaze,
   dozer: thinkDozer,
   rajaSawit: thinkRajaSawit,
+  ranged: thinkRanged,
+  ally: thinkAlly,
+  thief: thinkThief,
+  support: thinkSupport,
+  provokator: thinkProvokator,
+  boss: thinkBoss,
 };
 const PICKUP_X = 16;
 const PICKUP_Y = 9;
@@ -45,7 +55,7 @@ function rng(seed) {
   };
 }
 
-const isFighter = (e) => e.kind === 'hero' || e.kind === 'enemy';
+const isFighter = (e) => e.kind === 'hero' || e.kind === 'enemy' || e.kind === 'ally';
 
 // The whole simulation. Input arrives as messages; renderer and audio read
 // state and drain `events`.
@@ -74,6 +84,8 @@ export class Game {
     this.saved = 0;
     this.era = era;
     this.eraAfter = era;
+    this.darkness = 0;
+    this.evidence = 0;
     for (const p of stage.props ?? []) this.entities.push(createProp(p.type, p.x, p.y, p.drops));
     for (const it of stage.items ?? []) this.entities.push(createItem(it.type, it.x, it.y));
     this.director = stage.sections ? new Director(this) : null;
@@ -138,12 +150,12 @@ export class Game {
     }
     for (const e of this.entities) {
       if (isFighter(e)) {
-        if (e.kind === 'enemy' && !this.cleared) {
+        if (e.kind !== 'hero' && !this.cleared) {
           BRAINS[e.def.ai]?.(e, this, dt, this.rand);
           if (e.entering && (e.state === 'idle' || e.state === 'walk')) this.walkIntoView(e);
         }
         updateFighter(e, this, dt);
-        if (e.kind === 'enemy') e.input.pressed = 0;
+        if (e.kind !== 'hero') e.input.pressed = 0;
       } else if (e.kind === 'item') updateItem(e, dt);
       else if (e.kind === 'projectile') this.updateProjectile(e, dt);
     }
@@ -311,7 +323,11 @@ export class Game {
         if (it.kind !== 'item' || it.remove || it.def.kind === 'weapon' || it.z > 6) continue;
         if (Math.abs(it.x - h.x) > PICKUP_X || Math.abs(it.y - h.y) > PICKUP_Y) continue;
         it.remove = true;
-        if (it.def.kind === 'food') {
+        if (it.def.kind === 'evidence') {
+          this.evidence++;
+          this.addScore(500);
+          this.emit({ type: 'evidence', x: it.x, y: it.y, count: this.evidence });
+        } else if (it.def.kind === 'food') {
           h.hp = Math.min(h.def.maxHp, h.hp + it.def.heal);
           this.emit({ type: 'pickup', x: it.x, y: it.y, key: it.def.nameKey, amount: it.def.heal });
         } else {
@@ -374,6 +390,16 @@ export class Game {
   updateProjectile(p, dt) {
     p.t += dt;
     p.x += p.vx * dt;
+    if (p.falling) {
+      p.z += p.vz * dt;
+      if (p.z <= 0 || p.spent) p.remove = true;
+      return;
+    }
+    if (p.draw) {
+      const out = p.x < this.camera.x - 40 || p.x > this.camera.x + VIEW_W + 40;
+      if (p.spent || p.t > p.life || out) p.remove = true;
+      return;
+    }
     if (p.gravity) {
       p.vz -= 500 * dt;
       p.z += p.vz * dt;
@@ -401,6 +427,81 @@ export class Game {
 
   throwBag(f) {
     throwBag(this, f);
+  }
+
+  shoot(f, type) {
+    const shot = SHOTS[type];
+    const target = [...this.heroes.values()].find((h) => h.state !== 'dead');
+    const base = { kind: 'projectile', team: f.team, ownerUid: f.uid, draw: shot.draw, move: shot.move, t: 0, hitIds: new Set(), spent: false, remove: false };
+    if (shot.fall) {
+      for (let i = 0; i < shot.count; i++) {
+        const x = (target?.x ?? f.x) + (this.rand() - 0.5) * shot.spread * 2;
+        const y = (target?.y ?? f.y) + (this.rand() - 0.5) * 40;
+        this.entities.push({ ...base, hitIds: new Set(), uid: nextProjectileUid++, x, y, z: 160 + i * 30, vx: 0, vz: -220, falling: true, facing: 1 });
+      }
+    } else {
+      this.entities.push({ ...base, uid: nextProjectileUid++, x: f.x + f.facing * 18, y: f.y, z: shot.z, vx: f.facing * shot.speed, life: shot.life, facing: f.facing });
+    }
+    this.emit({ type: 'sfx', name: 'shot' });
+  }
+
+  spawnCandles(f, n) {
+    spawnCandles(this, f, n);
+  }
+
+  healNear(f, amount) {
+    for (const e of this.enemies) {
+      if (e === f || e.state === 'dead' || Math.abs(e.x - f.x) > 260) continue;
+      if (e.hp >= e.def.maxHp) continue;
+      e.hp = Math.min(e.def.maxHp, e.hp + amount);
+      this.emit({ type: 'heal', from: f, to: e });
+    }
+    this.emit({ type: 'sfx', name: 'heal' });
+  }
+
+  // Move-driven summon (a list of enemy types at the screen edges).
+  summon(f, types) {
+    types.forEach((type, i) => {
+      const left = i % 2 === 0;
+      const e = this.spawnEnemy(type, left ? this.camera.x - 30 : this.camera.x + VIEW_W + 30, f.y + (i - 1) * 18, { minion: true });
+      e.entering = true;
+      e.facing = left ? 1 : -1;
+    });
+  }
+
+  // Boss phase change: new enemies and/or allies joining the hero.
+  summonGroup(f, group) {
+    if (group.enemies) this.summon(f, group.enemies);
+    group.allies?.forEach((type, i) => this.spawnAlly(type, this.camera.x - 30 - i * 24, this.stage.floorTop + 20 + i * 22));
+    if (group.tutorial) this.emit({ type: 'tutorial', key: group.tutorial });
+    if (group.shield) f.shielded = true;
+  }
+
+  spawnAlly(type, x, y) {
+    const a = createFighter(ALLIES[type], 'hero', x, y);
+    a.kind = 'ally';
+    a.entering = true;
+    a.facing = 1;
+    this.entities.push(a);
+    this.emit({ type: 'ally', who: a });
+    return a;
+  }
+
+  // "Denda": a fine that takes rupiah outright.
+  fine(hero, share) {
+    if (this.rupiah <= 0) return;
+    const amount = Math.min(this.rupiah, Math.max(COIN_VALUE, Math.round((this.rupiah * share) / COIN_VALUE) * COIN_VALUE));
+    this.rupiah -= amount;
+    this.emit({ type: 'pickup', x: hero.x, y: hero.y - 30, rupiah: -amount });
+  }
+
+  steal(thief, hero) {
+    if (this.rupiah <= 0) return;
+    const amount = Math.min(this.rupiah, Math.max(COIN_VALUE, Math.round((this.rupiah * 0.12) / COIN_VALUE) * COIN_VALUE));
+    this.rupiah -= amount;
+    thief.loot = (thief.loot ?? 0) + amount;
+    this.emit({ type: 'pickup', x: hero.x, y: hero.y - 30, rupiah: -amount, snatched: true });
+    this.emit({ type: 'sfx', name: 'deny' });
   }
 
   slowAt(f) {

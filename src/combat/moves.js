@@ -210,6 +210,44 @@ export const MOVES = {
     startup: 22, active: 4, recovery: 26, step: 0, hit: null,
   },
   raja_bag_hit: { damage: 10, push: 140, launch: 160, knockdown: true, hit: { x: -12, w: 24, z: -10, h: 22, depth: 14 }, shake: 3 },
+  // Stage 2 — Pabrik Tutup
+  pentungan_l1: {
+    anim: 'jab', weapon: true, startup: 11, active: 3, recovery: 16, step: 6,
+    damage: 6, push: 50, stun: 18, next: 'pentungan_l2', hit: { x: 8, w: 32, z: 30, h: 16, depth: 9 }, sfx: 'whoosh',
+  },
+  pentungan_l2: {
+    anim: 'palm', weapon: true, startup: 9, active: 3, recovery: 22, step: 8,
+    damage: 8, push: 110, stun: 22, hit: { x: 8, w: 34, z: 26, h: 20, depth: 9 }, sfx: 'whoosh',
+  },
+  cambuk_l1: {
+    anim: 'palm', weapon: true, telegraph: true, startup: 13, active: 4, recovery: 20, step: 4,
+    damage: 7, push: 70, stun: 20, hit: { x: 10, w: 62, z: 28, h: 16, depth: 9 }, sfx: 'whoosh',
+  },
+  robot_punch: {
+    anim: 'none', telegraph: true, startup: 18, active: 5, recovery: 22, step: 10,
+    damage: 11, push: 140, launch: 160, knockdown: true, hit: { x: 8, w: 34, z: 30, h: 24, depth: 10 }, sfx: 'whooshBig', shake: 2,
+  },
+  mech_stamp: {
+    anim: 'none', telegraph: true, dizzyAfter: 1.7, startup: 30, active: 6, recovery: 10, step: 0,
+    damage: 16, push: 180, launch: 240, knockdown: true, hit: { x: 0, w: 76, z: 0, h: 50, depth: 20 }, sfx: 'whooshBig', shake: 6,
+  },
+  mech_kontrak: { anim: 'none', telegraph: true, shoot: 'kontrak', startup: 18, active: 2, recovery: 20, step: 0, hit: null },
+  mech_robot: { anim: 'none', telegraph: true, summon: ['robot'], startup: 22, active: 2, recovery: 26, step: 0, hit: null },
+
+  // Stage 3 — Pasar Rakyat -> Lantai Bursa
+  spekulan_shot: { anim: 'throwPose', shoot: 'koin_lempar', startup: 14, active: 2, recovery: 18, step: 0, hit: null },
+  rentenir_chain: { anim: 'throwPose', telegraph: true, shoot: 'rantai', startup: 16, active: 2, recovery: 24, step: 0, hit: null },
+  karung_slam: {
+    anim: 'palm', telegraph: true, startup: 16, active: 5, recovery: 24, step: 8,
+    damage: 11, push: 150, launch: 170, knockdown: true, hit: { x: 6, w: 40, z: 10, h: 30, depth: 11 }, sfx: 'whooshBig', shake: 2,
+  },
+  hantu_dash: {
+    anim: 'none', telegraph: true, lunge: 320, dizzyAfter: 1.5, startup: 30, active: 40, recovery: 6, step: 0,
+    damage: 12, push: 190, launch: 220, knockdown: true, hit: { x: -10, w: 50, z: -20, h: 70, depth: 16 }, sfx: 'whooshBig', shake: 4,
+  },
+  hantu_candles: { anim: 'none', telegraph: true, candles: 5, startup: 20, active: 2, recovery: 30, step: 0, hit: null, shake: 4 },
+  hantu_notes: { anim: 'none', telegraph: true, shoot: 'uang_kertas', startup: 16, active: 2, recovery: 26, step: 0, hit: null },
+
   fire_burn: { damage: 5, push: 70, stun: 14, hitstop: 0.04, shake: 1 },
 };
 

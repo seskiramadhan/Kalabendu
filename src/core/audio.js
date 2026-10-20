@@ -109,6 +109,16 @@ class Audio {
         this.tone(0.45, { freq: 196, type: 'square', gain: 0.12 });
         this.tone(0.45, { freq: 247, type: 'square', gain: 0.1 });
         break;
+      case 'shot':
+        this.noise(0.1, { freq: 2200, q: 1.2, gain: 0.12 });
+        break;
+      case 'block':
+        this.tone(0.08, { freq: 900, to: 600, type: 'square', gain: 0.1 });
+        this.noise(0.06, { freq: 4000, type: 'highpass', gain: 0.15 });
+        break;
+      case 'heal':
+        this.tone(0.3, { freq: 520, to: 1040, type: 'sine', gain: 0.12 });
+        break;
       case 'deny':
         this.tone(0.12, { freq: 180, to: 120, type: 'square', gain: 0.12 });
         break;

@@ -9,6 +9,11 @@ const DEFAULT = {
   era: 10,
   rupiah: 0,
   bribes: [],
+  refused: [],
+  evidence: 0,
+  upgrades: { hp: 0, dmg: 0 },
+  boosts: {},
+  bribePower: false,
   best: {},
   settings: { volume: 0.6, vibrate: true, tips: true, buttons: 'normal' },
 };

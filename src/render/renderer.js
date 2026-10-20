@@ -6,11 +6,11 @@ import { drawFigure } from './sprites/skeleton.js';
 import { poseFor, animState } from './sprites/poses.js';
 import { drawProp, drawItem, drawProjectile, drawHeldWeapon } from './sprites/objects.js';
 import { activeHitbox, hurtbox } from '../combat/hits.js';
-import { drawAsap, drawBuldoser, drawRaja, drawFire, flames } from './sprites/monsters.js';
+import { drawAsap, drawBuldoser, drawRaja, drawFire, flames, drawRobot, drawMech, drawHantu, drawCandle } from './sprites/monsters.js';
 import { applyEraGrade } from '../systems/era.js';
 import { zoneAt } from '../systems/environment.js';
 
-const MONSTERS = { asap: drawAsap, buldoser: drawBuldoser, raja: drawRaja };
+const MONSTERS = { asap: drawAsap, buldoser: drawBuldoser, raja: drawRaja, robot: drawRobot, mech: drawMech, hantu: drawHantu };
 
 const FIG = 120;
 
@@ -83,6 +83,7 @@ export class Renderer {
       ctx.drawImage(layer.canvas, -Math.round(camX * layer.factor), layer.y);
     }
 
+    this.drawBoards(ctx, game, camX, time);
     for (const fx of game.stage.decorFires ?? []) {
       const sx = fx - camX;
       if (sx > -30 && sx < VIEW_W + 30) flames(ctx, sx, game.stage.floorTop - 2, 9, 22, time + fx);
@@ -90,7 +91,7 @@ export class Renderer {
 
     const sorted = [...game.entities].sort((a, b) => a.y - b.y);
     for (const e of sorted) if (e.kind !== 'projectile' && e.kind !== 'hazard') this.drawShadow(ctx, e, camX);
-    for (const e of sorted) if (e.kind === 'hazard') drawFire(ctx, e, camX, time);
+    for (const e of sorted) if (e.kind === 'hazard') (e.type === 'candle' ? drawCandle : drawFire)(ctx, e, camX, time);
     for (const e of sorted) {
       if (e.kind === 'hazard') continue;
       if (e.kind === 'prop') drawProp(ctx, e, camX, game.time);
@@ -131,6 +132,7 @@ export class Renderer {
     if (size === 1) {
       const pts = drawFigure(ctx, pose, e.def.look, fx, e.y, e.z, e.facing);
       if (e.weapon) drawHeldWeapon(ctx, pts, e.weapon.id, e.facing);
+      if (e.def.shieldColor && e.state !== 'airborne' && e.state !== 'knockdown' && e.state !== 'dead') this.drawShield(ctx, e, fx);
     } else {
       // Bigger fighters: draw at normal size, then scale up the pixels.
       const f = this.fctx;
@@ -147,6 +149,10 @@ export class Renderer {
       ctx.fillStyle = 'rgba(120,220,90,0.8)';
       for (let i = 0; i < 3; i++) ctx.fillRect(Math.round(fx - 8 + i * 7), Math.round(headY + 8 - ((time * 20 + i * 7) % 18)), 2, 2);
     }
+    if (e.state === 'frozen') {
+      ctx.fillStyle = 'rgba(160,210,255,0.45)';
+      ctx.fillRect(Math.round(fx - 12), Math.round(e.y - e.z - 64), 24, 64);
+    }
     if (game.slowAt?.(e) < 1) this.drawWading(ctx, fx, e.y, time);
     if (e.state === 'dizzy') {
       for (let i = 0; i < 3; i++) {
@@ -155,6 +161,60 @@ export class Renderer {
         ctx.fillRect(Math.round(fx + Math.cos(a) * 12 - 1), Math.round(headY + Math.sin(a) * 4 - 1), 3, 3);
       }
     }
+  }
+
+  // Market chalkboards whose prices keep climbing, and trading screens with
+  // crashing red charts.
+  drawBoards(ctx, game, camX, time) {
+    for (const b of game.stage.boards ?? []) {
+      const x = Math.round(b.x - camX);
+      if (x < -80 || x > VIEW_W + 10) continue;
+      ctx.fillStyle = '#4a2c18';
+      ctx.fillRect(x - 2, 102, 74, 44);
+      ctx.fillStyle = '#26332a';
+      ctx.fillRect(x, 104, 70, 40);
+      ctx.font = 'bold 6px monospace';
+      b.items.forEach(([name, base], i) => {
+        const price = Math.round((base * (1 + game.time / 40 + i * 0.05)) / 500) * 500;
+        ctx.fillStyle = '#f6f2e4';
+        ctx.fillText(name, x + 3, 113 + i * 10);
+        ctx.fillStyle = '#ff8a6a';
+        ctx.fillText(`${price.toLocaleString('id-ID')}▲`, x + 30, 113 + i * 10);
+      });
+    }
+    for (const sc of game.stage.screens ?? []) {
+      const x = Math.round(sc.x - camX);
+      if (x < -sc.w || x > VIEW_W) continue;
+      ctx.fillStyle = '#05070c';
+      ctx.fillRect(x - 2, 70, sc.w + 4, 64);
+      ctx.fillStyle = '#0c1a14';
+      ctx.fillRect(x, 72, sc.w, 60);
+      ctx.strokeStyle = '#ff3a2a';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i <= sc.w; i += 4) {
+        const v = Math.sin((i + time * 30 + sc.x) / 9) * 6 + ((i + time * 20) % sc.w) * 0.35;
+        const y = 82 + v;
+        if (i === 0) ctx.moveTo(x + i, y);
+        else ctx.lineTo(x + i, y);
+      }
+      ctx.stroke();
+      ctx.fillStyle = '#ff3a2a';
+      ctx.font = 'bold 7px monospace';
+      const idx = Math.max(1000, Math.round(7000 - ((time * 37) % 3000)));
+      ctx.fillText(`INDEKS ${idx.toLocaleString('id-ID')} ▼`, x + 4, 128);
+    }
+  }
+
+  drawShield(ctx, e, fx) {
+    const x = Math.round(fx + e.facing * 9 - 3);
+    const y = Math.round(e.y - e.z - 46);
+    ctx.fillStyle = '#120c0a';
+    ctx.fillRect(x - 1, y - 1, 8, 32);
+    ctx.fillStyle = e.state === 'block' ? '#e6f0ff' : e.def.shieldColor;
+    ctx.fillRect(x, y, 6, 30);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fillRect(x + 1, y + 2, 1, 26);
   }
 
   drawAlert(ctx, x, y) {

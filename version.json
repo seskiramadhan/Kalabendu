@@ -1,19 +1,17 @@
 {
-  "version": "0.9.0",
+  "version": "0.10.0",
   "notes": {
     "id": [
-      "Stage 1 Hutan Terbakar → Kebun Sawit → sungai banjir (lumpur memperlambat)",
-      "Musuh baru: Asap (meracuni, kabut makin tebal), Pembakar Lahan (menyalakan api), Penebang Liar (gergaji mesin)",
-      "Api di tanah — padamkan dengan ember! Selamatkan warga yang terikat",
-      "Mini-bos Buldoser Liar dan bos Raja Sawit (karung uang, dinding api, memanggil buldoser)",
-      "Sistem zaman: Kalabendu → Kalatidha → Kalasuba, warna dunia berubah; tombol Lanjut ke stage berikutnya dan Pilih Stage"
+      "Stage 2 Pabrik Tutup: Satpam Bayaran (menangkis dari depan), Mandor Kejam, Robot Pengganti, bos Juragan Outsourcing — buruh bergabung membantu!",
+      "Stage 3 Pasar Rakyat → Lantai Bursa: Spekulan, Penimbun, Rentenir (rantai utang), lilin merah berjatuhan, bos Hantu Bursa",
+      "Warung Mak Inah antar-stage: Jamu, Sabuk, Kopi, Nasi Padang, Masker — harga naik tiap stage (inflasi)",
+      "Bukti (dokumen) mulai dijatuhkan musuh"
     ],
     "en": [
-      "Stage 1 Burning Forest → Oil Palm Plantation → flooded river (mud slows you)",
-      "New enemies: Haze (poisons, thickens the smog), Land Burner (lights fires), Illegal Logger (chainsaw)",
-      "Fires on the ground — put them out with a bucket! Rescue tied-up villagers",
-      "Wild Bulldozer mini-boss and the Palm Oil King boss (money bags, fire walls, calls bulldozers)",
-      "Era system: Kalabendu → Kalatidha → Kalasuba changes the colours; Next button and Stage Select"
+      "Stage 2 Closed Factory: Hired Guards (block from the front), Cruel Foreman, Replacement Robots, boss Outsourcing Boss — laid-off workers join you!",
+      "Stage 3 People's Market → Trading Floor: Speculators, Hoarders, Loan Sharks (debt chain), falling red candles, boss Stock Market Ghost",
+      "Mak Inah's warung between stages: Jamu, Belt, Coffee, Nasi Padang, Face Mask — prices rise every stage (inflation)",
+      "Enemies start dropping evidence documents"
     ]
   }
 }

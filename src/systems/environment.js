@@ -21,6 +21,35 @@ export const VILLAGER_LOOK = {
   hair: '#1a1210',
 };
 
+const CANDLE_WARN = 0.9;
+const CANDLE_HIT = { damage: 9, push: 90, launch: 170, knockdown: true, shake: 3, unblockable: true };
+
+// Falling red candlestick bars: a warning shadow, then the crash.
+export function spawnCandles(game, f, n) {
+  const target = [...game.heroes.values()].find((h) => h.state !== 'dead');
+  const cx = target?.x ?? f.x;
+  const cy = target?.y ?? f.y;
+  for (let i = 0; i < n; i++) {
+    const x = cx + (i - (n - 1) / 2) * 34 + (game.rand() - 0.5) * 14;
+    const y = Math.max(game.stage.floorTop + 6, Math.min(game.stage.floorBottom - 4, cy + (game.rand() - 0.5) * 36));
+    game.entities.push({ uid: nextUid++, kind: 'hazard', type: 'candle', x, y, z: 0, t: -i * 0.12, life: CANDLE_WARN + 0.6, hit: false, remove: false });
+  }
+}
+
+function updateCandle(game, c, dt, heroes) {
+  c.t += dt;
+  if (!c.hit && c.t >= CANDLE_WARN) {
+    c.hit = true;
+    game.emit({ type: 'shake', amount: 2 });
+    game.emit({ type: 'sfx', name: 'thud' });
+    for (const h of heroes) {
+      if (h.invuln > 0 || h.state === 'dead' || Math.abs(h.x - c.x) > 11 || Math.abs(h.y - c.y) > 9) continue;
+      react(game, { uid: c.uid, x: c.x, facing: 1, team: 'enemy', def: {}, hitIds: new Set() }, h, CANDLE_HIT, { x: h.x, z: 30 });
+    }
+  }
+  if (c.t > c.life) c.remove = true;
+}
+
 export function zoneAt(stage, x) {
   return stage.zones?.find((z) => x >= z.x0 && x < z.x1) ?? null;
 }
@@ -96,7 +125,7 @@ export function updateEnvironment(game, dt) {
   const heroes = [...game.heroes.values()];
   let asap = 0;
   for (const e of game.entities) {
-    if (e.kind === 'hazard') updateFire(game, e, dt, heroes);
+    if (e.kind === 'hazard') (e.type === 'candle' ? updateCandle : updateFire)(game, e, dt, heroes);
     else if (e.kind === 'npc') {
       e.t += dt;
       e.x += e.vx * dt;
@@ -117,6 +146,9 @@ export function updateEnvironment(game, dt) {
   for (const p of game.entities) if (p.kind === 'projectile' && p.weaponId === 'ember') douseWith(game, activeHitbox(p));
 
   const zone = zoneAt(game.stage, game.camera.x + 240);
+  // Trading floor: red bars rain down now and then.
+  if (zone?.candles && game.enemies.length && game.rand() < zone.candles * dt) spawnCandles(game, heroes[0] ?? { x: game.camera.x + 240, y: 220 }, 1);
+  game.darkness = Math.max(0, game.darkness - dt);
   const target = Math.min(0.85, (zone?.haze ?? game.stage.haze ?? 0) + asap * 0.12);
   game.haze += (target - game.haze) * Math.min(1, dt * 1.5);
 }
@@ -139,7 +171,7 @@ function updateFire(game, fire, dt, heroes) {
 }
 
 function touchPoison(game, e, h) {
-  if (h.invuln > 0 || h.state === 'dead' || (h.poisonCd ?? 0) > game.time) return;
+  if (h.invuln > 0 || h.state === 'dead' || h.poisonImmune || (h.poisonCd ?? 0) > game.time) return;
   if (Math.abs(h.x - e.x) > 16 || Math.abs(h.y - e.y) > 10) return;
   h.poison = POISON_TIME;
   h.poisonCd = game.time + 1;

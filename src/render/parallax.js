@@ -450,10 +450,197 @@ function hutanFloor(stage) {
   return { canvas: c, factor: 1, y: stage.floorTop };
 }
 
+// ---- Stage 2: Pabrik Tutup (night) ----
+
+function skyline(ctx, width, baseY, color, lit, r) {
+  for (let x = 0; x < width; ) {
+    const w = 16 + Math.floor(r() * 28);
+    const h = 20 + Math.floor(r() * 50);
+    px(ctx, color, x, baseY - h, w, h + 40);
+    for (let wy = baseY - h + 4; wy < baseY - 4; wy += 6)
+      for (let wx = x + 3; wx < x + w - 3; wx += 5) if (r() < 0.12) px(ctx, lit, wx, wy, 2, 2);
+    x += w + 2;
+  }
+}
+
+function pabrikFar(stage) {
+  const r = rng(211);
+  const width = VIEW_W + (stage.width - VIEW_W) * 0.12;
+  const c = canvas(width, VIEW_H);
+  skyline(c.getContext('2d'), width, 140, '#1a2236', '#e0c070', r);
+  return { canvas: c, factor: 0.12, y: 0 };
+}
+
+function pabrikMid(stage) {
+  const r = rng(223);
+  const width = VIEW_W + (stage.width - VIEW_W) * 0.4;
+  const c = canvas(width, VIEW_H);
+  const ctx = c.getContext('2d');
+  for (let x = 0; x < width; x += 90 + Math.floor(r() * 40)) {
+    // sawtooth factory roofs and cold chimneys: no smoke, the factory is closed
+    for (let k = 0; k < 4; k++) for (let i = 0; i < 12; i++) px(ctx, '#232c40', x + k * 16 + i, 120 - (i * 12) / 12 * 1.2, 1, 30);
+    px(ctx, '#232c40', x, 132, 64, 30);
+    px(ctx, '#2a344a', x + 54, 70, 8, 62);
+    px(ctx, '#c8322a', x + 54, 74, 8, 3);
+  }
+  return { canvas: c, factor: 0.4, y: 0 };
+}
+
+function pabrikWall(stage) {
+  const r = rng(239);
+  const c = canvas(stage.width, VIEW_H);
+  const ctx = c.getContext('2d');
+  const top = stage.floorTop;
+  px(ctx, '#3a3e48', 0, 80, stage.width, top - 80);
+  for (let y = 84; y < top; y += 6) for (let x = (y / 6) % 2 ? 0 : 6; x < stage.width; x += 12) px(ctx, '#33363f', x, y, 11, 5);
+  for (let x = 40; x < stage.width; x += 220 + Math.floor(r() * 80)) {
+    // closed roller door covered with PHK notices
+    px(ctx, '#1e2026', x - 1, 100, 92, top - 100);
+    for (let y = 102; y < top; y += 4) px(ctx, y % 8 ? '#5a5e68' : '#4a4e58', x, y, 90, 3);
+    for (let i = 0; i < 4; i++) {
+      const nx = x + 8 + i * 20 + Math.floor(r() * 6);
+      const ny = 116 + Math.floor(r() * 26);
+      px(ctx, '#f6f2e4', nx, ny, 14, 18);
+      px(ctx, '#c8322a', nx + 2, ny + 2, 10, 4);
+      px(ctx, '#8a8a8a', nx + 2, ny + 9, 10, 1);
+      px(ctx, '#8a8a8a', nx + 2, ny + 12, 8, 1);
+    }
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 7px monospace';
+    ctx.fillText('PHK', x + 10, 128);
+  }
+  // silent conveyor belts and a machine between the doors
+  for (let x = 170; x < stage.width; x += 300) {
+    px(ctx, '#20232a', x, top - 26, 110, 10);
+    for (let i = 0; i < 110; i += 8) px(ctx, '#4a4e58', x + i, top - 24, 4, 6);
+    for (const [i, col] of [[10, '#c8a070'], [40, '#e6e0cc'], [72, '#8a5a3a']]) px(ctx, col, x + i, top - 34, 14, 8);
+    px(ctx, '#4a5a6a', x + 112, top - 60, 30, 50);
+    px(ctx, '#c8322a', x + 118, top - 52, 6, 6);
+  }
+  const sign = (sx, w, color, text, tc) => {
+    px(ctx, '#120c0a', sx - 1, 84, w + 2, 18);
+    px(ctx, color, sx, 85, w, 16);
+    ctx.fillStyle = tc;
+    ctx.font = 'bold 8px monospace';
+    ctx.fillText(text, sx + 5, 96);
+  };
+  sign(120, 200, '#2a5a8a', 'PT SEPATU & KERAMIK MAJU MUNDUR', '#f6f2e4');
+  sign(1300, 120, '#c8322a', 'DITUTUP SEMENTARA', '#f6f2e4');
+  sign(2400, 150, '#e0b252', 'DIGANTI MESIN, MAAF YA', '#2a2a2a');
+  return { canvas: c, factor: 1, y: 0 };
+}
+
+function pabrikFloor(stage) {
+  const r = rng(251);
+  const h = VIEW_H - stage.floorTop;
+  const c = canvas(stage.width, h);
+  const ctx = c.getContext('2d');
+  px(ctx, '#4a4c52', 0, 0, stage.width, h);
+  for (let i = 0; i < stage.width * h * 0.04; i++) px(ctx, r() < 0.5 ? '#42444a' : '#55575d', r() * stage.width, r() * h, 2, 1);
+  for (let x = 0; x < stage.width; x += 12) {
+    px(ctx, (x / 12) % 2 ? '#e0b252' : '#2a2a2a', x, 2, 12, 3);
+    px(ctx, (x / 12) % 2 ? '#2a2a2a' : '#e0b252', x, h - 6, 12, 3);
+  }
+  return { canvas: c, factor: 1, y: stage.floorTop };
+}
+
+// ---- Stage 3: Pasar Rakyat -> Lantai Bursa ----
+
+function pasarFar(stage) {
+  const r = rng(263);
+  const f = 0.12;
+  const width = VIEW_W + (stage.width - VIEW_W) * f;
+  const c = canvas(width, VIEW_H);
+  const ctx = c.getContext('2d');
+  for (let x = 0; x < width; x += 4) {
+    if (zoneKind(stage, x / f) === 'bursa') px(ctx, '#0e1018', x, 0, 4, VIEW_H);
+  }
+  skyline(ctx, width, 136, '#5a6a8a', '#f6f2e4', r);
+  for (let x = 0; x < width; x += 4) if (zoneKind(stage, x / f) === 'bursa') px(ctx, '#0e1018', x, 0, 4, VIEW_H);
+  return { canvas: c, factor: f, y: 0 };
+}
+
+function pasarMid(stage) {
+  const r = rng(271);
+  const f = 0.4;
+  const width = VIEW_W + (stage.width - VIEW_W) * f;
+  const c = canvas(width, VIEW_H);
+  const ctx = c.getContext('2d');
+  for (let x = 0; x < width; x += 4) {
+    if (zoneKind(stage, x / f) !== 'bursa') continue;
+    px(ctx, '#141826', x, 40, 4, 120);
+    if ((x / 4) % 6 === 0) for (let y = 50; y < 150; y += 16) px(ctx, r() < 0.5 ? '#3a1a1a' : '#1a3a2a', x, y, 20, 12);
+  }
+  for (let x = 0; x < width; x += 30 + Math.floor(r() * 20)) {
+    if (zoneKind(stage, x / f) === 'bursa') continue;
+    const cols = ['#c8322a', '#2f7a2c', '#3a7ad8', '#e0b252'];
+    const col = cols[Math.floor(r() * cols.length)];
+    for (let i = 0; i < 6; i++) px(ctx, col, x - i * 2, 120 + i * 2, 34 + i * 4, 2);
+    px(ctx, '#4a3a2a', x + 2, 132, 3, 20);
+  }
+  return { canvas: c, factor: f, y: 0 };
+}
+
+function pasarWall(stage) {
+  const r = rng(283);
+  const c = canvas(stage.width, VIEW_H);
+  const ctx = c.getContext('2d');
+  const top = stage.floorTop;
+  let x = 0;
+  while (x < stage.width) {
+    if (zoneKind(stage, x) === 'bursa') {
+      px(ctx, '#181c2a', x, 60, 4, top - 60);
+      px(ctx, '#2a3046', x, top - 8, 4, 8);
+      x += 4;
+      continue;
+    }
+    // a market stall: tarp roof, a table of produce, a sack of rice
+    const w = 90;
+    const cols = ['#c8322a', '#2f7a2c', '#3a7ad8', '#e86a1a'];
+    const tarp = cols[Math.floor(r() * cols.length)];
+    for (let i = 0; i < w + 12; i += 8) px(ctx, (i / 8) % 2 ? tarp : '#f6f2e4', x - 6 + i, 90, 8, 10);
+    px(ctx, '#4a2c18', x, 100, 3, top - 100);
+    px(ctx, '#4a2c18', x + w - 3, 100, 3, top - 100);
+    px(ctx, '#8a5a2b', x, top - 34, w, 6);
+    const produce = [['#e0402a', 6], ['#4aa03c', 5], ['#f2c94c', 5], ['#8a3a8a', 4], ['#e86a1a', 5]];
+    for (let i = 0; i < 14; i++) {
+      const [col, sz] = produce[Math.floor(r() * produce.length)];
+      px(ctx, col, x + 4 + i * 6, top - 34 - sz, sz, sz);
+    }
+    px(ctx, '#e6dcc0', x + w - 26, top - 28, 20, 28);
+    ctx.fillStyle = '#8a6a3a';
+    ctx.font = 'bold 5px monospace';
+    ctx.fillText('BERAS', x + w - 25, top - 14);
+    x += w + 30 + Math.floor(r() * 30);
+  }
+  return { canvas: c, factor: 1, y: 0 };
+}
+
+function pasarFloor(stage) {
+  const r = rng(293);
+  const h = VIEW_H - stage.floorTop;
+  const c = canvas(stage.width, h);
+  const ctx = c.getContext('2d');
+  for (let x = 0; x < stage.width; x += 4) px(ctx, zoneKind(stage, x) === 'bursa' ? '#1a1e2a' : '#8a8478', x, 0, 4, h);
+  for (let i = 0; i < stage.width * h * 0.04; i++) {
+    const x = r() * stage.width;
+    const bursa = zoneKind(stage, x) === 'bursa';
+    px(ctx, bursa ? (r() < 0.1 ? '#5a1a1a' : '#222838') : r() < 0.5 ? '#7a7468' : '#9a9488', x, r() * h, 2, 1);
+  }
+  for (let x = 0; x < stage.width; x += 26) {
+    if (zoneKind(stage, x) === 'bursa') {
+      px(ctx, '#2a3046', x, 0, 1, h);
+    } else if (r() < 0.3) px(ctx, 'rgba(160,190,210,0.5)', x, 20 + Math.floor(r() * 60), 16, 3);
+  }
+  return { canvas: c, factor: 1, y: stage.floorTop };
+}
+
 const THEMES = {
   padepokan: [buildFar, buildMid, buildWall, buildFloor],
   kampung: [kampungFar, kampungMid, kampungWall, kampungFloor],
   hutan: [hutanFar, hutanMid, hutanWall, hutanFloor],
+  pabrik: [pabrikFar, pabrikMid, pabrikWall, pabrikFloor],
+  pasar: [pasarFar, pasarMid, pasarWall, pasarFloor],
 };
 
 export function buildStageArt(stage) {
@@ -465,9 +652,10 @@ export function buildStageArt(stage) {
   g.addColorStop(1, stage.sky[0]);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-  ctx.fillStyle = stage.theme === 'hutan' ? 'rgba(255,140,80,0.8)' : 'rgba(255,236,190,0.9)';
+  const sun = stage.sun ?? { x: 330, y: 112, r: 16, color: stage.theme === 'hutan' ? 'rgba(255,140,80,0.8)' : 'rgba(255,236,190,0.9)' };
+  ctx.fillStyle = sun.color;
   ctx.beginPath();
-  ctx.arc(330, 112, 16, 0, Math.PI * 2);
+  ctx.arc(sun.x, sun.y, sun.r, 0, Math.PI * 2);
   ctx.fill();
   return { sky, layers: THEMES[stage.theme].map((build) => build(stage)) };
 }

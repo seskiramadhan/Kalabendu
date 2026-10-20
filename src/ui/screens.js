@@ -3,6 +3,7 @@ import { HEROES, ROSTER } from '../entities/heroes.js';
 import { drawFigure } from '../render/sprites/skeleton.js';
 import { POSES } from '../render/sprites/poses.js';
 import { ERAS, eraOf } from '../systems/era.js';
+import { SHOP_ITEMS, priceOf, canBuy, ownedCount, inflation } from '../systems/economy.js';
 
 // Title / main menu, character select and settings, as DOM overlays.
 export class Screens {
@@ -41,6 +42,7 @@ export class Screens {
     else if (this.current === 'heroes') this.renderHeroes(save);
     else if (this.current === 'settings') this.renderSettings(save);
     else if (this.current === 'stages') this.renderStages(save);
+    else if (this.current === 'shop') this.renderShop(save);
     this.el.querySelector('button:not(:disabled)')?.focus({ preventScroll: true });
   }
 
@@ -63,6 +65,28 @@ export class Screens {
     );
     wrap.append(logo, panel, h('div', t('menuNavHint'), 'muted small nav-hint'));
     this.el.append(wrap);
+  }
+
+  renderShop(save) {
+    const panel = div('menu-panel batik-frame shop-panel');
+    panel.append(h('h2', t('shopTitle')));
+    const rise = Math.round((inflation(save) - 1) * 100);
+    panel.append(h('div', `Rp ${save.rupiah.toLocaleString('id-ID')}`, 'shop-money'), h('div', rise > 0 ? t('shopInflation').replace('{n}', rise) : t('shopNoInflation'), 'muted small'));
+    for (const item of SHOP_ITEMS) {
+      const owned = ownedCount(item, save);
+      const max = item.max ?? 1;
+      const card = btn('', () => {
+        if (this.h.onBuy(item)) this.render();
+      }, 'shop-card', !canBuy(item, save));
+      card.append(
+        h('b', `${t(item.nameKey)}${max > 1 ? ` (${owned}/${max})` : owned ? ' ✓' : ''}`),
+        h('span', t(item.descKey), 'muted'),
+        h('span', owned >= max ? t('shopOwned') : `Rp ${priceOf(item, save).toLocaleString('id-ID')}`, 'shop-price'),
+      );
+      panel.append(card);
+    }
+    panel.append(btn(t('shopDone'), () => this.h.onShopDone(), 'primary'));
+    this.el.append(center(panel));
   }
 
   renderStages(save) {

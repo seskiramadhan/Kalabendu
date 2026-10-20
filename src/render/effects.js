@@ -42,6 +42,14 @@ export class Effects {
       for (let i = 0; i < 6; i++) {
         this.items.push({ kind: 'dust', x: ev.x + (Math.random() - 0.5) * 16, y: ev.y, vx: (Math.random() - 0.5) * 20, vz: 30 + Math.random() * 30, z: 4, life: 0.8, age: 0, r: 2 + Math.floor(Math.random() * 2), steam: true });
       }
+    } else if (ev.type === 'block') {
+      this.items.push({ kind: 'blockfx', x: ev.x, y: ev.y, z: ev.z, age: 0, life: 0.15 });
+    } else if (ev.type === 'heal') {
+      this.items.push({ kind: 'beam', from: ev.from, to: ev.to, age: 0, life: 0.5 });
+    } else if (ev.type === 'evidence') {
+      this.items.push({ kind: 'popup', x: ev.x - 10, y: ev.y, z: 40, text: `${t('item_bukti')} ${ev.count}`, color: '#f2e090', age: 0, life: 1.4 });
+    } else if (ev.type === 'ally') {
+      this.items.push({ kind: 'popup', x: ev.who.x + 20, y: ev.who.y, z: 70, text: t('allyJoined'), color: '#7ce07a', age: 0, life: 1.8 });
     } else if (ev.type === 'saved') {
       this.items.push({ kind: 'popup', x: ev.x - 10, y: ev.y, z: 60, text: t('saved'), color: '#7ce07a', age: 0, life: 1.6 });
     } else if (ev.type === 'special') {
@@ -106,6 +114,19 @@ export class Effects {
         ctx.fillStyle = e.color;
         ctx.fillText(e.text, Math.round(e.x - camX - 10), Math.round(e.y - e.z));
         ctx.globalAlpha = 1;
+      } else if (e.kind === 'blockfx') {
+        ctx.strokeStyle = `rgba(200,230,255,${k})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(Math.round(e.x - camX), Math.round(e.y - e.z), 6 + (1 - k) * 6, 0, Math.PI * 2);
+        ctx.stroke();
+      } else if (e.kind === 'beam') {
+        ctx.strokeStyle = `rgba(124,224,122,${k})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(Math.round(e.from.x - camX), Math.round(e.from.y - 40));
+        ctx.lineTo(Math.round(e.to.x - camX), Math.round(e.to.y - e.to.z - 50));
+        ctx.stroke();
       } else if (e.kind === 'ring') {
         const rad = 10 + (e.age / e.life) * 60;
         ctx.strokeStyle = `rgba(242,201,76,${k})`;

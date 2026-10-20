@@ -33,7 +33,7 @@ export class Director {
       }
       return;
     }
-    const alive = g.enemies.filter((e) => e.state !== 'dead').length;
+    const alive = g.enemies.filter((e) => e.state !== 'dead' && !e.fleeing).length;
     if (this.wave < sec.waves.length) {
       const w = sec.waves[this.wave];
       if (alive <= (w.when ?? 0)) {
@@ -66,6 +66,10 @@ export class Director {
       const left = spec.side === 'left';
       const x = left ? g.camera.x - 30 - i * 18 : g.camera.x + VIEW_W + 30 + i * 18;
       const y = spec.y ?? floorTop + 12 + g.rand() * (floorBottom - floorTop - 24);
+      if (spec.ally) {
+        g.spawnAlly(spec.type, x, y);
+        return;
+      }
       const e = g.spawnEnemy(spec.type, x, y);
       e.facing = left ? 1 : -1;
       e.entering = true;

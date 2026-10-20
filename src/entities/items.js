@@ -5,6 +5,7 @@ export const ITEMS = {
   es_teh: { kind: 'food', heal: 18, nameKey: 'item_esteh' },
   koin: { kind: 'coin', rupiah: 500, score: 100 },
   uang: { kind: 'coin', rupiah: 2000, score: 300 },
+  bukti: { kind: 'evidence', nameKey: 'item_bukti' },
   bambu_runcing: { kind: 'weapon', weapon: 'bambu_runcing' },
   kursi_plastik: { kind: 'weapon', weapon: 'kursi_plastik' },
   ember: { kind: 'weapon', weapon: 'ember' },

@@ -98,6 +98,15 @@ export function drawItem(ctx, it, camX, time) {
       r(ctx, '#f2c94c', x - w, y - 7, w * 2, 6);
       break;
     }
+    case 'bukti':
+      // a folder of evidence with a red stamp
+      r(ctx, OUT, x - 8, y - 11, 16, 11);
+      r(ctx, '#e6d6a0', x - 7, y - 10, 14, 9);
+      r(ctx, '#c8322a', x + 1, y - 8, 5, 4);
+      r(ctx, '#8a7a50', x - 6, y - 6, 6, 1);
+      r(ctx, '#8a7a50', x - 6, y - 4, 5, 1);
+      if (Math.floor(time * 4) % 2) r(ctx, '#fff6c0', x - 9, y - 13, 2, 2);
+      break;
     case 'uang':
       r(ctx, OUT, x - 8, y - 7, 16, 7);
       r(ctx, '#4a9a5a', x - 7, y - 6, 14, 5);
@@ -193,6 +202,16 @@ export function drawHeldWeapon(ctx, pts, id, facing) {
       r(ctx, OUT, bx + dx * i - 2, by + dy * i - 2, 4, 4);
       r(ctx, tooth ? '#f6f2e4' : '#9a9a9a', bx + dx * i - 1, by + dy * i - 1, 3, 3);
     }
+  } else if (w.draw === 'whip') {
+    r(ctx, OUT, hx - 5, hy - 6, 10, 12);
+    r(ctx, w.color, hx - 4, hy - 5, 8, 10);
+    for (let i = 0; i < 26; i++) r(ctx, i % 4 ? '#f6f2e4' : '#c8c0a8', hx + dx * (6 + i) + Math.sin(i / 3) * 2, hy + dy * (6 + i), 2, 2);
+  } else if (w.draw === 'sack') {
+    r(ctx, OUT, hx - 10, hy - 14, 20, 24);
+    r(ctx, w.color, hx - 9, hy - 13, 18, 22);
+    ctx.fillStyle = '#8a6a3a';
+    ctx.font = 'bold 5px monospace';
+    ctx.fillText('BERAS', hx - 8, hy);
   } else if (w.draw === 'bag') {
     r(ctx, OUT, hx - 7, hy - 7, 14, 14);
     r(ctx, w.color, hx - 6, hy - 6, 12, 12);
@@ -206,6 +225,10 @@ export function drawHeldWeapon(ctx, pts, id, facing) {
 }
 
 export function drawProjectile(ctx, p, camX, time) {
+  if (p.draw) {
+    drawShot(ctx, p, camX, time);
+    return;
+  }
   const x = Math.round(p.x - camX);
   const y = Math.round(p.y - p.z);
   ctx.save();
@@ -213,4 +236,53 @@ export function drawProjectile(ctx, p, camX, time) {
   ctx.rotate(Math.round(time * 20) * (Math.PI / 4) * p.facing);
   drawWeaponFlat(ctx, p.weaponId, 0, 4);
   ctx.restore();
+}
+
+// Ranged shots (see combat/shots.js).
+export function drawShot(ctx, p, camX, time) {
+  const x = Math.round(p.x - camX);
+  const y = Math.round(p.y - p.z);
+  switch (p.draw) {
+    case 'coin':
+      r(ctx, OUT, x - 3, y - 3, 6, 6);
+      r(ctx, '#f2c94c', x - 2, y - 2, 4, 4);
+      break;
+    case 'chain':
+      for (let i = 0; i < 6; i++) r(ctx, i % 2 ? '#a0a0a0' : '#d0d0d0', x - p.facing * i * 5 - 2, y - 2, 4, 3);
+      r(ctx, '#c8322a', x - 3, y - 4, 6, 6);
+      break;
+    case 'paper':
+    case 'contract':
+      r(ctx, OUT, x - 7, y - 6, 14, 12);
+      r(ctx, '#f6f2e4', x - 6, y - 5, 12, 10);
+      r(ctx, '#c8322a', x - 2, y - 2, 5, 4);
+      ctx.fillStyle = '#2a2a2a';
+      ctx.font = 'bold 5px monospace';
+      ctx.fillText(p.draw === 'paper' ? 'DENDA' : 'PHK', x - 6, y - 1);
+      break;
+    case 'spam':
+      r(ctx, OUT, x - 8, y - 7, 16, 14);
+      r(ctx, '#3a7ad8', x - 7, y - 6, 14, 12);
+      r(ctx, '#f6f2e4', x - 5, y - 4, 10, 2);
+      r(ctx, '#f6f2e4', x - 5, y - 1, 7, 2);
+      r(ctx, '#e0402a', x + 4, y - 9, 5, 5);
+      break;
+    case 'note':
+      r(ctx, '#7aa08a', x - 4 + Math.sin(time * 10 + p.uid) * 2, y - 2, 8, 4);
+      r(ctx, '#4a7a5a', x - 1, y - 2, 2, 4);
+      ctx.fillStyle = 'rgba(255,40,30,0.25)';
+      ctx.fillRect(x - 6, Math.round(p.y) - 1, 12, 2);
+      break;
+    case 'water':
+      for (let i = 0; i < 8; i++) r(ctx, i % 2 ? '#9ad0f0' : '#5aa0e0', x - p.facing * i * 4 - 3, y - 4 + Math.sin(time * 30 + i) * 2, 6, 6);
+      break;
+    case 'flame':
+      for (let i = 0; i < 6; i++) r(ctx, i % 2 ? '#ffd25a' : '#e0402a', x - p.facing * i * 4 - 4, y - 6 + Math.sin(time * 25 + i) * 3, 8, 8);
+      break;
+    case 'cash':
+      r(ctx, OUT, x - 7, y - 4, 14, 8);
+      r(ctx, '#4a9a5a', x - 6, y - 3, 12, 6);
+      r(ctx, '#7ac08a', x - 2, y - 3, 4, 6);
+      break;
+  }
 }

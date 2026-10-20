@@ -91,7 +91,7 @@ export function canAct(f) {
   return f.state === 'idle' || f.state === 'walk';
 }
 
-function startMove(f, game, moveId, chain = 0) {
+export function startMove(f, game, moveId, chain = 0) {
   const dir = axes(f.input.held).x;
   if (dir) f.facing = dir;
   f.move = MOVES[moveId];
@@ -180,6 +180,11 @@ export function updateFighter(f, game, dt) {
         if (m.throws) game.throwWeapon(f);
         else if (m.spawnFire) game.spawnFireAhead(f, m.spawnFire);
         else if (m.throwsBag) game.throwBag(f);
+        if (m.shoot) game.shoot(f, m.shoot);
+        if (m.candles) game.spawnCandles(f, m.candles);
+        if (m.heal) game.healNear(f, m.heal);
+        if (m.summon) game.summon(f, m.summon);
+        if (m.darkness) game.darkness = m.darkness;
         if (!m.throws) game.emit({ type: 'sfx', name: m.sfx ?? 'whoosh', power: f.chain });
         if (!m.throws && m.hit) game.emit({ type: 'swing', who: f, move: m });
       }
@@ -231,6 +236,16 @@ export function updateFighter(f, game, dt) {
       f.vx = 0;
       f.vy = 0;
       if (f.t > GRAB_TIME + 0.8) setState(f, 'idle');
+      break;
+    case 'frozen':
+      f.vx = 0;
+      f.vy = 0;
+      if (f.t >= f.stun) setState(f, 'idle');
+      break;
+    case 'block':
+      f.vx *= Math.max(0, 1 - dt * 10);
+      f.vy = 0;
+      if (f.t >= 0.3) setState(f, 'idle');
       break;
     case 'dizzy':
       f.vx = 0;

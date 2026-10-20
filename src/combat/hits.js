@@ -33,7 +33,7 @@ function boxAround(e, h) {
 
 export function hurtbox(f) {
   if (f.kind === 'prop') return { x0: f.x - f.def.w / 2, x1: f.x + f.def.w / 2, z0: 0, z1: f.def.h };
-  if (f.kind !== 'hero' && f.kind !== 'enemy') return null;
+  if (f.kind !== 'hero' && f.kind !== 'enemy' && f.kind !== 'ally') return null;
   if (f.thrown || f.state === 'knockdown' || f.state === 'getup' || f.state === 'dead') return null;
   const scale = f.def.size ?? 1;
   if (f.state === 'airborne') {
@@ -100,13 +100,41 @@ function wearWeapon(game, attacker, m) {
 
 // Applies one hit's damage and reaction. opts: keepGrabbed (knee strikes),
 // launchDir + thrown (Bantingan).
+const BLOCKABLE_STATES = new Set(['idle', 'walk', 'block']);
+
+// Shield bearers stop hits from the front unless the hit is a heavy,
+// knockdown, special, throw or grab.
+function blocks(attacker, target, m, opts) {
+  if (!target.def.block || !BLOCKABLE_STATES.has(target.state) || opts.keepGrabbed || opts.thrown) return false;
+  if (m.knockdown || m.special || m.unblockable) return false;
+  const from = Math.sign(attacker.x - target.x) || attacker.facing * -1;
+  return from === target.facing;
+}
+
 export function react(game, attacker, target, m, contact, opts = {}) {
   const hero = owner(game, attacker);
+  if (target.shielded) {
+    game.emit({ type: 'block', x: contact.x, y: target.y, z: contact.z });
+    game.emit({ type: 'sfx', name: 'block' });
+    return;
+  }
+  if (blocks(attacker, target, m, opts)) {
+    target.state = 'block';
+    target.t = 0;
+    game.hitstop = Math.max(game.hitstop, 0.04);
+    if (attacker.kind !== 'projectile') attacker.vx = -attacker.facing * 60;
+    game.emit({ type: 'block', x: contact.x, y: target.y, z: contact.z });
+    game.emit({ type: 'sfx', name: 'block' });
+    wearWeapon(game, attacker, m);
+    return;
+  }
   // Guarded bosses take reduced damage until they are dizzy.
   const guard = target.def.guard && target.state !== 'dizzy' ? target.def.guard : 1;
-  target.hp = Math.max(0, target.hp - m.damage * guard);
+  const bonus = hero?.team === 'hero' && target.team !== 'hero' ? hero.dmgMul ?? 1 : 1;
+  const taken = target.team === 'hero' ? target.takeMul ?? 1 : 1;
+  target.hp = Math.max(0, target.hp - m.damage * guard * bonus * taken);
   target.lastHitAt = game.time;
-  if (hero?.team === 'hero' && target.team !== 'hero') game.heroLanded(hero, m);
+  if (hero?.kind === 'hero' && target.team !== 'hero') game.heroLanded(hero, m);
   if (target.team === 'hero') game.heroHurt(target, m);
   if (target.weapon && target.state !== 'grabbed') game.dropWeapon(target);
   wearWeapon(game, attacker, m);
@@ -166,4 +194,22 @@ export function react(game, attacker, target, m, contact, opts = {}) {
     target.hurtFrame = (target.hurtFrame + 1) % 2;
   }
   if (target.hp <= 0) game.onKill(target);
+  else applyEffect(game, attacker, target, m);
+}
+
+// Extra effects carried by some shots: freeze ("fines"), pull (debt chain),
+// fine (takes rupiah).
+function applyEffect(game, attacker, target, m) {
+  if (!m.effect || target.team !== 'hero') return;
+  if (m.effect === 'freeze') {
+    target.state = 'frozen';
+    target.t = 0;
+    target.stun = m.freeze ?? 1.2;
+    target.vx = 0;
+    game.emit({ type: 'frozen', who: target });
+  } else if (m.effect === 'pull') {
+    const src = owner(game, attacker) ?? attacker;
+    target.vx = Math.sign(src.x - target.x) * 260;
+  }
+  if (m.fine) game.fine(target, m.fine);
 }

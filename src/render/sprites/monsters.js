@@ -163,3 +163,150 @@ export function flames(ctx, x, y, halfW, height, time) {
 }
 
 // Steam puff where a fire was put out — handled by effects.
+
+// Robot Pengganti: a boxy replacement machine with a barcode chest.
+export function drawRobot(ctx, e, camX, time) {
+  const f = e.facing;
+  const x = Math.round(e.x - camX);
+  const y = Math.round(e.y - e.z);
+  const m = e.move;
+  const wind = e.state === 'attack' && m && e.t < m.startup / 60;
+  const hitting = e.state === 'attack' && m && !wind && e.t < (m.startup + m.active) / 60;
+  const lying = e.state === 'airborne' || e.state === 'knockdown' || e.state === 'dead';
+  if (lying) {
+    r(ctx, OUT, x - 30, y - 16, 60, 16);
+    r(ctx, '#8a94a0', x - 29, y - 15, 58, 14);
+    r(ctx, '#e0402a', x + 20 * f, y - 12, 4, 4);
+    return;
+  }
+  const step = e.state === 'walk' ? Math.round(Math.sin(e.walkDist / 6) * 2) : 0;
+  for (const dx of [-8, 3]) {
+    r(ctx, OUT, x + dx - 1, y - 22, 8, 22);
+    r(ctx, '#5a646e', x + dx, y - 21, 6, 21 + (dx < 0 ? step : -step));
+  }
+  r(ctx, OUT, x - 13, y - 52, 26, 32);
+  r(ctx, '#8a94a0', x - 12, y - 51, 24, 30);
+  for (let i = 0; i < 7; i++) r(ctx, '#2a2a2a', x - 8 + i * 2 + (i % 2), y - 44, 1, 10);
+  r(ctx, OUT, x - 9, y - 66, 18, 14);
+  r(ctx, '#a0aab4', x - 8, y - 65, 16, 12);
+  r(ctx, wind ? '#ff3a2a' : '#5ae0ff', x - 4 + 2 * f, y - 61, 8, 3);
+  r(ctx, '#5a646e', x - 1, y - 72, 2, 6);
+  r(ctx, '#e0402a', x - 2, y - 74, 4, 2);
+  const reach = hitting ? 22 : wind ? -4 : 6;
+  r(ctx, OUT, x + f * 10 - (f < 0 ? reach + 6 : 0), y - 46, reach + 6, 8);
+  r(ctx, '#5a646e', x + f * 10 - (f < 0 ? reach + 5 : 0), y - 45, reach + 4, 6);
+  r(ctx, '#3a3a3a', x + f * (14 + reach) - 4, y - 48, 8, 10);
+}
+
+// Juragan Outsourcing: a boss in a mech built from machines and contracts.
+export function drawMech(ctx, e, camX, time) {
+  const f = e.facing;
+  const x = Math.round(e.x - camX);
+  const y = Math.round(e.y);
+  const m = e.move;
+  const wind = e.state === 'attack' && m && e.t < m.startup / 60;
+  const stamping = e.state === 'attack' && m?.id === 'mech_stamp' && !wind;
+  for (const dx of [-24, 10]) {
+    r(ctx, OUT, x + dx - 1, y - 30, 16, 30);
+    r(ctx, '#4a5a6a', x + dx, y - 29, 14, 29);
+    r(ctx, '#2a3a4a', x + dx - 2, y - 6, 18, 6);
+  }
+  r(ctx, OUT, x - 32, y - 84, 64, 56);
+  r(ctx, '#6a7a8a', x - 31, y - 83, 62, 54);
+  r(ctx, '#e0b252', x - 31, y - 40, 62, 4);
+  // contracts pinned to the hull
+  for (let i = 0; i < 3; i++) {
+    r(ctx, '#f6f2e4', x - 26 + i * 18, y - 74 + (i % 2) * 6, 12, 16);
+    for (let k = 0; k < 4; k++) r(ctx, '#8a8a8a', x - 24 + i * 18, y - 70 + (i % 2) * 6 + k * 3, 8, 1);
+  }
+  // cockpit with the boss inside: fat cigar, money-green tie
+  r(ctx, OUT, x - 14, y - 106, 28, 24);
+  r(ctx, '#9ad0e8', x - 13, y - 105, 26, 22);
+  r(ctx, '#c08a5a', x - 6, y - 102, 12, 11);
+  r(ctx, '#1a1210', x - 7, y - 104, 14, 3);
+  r(ctx, '#1a1210', x + 3 * f - 1, y - 98, 2, 2);
+  r(ctx, '#7a4e24', x + 6 * f - (f < 0 ? 6 : 0), y - 95, 6, 2);
+  r(ctx, '#ff6a2a', x + 12 * f - 1, y - 95, 2, 2);
+  r(ctx, '#2a2a3a', x - 8, y - 90, 16, 6);
+  r(ctx, '#3a8a4a', x - 1, y - 90, 3, 6);
+  // stamp arm
+  const armY = stamping ? y - 20 : wind && m?.id === 'mech_stamp' ? y - 110 : y - 66;
+  const ax = x + f * 40;
+  r(ctx, OUT, ax - 5, Math.min(armY, y - 70) - 1, 10, Math.abs(armY - (y - 70)) + 4);
+  r(ctx, '#4a5a6a', ax - 4, Math.min(armY, y - 70), 8, Math.abs(armY - (y - 70)) + 2);
+  r(ctx, OUT, ax - 14, armY - 2, 28, 16);
+  r(ctx, '#c8322a', ax - 13, armY - 1, 26, 14);
+  ctx.fillStyle = '#f6f2e4';
+  ctx.font = 'bold 6px monospace';
+  ctx.fillText('PHK', ax - 9, armY + 9);
+  r(ctx, '#3a3a3a', x - 20, y - 116, 6, 12);
+  if (Math.floor(time * 3) % 2) {
+    ctx.fillStyle = 'rgba(60,60,60,0.6)';
+    ctx.fillRect(x - 21, y - 124 - ((time * 20) % 8), 8, 6);
+  }
+  if (e.state === 'dizzy') {
+    for (let i = 0; i < 4; i++) r(ctx, '#f2c94c', x - 20 + i * 14 + Math.sin(time * 20 + i) * 2, y - 118 + Math.cos(time * 20 + i) * 2, 3, 3);
+  }
+}
+
+// Hantu Bursa: a ghost of crashing charts and shredded rupiah notes.
+export function drawHantu(ctx, e, camX, time) {
+  const f = e.facing;
+  const x = Math.round(e.x - camX);
+  const y = Math.round(e.y - e.z);
+  const wind = e.state === 'attack' && e.move && e.t < e.move.startup / 60;
+  const fade = e.state === 'dead' ? Math.max(0, 1 - e.t / 1.3) : 1;
+  ctx.globalAlpha = 0.9 * fade;
+  // tattered body of shredded notes
+  for (let i = 0; i < 18; i++) {
+    const a = (i / 18) * Math.PI * 2;
+    const len = 26 + Math.sin(time * 3 + i) * 6;
+    const px = x + Math.cos(a) * 10;
+    const py = y - 40 + Math.sin(a) * 10;
+    for (let k = 0; k < len; k += 3) {
+      r(ctx, i % 3 ? '#7aa08a' : '#c8a050', px + Math.sin(time * 4 + k / 6 + i) * 3, py + k, 3, 2);
+    }
+  }
+  r(ctx, OUT, x - 18, y - 76, 36, 40);
+  r(ctx, '#3a4a5a', x - 17, y - 75, 34, 38);
+  // falling red chart across its face
+  ctx.strokeStyle = '#ff3a2a';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 0; i <= 8; i++) {
+    const px = x - 15 + i * 4;
+    const py = y - 70 + i * 3 + (i % 2 ? -3 : 3);
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  r(ctx, wind ? '#ff3a2a' : '#f6f2e4', x - 9 + 3 * f, y - 62, 5, 5);
+  r(ctx, wind ? '#ff3a2a' : '#f6f2e4', x + 3 + 3 * f, y - 62, 5, 5);
+  r(ctx, OUT, x - 6, y - 48, 12, 4);
+  ctx.fillStyle = '#ff3a2a';
+  ctx.font = 'bold 7px monospace';
+  ctx.fillText('▼', x - 3, y - 80 + Math.sin(time * 6) * 2);
+  ctx.globalAlpha = 1;
+}
+
+// Falling red candlestick bar: shadow first, then the bar drops.
+export function drawCandle(ctx, c, camX, time) {
+  const x = Math.round(c.x - camX);
+  const y = Math.round(c.y);
+  const warn = 0.9;
+  if (c.t < 0) return;
+  if (c.t < warn) {
+    const k = c.t / warn;
+    ctx.fillStyle = `rgba(255,40,30,${0.25 + 0.35 * k})`;
+    ctx.fillRect(x - 9, y - 2, 18, 4);
+    const by = y - 200 * (1 - k);
+    r(ctx, '#7a1a14', x - 1, by - 46, 2, 46);
+    r(ctx, OUT, x - 6, by - 38, 12, 28);
+    r(ctx, '#e0402a', x - 5, by - 37, 10, 26);
+  } else {
+    r(ctx, '#7a1a14', x - 1, y - 46, 2, 46);
+    r(ctx, OUT, x - 6, y - 38, 12, 30);
+    r(ctx, '#e0402a', x - 5, y - 37, 10, 28);
+    if (Math.floor(time * 20) % 2) r(ctx, '#ffd25a', x - 10, y - 4, 20, 2);
+  }
+}

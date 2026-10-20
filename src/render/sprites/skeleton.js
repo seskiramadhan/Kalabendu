@@ -159,6 +159,20 @@ function drawHeadgear(ctx, look, hx, hy, facing) {
   } else if (look.headgear === 'caping') {
     ctx.fillStyle = '#d8b56a';
     for (let i = 0; i < 6; i++) ctx.fillRect(hx - 2 - i * 2, hy - 12 + i, 5 + i * 4, 1);
+  } else if (look.headgear === 'cap') {
+    ctx.fillStyle = look.cap;
+    ctx.fillRect(hx - 7, hy - 9, 14, 5);
+    ctx.fillRect(facing > 0 ? hx + 2 : hx - 11, hy - 5, 9, 2);
+    ctx.fillStyle = '#e0b252';
+    ctx.fillRect(hx - 1, hy - 8, 2, 2);
+  } else if (look.headgear === 'slick') {
+    ctx.fillStyle = '#0c0806';
+    ctx.fillRect(hx - 7, hy - 8, 14, 4);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fillRect(hx - 4, hy - 7, 6, 1);
+  } else if (look.headgear === 'peci') {
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(hx - 6, hy - 11, 12, 6);
   } else if (look.headgear === 'bandana') {
     ctx.fillStyle = look.bandana;
     ctx.fillRect(hx - 7, hy - 8, 15, 5);

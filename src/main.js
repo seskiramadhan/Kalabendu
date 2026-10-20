@@ -12,10 +12,13 @@ import { Screens, navigate } from './ui/screens.js';
 import { PADEPOKAN } from './stages/padepokan.js';
 import { STAGE0 } from './stages/stage0_kampung.js';
 import { STAGE1 } from './stages/stage1_hutan.js';
+import { STAGE2 } from './stages/stage2_pabrik.js';
+import { STAGE3 } from './stages/stage3_pasar.js';
+import { buy, applyToHero } from './systems/economy.js';
 import { SPECIAL_COST } from './entities/fighter.js';
 
-const STAGES = { padepokan: PADEPOKAN, stage0: STAGE0, stage1: STAGE1 };
-const STAGE_ORDER = ['stage0', 'stage1'];
+const STAGES = { padepokan: PADEPOKAN, stage0: STAGE0, stage1: STAGE1, stage2: STAGE2, stage3: STAGE3 };
+const STAGE_ORDER = ['stage0', 'stage1', 'stage2', 'stage3'];
 const nextStageOf = (id) => STAGE_ORDER[STAGE_ORDER.indexOf(id) + 1] ?? null;
 const urlStage = new URLSearchParams(location.search).get('stage');
 
@@ -56,7 +59,9 @@ function applySettings() {
 
 function newGame(stageId, { rupiah = 0 } = {}) {
   game = new Game(STAGES[stageId] ?? STAGE0, (Math.random() * 1e9) >>> 0, { era: save.era });
-  game.addHero('p1', save.hero);
+  const hero = game.addHero('p1', save.hero);
+  applyToHero(hero, save);
+  persist();
   game.rupiah = rupiah;
   renderer.setStage(game.stage);
   applySettings();
@@ -135,6 +140,15 @@ const screens = new Screens(ui, {
     applySettings();
   },
   onLanguage: () => touch?.labels(),
+  onBuy: (item) => {
+    const ok = buy(item, save);
+    if (ok) {
+      persist();
+      audio.play('pickup');
+    } else audio.play('deny');
+    return ok;
+  },
+  onShopDone: () => play(save.stage, { rupiah: save.rupiah }),
   onReset: () => {
     save = resetSave();
     applySettings();
@@ -342,7 +356,17 @@ const loop = startLoop({
 
 againBtn.addEventListener('click', () => play(game.stage.id, { rupiah: save.rupiah }));
 continueBtn.addEventListener('click', () => (continueQueued = true));
-nextBtn.addEventListener('click', () => play(nextStageOf(game.stage.id), { rupiah: save.rupiah }));
+nextBtn.addEventListener('click', () => {
+  // Between stages: the warung, then the next stage.
+  mode = 'shop';
+  paused = true;
+  releaseInputs();
+  nextBtn.hidden = true;
+  againBtn.hidden = true;
+  renderer.showHud = false;
+  document.body.classList.add('in-menu');
+  screens.show('shop');
+});
 
 newGame(urlStage ?? 'stage0');
 if (urlStage) play(urlStage);

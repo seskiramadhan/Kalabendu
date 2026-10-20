@@ -128,6 +128,73 @@ export const ENEMIES = {
     drops: { uang: 1 },
     look: PREMAN_LOOK,
   },
+  // ---- Stage 2: Pabrik Tutup ----
+  satpam: {
+    id: 'satpam', nameKey: 'enemy_satpam', maxHp: 48, walkX: 56, walkY: 36,
+    light: ['preman_l1'], weapon: 'pentungan', block: true, shieldColor: '#5a6a8a', ai: 'brawler', reach: 40,
+    score: 350, drops: { koin: 0.4, bukti: 0.12 },
+    look: { ...PREMAN_LOOK, top: '#2a3a5a', clothLight: '#3a4a6a', pants: '#1e2a40', sleeve: '#2a3a5a', sash: '#e0b252', headgear: 'cap', cap: '#1e2a40' },
+  },
+  mandor: {
+    id: 'mandor', nameKey: 'enemy_mandor', maxHp: 44, walkX: 52, walkY: 34,
+    light: ['preman_l1'], weapon: 'map_kertas', ai: 'brawler', reach: 64,
+    score: 350, drops: { koin: 0.5, bukti: 0.15 },
+    look: { ...PREMAN_LOOK, skin: '#c08a5a', top: '#f6f2e4', clothLight: '#ffffff', pants: '#5a5a5a', sleeve: '#f6f2e4', sash: '#c8322a', headgear: 'helmet', helmet: '#f6f2e4' },
+  },
+  robot: {
+    id: 'robot', nameKey: 'enemy_robot', maxHp: 70, armor: true, walkX: 40, walkY: 28,
+    light: ['robot_punch'], ai: 'brawler', reach: 40, render: 'robot', body: { w: 12, h: 62 },
+    score: 450, drops: { koin: 0.6 }, look: PREMAN_LOOK,
+  },
+  juragan: {
+    id: 'juragan', nameKey: 'boss_juragan', boss: true, maxHp: 420, armor: true, immovable: true, guard: 0.6,
+    walkX: 40, walkY: 26, light: [], ai: 'boss', render: 'mech', body: { w: 30, h: 92 }, keep: 110,
+    attacks: [
+      { move: 'mech_stamp', max: 80, weight: 2, align: true },
+      { move: 'mech_kontrak', min: 50, weight: 2, align: true },
+      { move: 'mech_robot', weight: 0.5 },
+    ],
+    summons: [
+      { at: 0.7, enemies: ['robot'] },
+      { at: 0.5, allies: ['buruh', 'buruh', 'buruh'], tutorial: 'tut_buruh' },
+      { at: 0.3, enemies: ['robot', 'satpam'] },
+    ],
+    score: 14000, drops: { uang: 1, bukti: 1 }, look: PREMAN_LOOK,
+  },
+
+  // ---- Stage 3: Pasar Rakyat -> Lantai Bursa ----
+  spekulan: {
+    id: 'spekulan', nameKey: 'enemy_spekulan', maxHp: 32, walkX: 60, walkY: 38,
+    light: ['preman_l1'], ai: 'ranged', range: [100, 170], shot: 'spekulan_shot', shotCd: 2.2,
+    score: 350, drops: { koin: 0.8, bukti: 0.12 },
+    look: { ...PREMAN_LOOK, skin: '#c08a5a', top: '#7a7a8a', clothLight: '#f6f2e4', pants: '#5a5a6a', sleeve: '#7a7a8a', sash: '#e0b252', headgear: 'slick', chain: '#e0b252' },
+  },
+  penimbun: {
+    id: 'penimbun', nameKey: 'enemy_penimbun', maxHp: 55, walkX: 44, walkY: 30,
+    light: ['preman_l1'], heavy: 'karung_slam', weapon: 'karung_beras', block: true, ai: 'brawler', reach: 40,
+    score: 400, drops: { nasi_bungkus: 0.7, es_teh: 0.5, bukti: 0.1 },
+    look: { ...PREMAN_LOOK, top: '#8a6a3a', clothLight: '#a08050', pants: '#4a3a2a', sleeve: '#9a6a44', headgear: 'peci' },
+  },
+  rentenir: {
+    id: 'rentenir', nameKey: 'enemy_rentenir', maxHp: 44, walkX: 56, walkY: 36,
+    light: ['preman_l1'], ai: 'ranged', range: [80, 150], shot: 'rentenir_chain', shotCd: 2.6,
+    score: 400, drops: { uang: 0.6, bukti: 0.15 },
+    look: { ...PREMAN_LOOK, top: '#a4307a', clothLight: '#c8509a', pants: '#2a2a2a', headgear: 'shades', chain: '#f2c94c' },
+  },
+  hantu_bursa: {
+    id: 'hantu_bursa', nameKey: 'boss_hantu_bursa', boss: true, maxHp: 400, armor: true, immovable: true, guard: 0.6, float: 26,
+    walkX: 60, walkY: 34, light: [], ai: 'boss', render: 'hantu', body: { w: 22, h: 70 }, keep: 130,
+    attacks: [
+      { move: 'hantu_dash', min: 60, weight: 2, align: true },
+      { move: 'hantu_candles', weight: 1.5 },
+      { move: 'hantu_notes', weight: 1.5 },
+    ],
+    summons: [
+      { at: 0.6, enemies: ['spekulan', 'spekulan'] },
+      { at: 0.3, enemies: ['rentenir', 'penimbun'] },
+    ],
+    score: 15000, drops: { uang: 1, bukti: 1 }, look: PREMAN_LOOK,
+  },
   preman_kampung: {
     id: 'preman_kampung',
     nameKey: 'boss_preman_kampung',
