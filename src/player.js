@@ -25,7 +25,7 @@ export function createPlayer(id, tileX, tileY) {
     hp: 100,
     maxHp: 100,
     rupiah: 0,
-    intent: { move: 0, jump: false },
+    intent: { move: 0, jump: false, mine: null, place: null },
     jumpWasHeld: false,
     coyote: 0,
     jumpBuffer: 0,

@@ -1,12 +1,12 @@
 # NEXT — Kalabendu plan
 
-Status line: **Milestone 1 done, Milestone 2 next** (2026-10-20)
+Status line: **Milestone 2 done, Milestone 3 next** (2026-10-20)
 
 ## Milestones (each playable before the next)
 | # | Milestone | Status |
 |---|---|---|
 | 1 | Small flat world, movement, jumping, collision, camera, fixed-timestep loop, F3 FPS | done |
-| 2 | Mining and placing, 9-slot hotbar with stacks, Indonesian tile set with code-made pixel textures | todo |
+| 2 | Mining and placing, 9-slot hotbar with stacks, Indonesian tile set with code-made pixel textures | done |
 | 3 | Full generated world 4200x1200 (seeded noise): biomes, caves, ores by depth, kampung, sawit; 32x32 chunks pre-rendered offscreen | todo |
 | 4 | Save/load with IndexedDB (changed chunks + system state), autosave 60 s + on page hide, menu Dunia Baru / Muat Dunia | todo |
 | 5 | Mobile controls (joystick, jump, mine/place toggle, tap), portrait/landscape layout, batik UI, wayang title screen, ID/EN | todo |

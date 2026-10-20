@@ -1,22 +1,13 @@
+import { T, SOLID } from './tiles.js';
+
 export const TILE = 16;
-
-export const T = {
-  AIR: 0,
-  RUMPUT: 1,
-  TANAH: 2,
-  BATU: 3,
-};
-
-const SOLID = new Uint8Array(256);
-SOLID[T.RUMPUT] = 1;
-SOLID[T.TANAH] = 1;
-SOLID[T.BATU] = 1;
 
 export class World {
   constructor(w, h) {
     this.w = w;
     this.h = h;
     this.tiles = new Uint8Array(w * h);
+    this.listeners = [];
   }
 
   inBounds(x, y) {
@@ -30,7 +21,14 @@ export class World {
 
   set(x, y, id) {
     if (!this.inBounds(x, y)) return;
-    this.tiles[y * this.w + x] = id;
+    const i = y * this.w + x;
+    if (this.tiles[i] === id) return;
+    this.tiles[i] = id;
+    for (const fn of this.listeners) fn(x, y, id);
+  }
+
+  onChange(fn) {
+    this.listeners.push(fn);
   }
 
   isSolid(x, y) {
