@@ -1,13 +1,23 @@
 import { createFighter, updateFighter } from './entities/fighter.js';
 import { HEROES } from './entities/heroes.js';
 import { ENEMIES } from './entities/enemies.js';
-import { resolveHits } from './combat/hits.js';
+import { createItem, updateItem } from './entities/items.js';
+import { createProp } from './entities/props.js';
+import { WEAPONS } from './combat/weapons.js';
+import { MOVES } from './combat/moves.js';
+import { resolveHits, react } from './combat/hits.js';
 import { thinkBrawler } from './ai/brawler.js';
+import { thinkBossPreman } from './ai/boss_preman.js';
+import { Director } from './systems/director.js';
+import { VIEW_W } from './core/view.js';
 
-export const VIEW_W = 480;
-export const VIEW_H = 270;
 const EDGE = 14;
-const BRAINS = { brawler: thinkBrawler };
+const BRAINS = { brawler: thinkBrawler, bossPreman: thinkBossPreman };
+const PICKUP_X = 16;
+const PICKUP_Y = 9;
+const GRAB_X = 24;
+const GRAB_Y = 7;
+let nextProjectileUid = 3_000_000;
 
 function rng(seed) {
   let s = seed >>> 0 || 1;
@@ -17,6 +27,8 @@ function rng(seed) {
   };
 }
 
+const isFighter = (e) => e.kind === 'hero' || e.kind === 'enemy';
+
 // The whole simulation. Input arrives as messages; renderer and audio read
 // state and drain `events`.
 export class Game {
@@ -25,12 +37,20 @@ export class Game {
     this.heroes = new Map();
     this.entities = [];
     this.events = [];
-    this.camera = { x: 0 };
+    this.camera = { x: 0, minX: 0, lockRight: Infinity };
     this.hitstop = 0;
     this.time = 0;
     this.rand = rng(seed);
     this.ai = { engaged: new Set() };
     this.spawnTimer = 1;
+    this.score = 0;
+    this.rupiah = 0;
+    this.go = false;
+    this.cleared = false;
+    this.boss = null;
+    for (const p of stage.props ?? []) this.entities.push(createProp(p.type, p.x, p.y, p.drops));
+    for (const it of stage.items ?? []) this.entities.push(createItem(it.type, it.x, it.y));
+    this.director = stage.sections ? new Director(this) : null;
   }
 
   addHero(playerId, heroId) {
@@ -46,11 +66,16 @@ export class Game {
     const e = createFighter(ENEMIES[type], 'enemy', x, y);
     e.facing = -1;
     this.entities.push(e);
+    if (e.def.boss) this.boss = e;
     return e;
   }
 
   get enemies() {
-    return this.entities.filter((e) => e.team === 'enemy');
+    return this.entities.filter((e) => e.kind === 'enemy');
+  }
+
+  byUid(uid) {
+    return this.entities.find((e) => e.uid === uid) ?? null;
   }
 
   applyInput(msg) {
@@ -64,6 +89,10 @@ export class Game {
     this.events.push(event);
   }
 
+  addScore(n) {
+    this.score += Math.round(n);
+  }
+
   step(dt) {
     this.time += dt;
     if (this.hitstop > 0) {
@@ -71,13 +100,18 @@ export class Game {
       return;
     }
     for (const e of this.entities) {
-      if (e.team === 'enemy') BRAINS[e.def.ai]?.(e, this, dt, this.rand);
-      updateFighter(e, this, dt);
-      e.input.pressed = 0;
+      if (isFighter(e)) {
+        if (e.kind === 'enemy' && !this.cleared) BRAINS[e.def.ai]?.(e, this, dt, this.rand);
+        updateFighter(e, this, dt);
+        if (e.kind === 'enemy') e.input.pressed = 0;
+      } else if (e.kind === 'item') updateItem(e, dt);
+      else if (e.kind === 'projectile') this.updateProjectile(e, dt);
     }
+    for (const h of this.heroes.values()) h.input.pressed = 0;
     resolveHits(this);
+    this.collectTouching();
     this.separateEnemies();
-    for (const e of this.entities) this.keepOnStage(e);
+    for (const e of this.entities) if (isFighter(e)) this.keepOnStage(e);
     for (const h of this.heroes.values()) {
       // Placeholder until game over arrives in milestone 4.
       if (h.state === 'dead') {
@@ -90,12 +124,139 @@ export class Game {
     for (const e of this.entities) if (e.remove) this.ai.engaged.delete(e.uid);
     this.entities = this.entities.filter((e) => !e.remove);
     this.updateCamera(dt);
-    this.updateSpawner(dt);
+    this.director?.step(dt);
+    this.updateTrainingSpawner(dt);
   }
 
-  updateSpawner(dt) {
+  // Food and coins are picked up by walking over them.
+  collectTouching() {
+    for (const h of this.heroes.values()) {
+      if (h.state === 'dead' || h.z > 0) continue;
+      for (const it of this.entities) {
+        if (it.kind !== 'item' || it.remove || it.def.kind === 'weapon' || it.z > 6) continue;
+        if (Math.abs(it.x - h.x) > PICKUP_X || Math.abs(it.y - h.y) > PICKUP_Y) continue;
+        it.remove = true;
+        if (it.def.kind === 'food') {
+          h.hp = Math.min(h.def.maxHp, h.hp + it.def.heal);
+          this.emit({ type: 'pickup', x: it.x, y: it.y, key: it.def.nameKey, amount: it.def.heal });
+        } else {
+          this.rupiah += it.def.rupiah;
+          this.addScore(it.def.score);
+          this.emit({ type: 'pickup', x: it.x, y: it.y, rupiah: it.def.rupiah });
+        }
+        this.emit({ type: 'sfx', name: 'pickup' });
+      }
+    }
+  }
+
+  // Weapons need a press of the light attack button while standing on them.
+  tryPickup(h) {
+    const it = this.entities.find(
+      (e) => e.kind === 'item' && !e.remove && e.def.kind === 'weapon' && e.z <= 6 && Math.abs(e.x - h.x) <= PICKUP_X && Math.abs(e.y - h.y) <= PICKUP_Y,
+    );
+    if (!it) return false;
+    if (h.weapon) this.dropWeapon(h);
+    it.remove = true;
+    const id = it.def.weapon;
+    h.weapon = { id, durability: it.durability ?? WEAPONS[id].durability };
+    this.emit({ type: 'label', who: h, key: WEAPONS[id].nameKey });
+    this.emit({ type: 'sfx', name: 'pickup' });
+    return true;
+  }
+
+  dropWeapon(f) {
+    if (!f.weapon) return;
+    const it = createItem(f.weapon.id, f.x, f.y, { z: 20, vz: 120, vx: -f.facing * 40, durability: f.weapon.durability });
+    this.entities.push(it);
+    f.weapon = null;
+  }
+
+  throwWeapon(f) {
+    if (!f.weapon) return;
+    const w = WEAPONS[f.weapon.id];
+    this.entities.push({
+      uid: nextProjectileUid++,
+      kind: 'projectile',
+      team: f.team,
+      ownerUid: f.uid,
+      weaponId: f.weapon.id,
+      move: MOVES[w.throwMove],
+      x: f.x + f.facing * 14,
+      y: f.y,
+      z: 30,
+      vx: f.facing * 330,
+      facing: f.facing,
+      t: 0,
+      hitIds: new Set(),
+      spent: false,
+      remove: false,
+    });
+    f.weapon = null;
+    this.emit({ type: 'sfx', name: 'whooshBig' });
+  }
+
+  updateProjectile(p, dt) {
+    p.t += dt;
+    p.x += p.vx * dt;
+    const out = p.x < this.camera.x - 40 || p.x > this.camera.x + VIEW_W + 40;
+    if (p.spent || p.t > 1.2 || out) {
+      p.remove = true;
+      this.emit({ type: 'break', x: p.x, y: p.y, z: p.z, colors: [WEAPONS[p.weaponId].color, '#7a4e24'] });
+    }
+  }
+
+  findGrabTarget(h, dirX) {
+    for (const e of this.entities) {
+      if (e.kind !== 'enemy') continue;
+      const ok = e.def.boss ? e.state === 'dizzy' : e.state === 'idle' || e.state === 'walk' || e.state === 'hurt';
+      if (!ok || e.z > 0 || e.entering) continue;
+      const dx = e.x - h.x;
+      if (Math.sign(dx) !== dirX || Math.abs(dx) > GRAB_X * (e.def.size ?? 1) || Math.abs(e.y - h.y) > GRAB_Y) continue;
+      return e;
+    }
+    return null;
+  }
+
+  directHit(attacker, target, move, opts) {
+    const scale = target.def.size ?? 1;
+    react(this, attacker, target, move, { x: target.x - attacker.facing * 6, z: 36 * scale }, opts);
+  }
+
+  onKill(e) {
+    if (e.killed) return;
+    e.killed = true;
+    this.ai.engaged.delete(e.uid);
+    if (e.kind !== 'enemy') return;
+    this.addScore(e.def.score ?? 100);
+    for (const [type, chance] of Object.entries(e.def.drops ?? {})) {
+      if (this.rand() < chance) {
+        this.entities.push(createItem(type, e.x, e.y, { z: 20, vz: 160, vx: (this.rand() - 0.5) * 80 }));
+      }
+    }
+    if (e.weapon) this.dropWeapon(e);
+    if (e.def.boss) this.emit({ type: 'bossDown', who: e });
+  }
+
+  breakProp(prop) {
+    prop.remove = true;
+    this.emit({ type: 'break', x: prop.x, y: prop.y, z: prop.def.h / 2, colors: prop.def.debris, big: true });
+    this.emit({ type: 'sfx', name: 'hitHeavy' });
+    this.emit({ type: 'shake', amount: 2 });
+    this.addScore(50);
+    prop.drops.forEach((type, i) => {
+      const vx = (i - (prop.drops.length - 1) / 2) * 50 + (this.rand() - 0.5) * 20;
+      this.entities.push(createItem(type, prop.x, prop.y + 2, { z: 16, vz: 170 + this.rand() * 60, vx }));
+    });
+  }
+
+  stageClear() {
+    this.cleared = true;
+    this.emit({ type: 'clear' });
+  }
+
+  updateTrainingSpawner(dt) {
     const wanted = this.stage.training?.enemies ?? 0;
-    if (this.enemies.length >= wanted) return;
+    if (!wanted || this.enemies.length >= wanted) return;
     this.spawnTimer -= dt;
     if (this.spawnTimer > 0) return;
     this.spawnTimer = 1.5;
@@ -103,13 +264,13 @@ export class Game {
     const left = this.rand() < 0.5;
     const x = left ? this.camera.x - 20 : this.camera.x + VIEW_W + 20;
     const y = floorTop + 10 + this.rand() * (floorBottom - floorTop - 20);
-    const e = this.spawnEnemy('preman', x, y);
+    const e = this.spawnEnemy(this.rand() < 0.3 ? 'preman_tongkat' : 'preman', x, y);
     e.facing = left ? 1 : -1;
     e.entering = true;
   }
 
   separateEnemies() {
-    const list = this.enemies;
+    const list = this.enemies.filter((e) => e.state !== 'grabbed' && e.state !== 'dead');
     for (let i = 0; i < list.length; i++) {
       for (let j = i + 1; j < list.length; j++) {
         const a = list[i];
@@ -142,7 +303,11 @@ export class Game {
     let sum = 0;
     for (const h of this.heroes.values()) sum += h.x + h.facing * 24;
     const target = sum / this.heroes.size - VIEW_W / 2;
-    this.camera.x += (target - this.camera.x) * Math.min(1, dt * 5);
-    this.camera.x = Math.max(0, Math.min(this.stage.width - VIEW_W, this.camera.x));
+    const cam = this.camera;
+    cam.x += (target - cam.x) * Math.min(1, dt * 5);
+    const maxX = Math.min(this.stage.width - VIEW_W, cam.lockRight);
+    cam.x = Math.max(cam.minX, Math.min(maxX, cam.x));
+    // No walking back to earlier sections.
+    if (this.director) cam.minX = Math.max(cam.minX, cam.x);
   }
 }

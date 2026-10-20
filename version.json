@@ -1,15 +1,19 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "notes": {
     "id": [
-      "Musuh pertama: Preman! Mereka bergantian menyerang, maksimal dua sekaligus",
-      "Pukulan terasa: hitstop, layar bergetar, percikan, terpental, juggle di udara, jatuh dan bangun (kebal sebentar)",
-      "Lompat + Pukul = Pukulan Melayang, Lompat + Tendang = Tendangan Terbang"
+      "Stage 0 Kampung Saat Fajar: 5 bagian dengan panah MAJU, gelombang preman, dan bos Preman Kampung",
+      "Kuncian: jalan menempel ke musuh, Pukul = lutut, Tendang = Bantingan (lempar musuh ke musuh lain)",
+      "Hancurkan gerobak bakso, tong & kardus: nasi bungkus, es teh, koin",
+      "Senjata: bambu runcing, kursi plastik, ember (Tendang = lempar)",
+      "HUD: nyawa, skor, rupiah, bar bos, petunjuk tutorial"
     ],
     "en": [
-      "First enemy: the Preman! They take turns, at most two attack at once",
-      "Hits feel heavy: hitstop, screen shake, sparks, knockback, air juggles, knockdown and get-up invincibility",
-      "Jump + Punch = Air Punch, Jump + Kick = Flying Kick"
+      "Stage 0 Village at Dawn: 5 sections with GO arrows, thug waves and the Preman Kampung boss",
+      "Grab (Kuncian): walk into an enemy, Punch = knee, Kick = slam (throw them into others)",
+      "Smash bakso carts, drums and boxes: nasi bungkus, es teh, coins",
+      "Weapons: bamboo spear, plastic chair, bucket (Kick = throw)",
+      "HUD: health, score, rupiah, boss bar, tutorial tips"
     ]
   }
 }

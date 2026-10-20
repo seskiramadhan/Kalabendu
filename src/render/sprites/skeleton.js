@@ -99,6 +99,11 @@ export function drawFigure(ctx, pose, look, x, groundY, z, facing) {
   seg(ctx, [p.hip[0] - 5, p.hip[1] - 2], [p.hip[0] + 5, p.hip[1] - 2], 4, look.sash);
   seg(ctx, [p.hip[0] - 4 * facing, p.hip[1]], [p.hip[0] - 8 * facing, p.hip[1] + 8], 3, look.sash);
 
+  if (look.chain) {
+    ctx.fillStyle = look.chain;
+    for (let i = -4; i <= 4; i += 2) ctx.fillRect(Math.round(p.neck[0] + i), Math.round(p.neck[1] + 3 + Math.abs(i) * 0.4), 2, 2);
+  }
+
   // front leg
   part(ctx, p.hip, p.fKnee, 7, look.pants);
   part(ctx, p.fKnee, p.fFoot, 6, look.pants);
@@ -134,6 +139,17 @@ function drawHeadgear(ctx, look, hx, hy, facing) {
     ctx.fillStyle = look.udeng;
     ctx.fillRect(back, hy - 4, 4, 2);
     ctx.fillRect(facing > 0 ? hx - 12 : hx + 10, hy - 2, 3, 2);
+  } else if (look.headgear === 'shades') {
+    // bald head, dark sunglasses
+    ctx.fillStyle = look.skin;
+    ctx.fillRect(hx - 6, hy - 7, 12, 3);
+    ctx.fillRect(hx - 6 * facing - (facing > 0 ? 0 : 2), hy - 5, 3, 6);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fillRect(hx - 2, hy - 6, 3, 1);
+    ctx.fillStyle = '#120c0a';
+    ctx.fillRect(facing > 0 ? hx - 1 : hx - 7, hy - 2, 8, 3);
+    ctx.fillStyle = '#4a4a5a';
+    ctx.fillRect(facing > 0 ? hx + 1 : hx - 5, hy - 2, 2, 1);
   } else if (look.headgear === 'bandana') {
     ctx.fillStyle = look.bandana;
     ctx.fillRect(hx - 7, hy - 8, 15, 5);

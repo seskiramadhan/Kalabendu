@@ -309,3 +309,17 @@ body.is-touch #hint {
 body.is-touch:not(.portrait) #hint {
   top: max(8px, env(safe-area-inset-top));
 }
+
+.again {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  font-size: 18px;
+  padding: 12px 28px;
+}
+
+.again[hidden] {
+  display: none;
+}

@@ -1,5 +1,6 @@
 import { BTN } from '../core/input.js';
 import { MOVES } from '../combat/moves.js';
+import { WEAPONS } from '../combat/weapons.js';
 
 export const FRAME = 1 / 60;
 const GRAVITY = 980;
@@ -11,6 +12,9 @@ const KNOCKDOWN_TIME = 0.6;
 const GETUP_TIME = 0.35;
 const GETUP_INVULN = 0.9;
 const DEAD_TIME = 1.4;
+const GRAB_TIME = 1.8;
+const KNEE_TIME = 0.22;
+const THROW_TIME = 0.35;
 
 let nextUid = 1;
 
@@ -43,6 +47,14 @@ export function createFighter(def, team, x, y) {
     bounced: false,
     hurtFrame: 0,
     hp: def.maxHp,
+    weapon: def.weapon ? { id: def.weapon, durability: WEAPONS[def.weapon].durability } : null,
+    grabbedUid: null,
+    knees: 0,
+    kneeT: 0,
+    thrown: false,
+    ownerUid: null,
+    dizzyTime: 0,
+    killed: false,
     lastHitAt: -10,
     walkDist: 0,
     remove: false,
@@ -65,6 +77,10 @@ function axes(held) {
 
 export function isAirState(state) {
   return state === 'jump' || state === 'jumpAttack' || state === 'airborne';
+}
+
+export function lightChain(f) {
+  return f.weapon ? WEAPONS[f.weapon.id].light : f.def.light;
 }
 
 export function canAct(f) {
@@ -132,13 +148,18 @@ export function updateFighter(f, game, dt) {
     case 'walk': {
       if (pressed & BTN.JUMP && def.jumpSpeed) startJump(f, game, dir.x);
       else if (pressed & BTN.DODGE && def.canDodge) startDodge(f, game, dir);
-      else if (pressed & BTN.LIGHT) startMove(f, game, def.light[0]);
+      else if (pressed & BTN.LIGHT) {
+        if (!(f.kind === 'hero' && game.tryPickup(f))) startMove(f, game, lightChain(f)[0]);
+      } else if (pressed & BTN.HEAVY && f.weapon && f.kind === 'hero') startMove(f, game, 'throw_anim');
       else if (pressed & BTN.HEAVY && def.heavy) startMove(f, game, def.heavy);
+      else if (pressed & BTN.SPECIAL && def.special) startMove(f, game, def.special);
       else {
         f.vx = dir.x * def.walkX;
         f.vy = dir.y * def.walkY;
         if (dir.x) f.facing = dir.x;
         setState(f, dir.x || dir.y ? 'walk' : 'idle');
+        const target = def.canGrab && dir.x ? game.findGrabTarget(f, dir.x) : null;
+        if (target) startGrab(f, game, target);
       }
       break;
     }
@@ -148,13 +169,17 @@ export function updateFighter(f, game, dt) {
       const a = m.active * FRAME;
       const r = m.recovery * FRAME;
       if (pressed & BTN.LIGHT && f.t > s * 0.5 && m.next) f.queued = 'light';
-      if (pressed & BTN.HEAVY && f.t > s && def.heavy && m.id !== def.heavy) f.queued = 'heavy';
+      if (pressed & BTN.HEAVY && f.t > s && def.heavy && !f.weapon && m.id !== def.heavy) f.queued = 'heavy';
       if (!f.activeEmitted && f.t >= s) {
         f.activeEmitted = true;
-        game.emit({ type: 'sfx', name: m.sfx ?? 'whoosh', power: f.chain });
-        game.emit({ type: 'swing', who: f, move: m });
+        if (m.throws) game.throwWeapon(f);
+        else {
+          game.emit({ type: 'sfx', name: m.sfx ?? 'whoosh', power: f.chain });
+          game.emit({ type: 'swing', who: f, move: m });
+        }
       }
-      f.vx = f.t < s + a ? (f.facing * m.step) / (s + a) : 0;
+      if (m.lunge) f.vx = f.t >= s && f.t < s + a ? f.facing * m.lunge : 0;
+      else f.vx = f.t < s + a ? (f.facing * m.step) / (s + a) : 0;
       f.vy = 0;
       if (f.t >= s + a) {
         if (pressed & BTN.DODGE && def.canDodge) {
@@ -170,9 +195,32 @@ export function updateFighter(f, game, dt) {
           break;
         }
       }
-      if (f.t >= s + a + r) setState(f, 'idle');
+      if (f.t >= s + a + r) {
+        if (m.dizzyAfter) {
+          setState(f, 'dizzy');
+          f.dizzyTime = m.dizzyAfter;
+          game.emit({ type: 'dizzy', who: f });
+        } else setState(f, 'idle');
+      }
       break;
     }
+    case 'grab':
+      updateGrab(f, game, dt, dir, pressed);
+      break;
+    case 'throw':
+      f.vx = 0;
+      if (f.t >= THROW_TIME) setState(f, 'idle');
+      break;
+    case 'grabbed':
+      f.vx = 0;
+      f.vy = 0;
+      if (f.t > GRAB_TIME + 0.8) setState(f, 'idle');
+      break;
+    case 'dizzy':
+      f.vx = 0;
+      f.vy = 0;
+      if (f.t >= f.dizzyTime) setState(f, 'idle');
+      break;
     case 'jump': {
       f.vx += (dir.x * def.walkX - f.vx) * Math.min(1, dt * 4);
       if (!f.airAttacked && def.air) {
@@ -242,8 +290,70 @@ export function updateFighter(f, game, dt) {
   }
 }
 
+function startGrab(f, game, e) {
+  f.state = 'grab';
+  f.t = 0;
+  f.grabbedUid = e.uid;
+  f.knees = 0;
+  f.kneeT = 0;
+  f.vx = 0;
+  f.vy = 0;
+  f.facing = Math.sign(e.x - f.x) || f.facing;
+  e.state = 'grabbed';
+  e.t = 0;
+  e.vx = 0;
+  e.vy = 0;
+  e.move = null;
+  game.ai.engaged.delete(e.uid);
+  game.emit({ type: 'label', who: f, key: 'move_kuncian' });
+  game.emit({ type: 'sfx', name: 'grab' });
+}
+
+// Kuncian: J = knee strike (third one throws), K or J pressed away = Bantingan.
+function updateGrab(f, game, dt, dir, pressed) {
+  const e = game.byUid(f.grabbedUid);
+  if (!e || e.state !== 'grabbed') {
+    setState(f, 'idle');
+    return;
+  }
+  f.vx = 0;
+  f.vy = 0;
+  const size = e.def.size ?? 1;
+  e.x = f.x + f.facing * 18 * size;
+  e.y = f.y + 0.5;
+  e.z = 0;
+  e.facing = -f.facing;
+  f.kneeT = Math.max(0, f.kneeT - dt);
+
+  const away = dir.x === -f.facing;
+  if (pressed & BTN.HEAVY || (pressed & BTN.LIGHT && (away || f.knees >= 2))) {
+    const throwDir = away ? -f.facing : f.facing;
+    f.facing = throwDir;
+    f.state = 'throw';
+    f.t = 0;
+    game.emit({ type: 'label', who: f, key: 'move_bantingan' });
+    game.directHit(f, e, MOVES.bantingan, { launchDir: throwDir, thrown: true });
+    return;
+  }
+  if (pressed & BTN.LIGHT && f.kneeT <= 0) {
+    f.kneeT = KNEE_TIME;
+    f.knees++;
+    game.emit({ type: 'label', who: f, key: 'move_knee' });
+    game.directHit(f, e, MOVES.kuncian_knee, { keepGrabbed: true });
+    if (e.state === 'grabbed') e.t = 0;
+    return;
+  }
+  if (f.t > GRAB_TIME) {
+    e.state = 'idle';
+    e.t = 0;
+    e.vx = f.facing * 80;
+    setState(f, 'idle');
+  }
+}
+
 function land(f, game) {
   f.z = 0;
+  f.thrown = false;
   if (f.state === 'airborne') {
     if (!f.bounced && f.vz < -150) {
       f.bounced = true;

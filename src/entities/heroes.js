@@ -7,6 +7,7 @@ export const HEROES = {
     walkY: 56,
     jumpSpeed: 290,
     canDodge: true,
+    canGrab: true,
     light: ['bayu_l1', 'bayu_l2', 'bayu_l3', 'bayu_l4'],
     heavy: 'bayu_heavy',
     air: { light: 'bayu_air_punch', heavy: 'bayu_air' },

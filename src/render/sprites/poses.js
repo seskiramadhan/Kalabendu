@@ -33,6 +33,10 @@ export const POSES = {
   airhit: { ...stance, t: -30, hd: -20, bu: -120, bf: -150, fu: -100, ff: -140, bt: 30, bs: 10, ft: 50, fs: 30, spin: -35 },
   lying: { t: 0, hd: 0, bu: 170, bf: 175, fu: 160, ff: 175, bt: 4, bs: 4, ft: -4, fs: -4, spin: -90 },
   getup: { ...stance, t: 40, hd: 10, bu: 60, bf: 40, fu: 80, ff: 60, bt: -60, bs: 30, ft: 70, fs: -40 },
+  grab: { ...stance, t: 14, bu: 80, bf: 95, fu: 85, ff: 92, bt: -26, bs: -6, ft: 30, fs: 6 },
+  knee: { ...stance, t: 18, bu: 80, bf: 100, fu: 85, ff: 100, bt: -14, bs: -6, ft: 100, fs: 10 },
+  throwPose: { ...stance, t: -24, bu: 150, bf: 170, fu: 140, ff: 165, bt: -36, bs: -10, ft: 40, fs: 8 },
+  dizzy: { ...stance, t: -6, hd: 14, bu: 10, bf: 20, fu: 5, ff: 15, bt: -12, bs: -4, ft: 12, fs: 4 },
   roll: { t: 50, hd: 20, bu: 70, bf: 130, fu: 60, ff: 120, bt: 85, bs: -40, ft: 95, fs: -50, spinPivot: 'center' },
 };
 
@@ -93,6 +97,8 @@ function attackPose(f) {
 // heavy, jump, jumpAttack, dodge, land.
 export function animState(f) {
   if (f.state === 'airborne') return 'knockdown';
+  if (f.state === 'attack' && f.move.id === 'throw_anim') return 'throw';
+  if (f.move?.id === f.def.special && f.state === 'attack') return 'special';
   if (f.state === 'attack') {
     if (f.move.id === f.def.heavy) return 'heavy';
     return 'attack' + (f.chain + 1);
@@ -116,6 +122,16 @@ export function poseFor(f, time) {
       return lerpPose(POSES.jump_down, POSES[f.move.anim], Math.min(1, f.t / (FRAME * 3)));
     case 'hurt':
       return POSES[f.hurtFrame ? 'hurt2' : 'hurt1'];
+    case 'grabbed':
+      return POSES.hurt2;
+    case 'grab':
+      return f.kneeT > 0 ? lerpPose(POSES.grab, POSES.knee, Math.sin((f.kneeT / 0.22) * Math.PI)) : POSES.grab;
+    case 'throw':
+      return lerpPose(POSES.grab, POSES.throwPose, ease(Math.min(1, f.t / 0.2)));
+    case 'dizzy': {
+      const sway = Math.sin(time * 6) * 8;
+      return { ...POSES.dizzy, t: POSES.dizzy.t + sway, hd: POSES.dizzy.hd - sway };
+    }
     case 'airborne': {
       const k = Math.max(0, Math.min(1, 0.5 - f.vz / 400));
       return lerpPose(POSES.airhit, POSES.lying, k * 0.8);

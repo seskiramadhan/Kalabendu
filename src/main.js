@@ -7,6 +7,10 @@ import { Renderer } from './render/renderer.js';
 import { TouchControls, isTouchDevice } from './core/touch.js';
 import { Menu, fetchVersion } from './ui/menu.js';
 import { PADEPOKAN } from './stages/padepokan.js';
+import { STAGE0 } from './stages/stage0_kampung.js';
+
+const STAGES = { padepokan: PADEPOKAN, stage0: STAGE0 };
+const stageId = new URLSearchParams(location.search).get('stage');
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
@@ -19,11 +23,14 @@ const renderer = new Renderer(canvas);
 const keyboard = new Keyboard();
 const touch = isTouchDevice() ? new TouchControls(document.getElementById('ui')) : null;
 if (touch) document.body.classList.add('is-touch');
+renderer.touch = !!touch;
+const againBtn = document.getElementById('again');
 
 let game;
 function newGame() {
-  game = new Game(PADEPOKAN);
+  game = new Game(STAGES[stageId] ?? STAGE0, (Math.random() * 1e9) >>> 0);
   game.addHero('p1', 'bayu');
+  againBtn.hidden = true;
   renderer.setStage(game.stage);
   globalThis.kalabendu = { game, renderer, keyboard, menu, loop };
 }
@@ -99,13 +106,18 @@ const loop = startLoop({
     renderer.draw(game, time, dt, debug);
     for (const ev of game.events) {
       if (ev.type === 'sfx') audio.play(ev.name, ev.power ?? 1);
-      if (ev.type === 'swing' && ev.who.team === 'hero') {
-        moveLabel.textContent = t(ev.move.nameKey);
+      const label = ev.type === 'label' ? ev.key : ev.type === 'swing' ? ev.move.nameKey : null;
+      if (label && ev.who.kind === 'hero') {
+        moveLabel.textContent = t(label);
         moveLabel.style.opacity = '1';
         moveLabelTimer = 0.9;
       }
     }
     game.events.length = 0;
+    if (againBtn.hidden === game.cleared) {
+      againBtn.textContent = t('playAgain');
+      againBtn.hidden = !game.cleared;
+    }
     moveLabelTimer -= dt;
     if (moveLabelTimer <= 0) moveLabel.style.opacity = '0';
     if (debug) {
@@ -115,6 +127,7 @@ const loop = startLoop({
   },
 });
 
+againBtn.addEventListener('click', () => newGame());
 newGame();
 hint.textContent = t(touch ? 'hintTouch' : 'hintDesktop');
 setTimeout(() => (hint.style.opacity = '0'), 10000);

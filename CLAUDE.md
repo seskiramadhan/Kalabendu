@@ -22,7 +22,8 @@ python3 -m http.server 8000
 ```
 Then open http://localhost:8000 (on a phone: http://<laptop-ip>:8000 on the same Wi-Fi).
 
-## Original request (user, 2026-10-20, verbatim) — beat 'em up
+
+## Original request (user, 2026-10-20, verbatim) — beat 'em up, updated stage list
 
 Build "Kalabendu", a 2D side-scrolling beat 'em up with an Indonesian theme and a social and environmental message, in plain JavaScript using HTML5 Canvas (no frameworks, no Three.js). It must run in the browser on PC and phones. Inspired by Streets of Rage 4, TMNT: Shredder's Revenge, and River City Girls, with pencak silat as the core fighting style.
 
@@ -34,98 +35,121 @@ Meaning of the name:
 - In Javanese tradition (Serat Kalatidha by Ranggawarsita and the Jayabaya prophecies), Kalabendu is the "age of curse": leaders are corrupt, law can be bought, truth is twisted, nature turns against people, and the honest are pushed aside. It is followed by Kalasuba, an age of peace and prosperity.
 
 Story:
-- The land of Marcapada has fallen into Kalabendu: corrupt officials, palm oil (sawit) companies swallowing forests, illegal logging causing floods, haze, rising prices, and suffering villages.
-- Ordinary villagers trained in pencak silat rise up to fight back, stage by stage, and bring the world into Kalasuba.
+- The land of Marcapada has fallen into Kalabendu: burning forests and haze, palm oil (sawit) swallowing the land, factories closing, the rupiah collapsing, prices rising, protests in the streets, and corrupt officials profiting from it all.
+- Ordinary villagers trained in pencak silat rise up and fight their way from the burning forest to the corrupt tower at the top, bringing the world into Kalasuba.
+- Story arc: nature suffers → people suffer → you find who profits → people unite → you face the source.
 - All characters, companies, and places are fictional. No real people, politicians, company names, or logos. Use satire and symbols.
 - Tone: energetic, funny satire with heart, not depressing. Treat Indonesian culture and pencak silat respectfully.
-- Short story scenes between stages: dialogue boxes with character portraits, plus wayang-style silhouette cutscenes.
+- Short story scenes between stages: dialogue boxes with character portraits and wayang-style silhouette cutscenes.
 
-Playable heroes (each with different stats and special move):
+Playable heroes (each with different stats and a special move):
 - Bayu: young pesilat, balanced, fast combos
 - Sri: rice farmer, strong sweeping attacks with a cangkul
 - Ujang: ojol driver, fast dashes and a motorcycle charge special
 - Mak Inah: fisherwoman, slow but heavy hits and a net throw that holds enemies
 - Start with Bayu only; add the others in later milestones
 
-Combat (the most important part, make it feel good):
-- Belt-scroll movement: left/right and up/down on a 2.5D floor plane, with depth sorting by Y
-- Light attack combo (3-4 hits), heavy attack, jump, jump attack, grab and throw, dodge/roll
-- Silat-inspired moves: sweeps, palm strikes, kicks, takedowns (named moves like "Tendangan Sabit", "Kuncian")
-- Special move that uses a "Semangat" (spirit) meter filled by dealing and taking damage
-- Hitboxes and hurtboxes, hit pause (hitstop), screen shake, knockback, juggles, knockdown and get-up invincibility
+Combat (most important, make it feel good):
+- Belt-scroll movement: left/right and up/down on a 2.5D floor plane, depth sorting by Y
+- Light combo (3-4 hits), heavy attack, jump, jump attack, grab and throw, dodge/roll
+- Silat-inspired moves with names like "Tendangan Sabit" and "Kuncian"
+- Special move using a "Semangat" meter filled by dealing and taking damage
+- Hitboxes and hurtboxes, hitstop, screen shake, knockback, juggles, knockdown, get-up invincibility
 - Enemy health bars, combo counter, score
-- Pickups: nasi bungkus and es teh to heal, weapons to pick up (bambu runcing, golok, ember, kursi plastik)
-- Breakable objects: gerobak, drums, boxes that drop items or coins
+- Pickups: nasi bungkus and es teh to heal; weapons: bambu runcing, golok, ember, kursi plastik
+- Breakables: gerobak, drums, boxes that drop items or coins
+- Enemy AI: approach, keep distance, surround the player, take turns attacking so the player isn't overwhelmed
 
-Enemies (fictional satire plus folklore):
-- Preman (thugs): basic, some with sticks
-- Satpam Bayaran (hired guards): block attacks
-- Tikus Berdasi (rats in neckties): fast, steal your coins and run
-- Buldoser Liar (wild bulldozers): mini-boss, charges across the screen
-- Asap (haze spirits): reduce visibility, poison on contact
-- Folklore enemies at night stages: tuyul (steals coins), genderuwo (big and strong), kuntilanak (floating, screams to stun)
-- Each enemy type has simple AI: approach, keep distance, surround the player, wait their turn so the player isn't overwhelmed
+Stages (in this order, each harder than the last):
 
-Stages (each tells part of the story):
-1. Kampung Diserbu: thugs raid the village at dawn
-2. Hutan Terbakar: burning forest full of haze
-3. Kebun Sawit: endless sawit rows, Buldoser Liar mini-boss
-4. Kota Banjir: flooded town after a landslide, wading slows movement
-5. Pasar Malam: night market, folklore creatures appear
-6. Gedung Pejabat: corrupt office tower, Tikus Berdasi everywhere, elevator fight
-7. Final: Raja Sawit (giant of palm fronds and money bags), then true final boss Batara Kala if the player refused all bribes
-- Each stage ends with a boss and has 3-4 "go arrow" sections where enemies spawn before the screen continues scrolling
+Stage 0 - Kampung Saat Fajar (tutorial)
+- Scene: the hero's village at dawn, rice fields and warung, smoke rising from the forest in the distance
+- Enemies: Preman (basic thugs)
+- Boss: Preman Kampung (bigger thug), teaches grab and special move
+- Purpose: learn the controls
+
+Stage 1 - Environment: Hutan Terbakar → Kebun Sawit
+- Scene: burning rainforest full of orange haze, fading into endless sawit rows, ending at a muddy flooded river
+- Enemies: Asap (haze spirits that reduce vision and poison on contact), Pembakar Lahan (arsonists with torches), Penebang Liar (chainsaw loggers), Buldoser Liar (charging bulldozers, mini-boss)
+- Boss: Raja Sawit, a giant of palm fronds, logs, and money bags that sets fires and summons bulldozers
+
+Stage 2 - Jobs: Pabrik Tutup
+- Scene: dark shoe and ceramic factory at night, silent conveyor belts, "PHK" notices on the gate
+- Enemies: Satpam Bayaran (hired guards with shields, teach grabs and heavy attacks), Mandor Kejam (foremen with whips of paperwork), Robot Pengganti (replacement machines)
+- Boss: Juragan Outsourcing, a factory boss in a giant mech made of machines and contracts; laid-off workers join as allies during the fight
+
+Stage 3 - Economy: Pasar Rakyat → Lantai Bursa
+- Scene: crowded traditional market with prices flipping on chalkboards, leading into a glowing trading floor with falling red charts
+- Enemies: Spekulan (suited traders throwing coins from range), Penimbun (hoarders hiding behind rice sacks), Rentenir (loan sharks with debt chains that pull you), falling red candlestick bars as hazards
+- Boss: Hantu Bursa, a ghost of crashing charts and shredded rupiah notes; the screen shakes as the "index" falls
+
+Stage 4 - Society: Jalan Raya Demo
+- Scene: city streets packed with protesters, burning tires, water cannon trucks, students and ojol drivers fighting alongside you
+- Enemies: Preman Bayaran (paid thugs breaking up the protest), Provokator (turns crowd NPCs hostile), Buzzer (floating phones that spam and stun)
+- Boss: Komandan Preman, a huge thug leader riding a water cannon truck; beating him lets the crowd march to the tower
+
+Stage 5 - Corruption: Gedung Pejabat
+- Scene: luxurious glass tower, elevator fight up to a vault full of gold bars and cash
+- Enemies: Tikus Berdasi (rats in neckties that steal coins and run), Ajudan (bodyguards), Makelar Kasus (case brokers who heal the boss), Jaksa Palsu (fake prosecutors who freeze you with "fines")
+- Boss: Pejabat Tinggi (the corrupt official who offered bribes all game)
+- True final boss: Batara Kala, the embodiment of Kalabendu, only reachable if the player refused every bribe
+
+Each stage has 3-4 "go arrow" sections where enemies spawn before scrolling continues, then a boss.
 
 Era system:
 - World meter from Kalabendu to Kalasuba, rising as stages are cleared and villagers are saved
-- Backgrounds and colors change with the era: Kalabendu is grey-orange haze and dull colors; as the era improves, skies clear and greens get vivid
-- Show era name on stage select and announce changes with a wayang-style title card
+- Backgrounds change with the era: Kalabendu is grey-orange haze and dull colors; as the era improves, skies clear and greens get vivid
+- Show the era on stage select and announce changes with a wayang-style title card
 
 Moral choice:
-- Before some stages, a fictional "Pejabat" offers a bribe (suap): accept for a strong power-up and money, or refuse
-- Accepting keeps the world closer to Kalabendu and leads to a bad ending
-- Refusing and collecting evidence (bukti) dropped by enemies unlocks the true final boss and the good ending (Kalasuba)
+- Before stages 1 to 5, the fictional "Pejabat" offers a bribe (suap): accept for a strong power-up and money, or refuse
+- Accepting keeps the world closer to Kalabendu and leads to the bad ending
+- Refusing and collecting evidence (bukti) dropped by enemies unlocks Batara Kala and the good ending (Kalasuba)
+
+Economy touch:
+- Coins (rupiah) buy healing and upgrades at warung between stages
+- Prices rise each stage (inflation), and faster if the player accepted bribes
 
 Graphics and audio:
-- No external assets for now. Draw characters with simple procedural pixel art or shapes in code, built so sprite sheets can replace them later (keep an animation system with named states: idle, walk, attack1-3, heavy, jump, hurt, knockdown, getup, grab, throw, special)
-- Parallax backgrounds per stage with Indonesian details: warung, angkot, gerobak bakso, rice terraces, sawit rows, flooded streets, neon night market, glass tower
+- No external assets for now. Draw characters with simple procedural pixel art or shapes in code, ready to swap for sprite sheets later (animation states: idle, walk, attack1-3, heavy, jump, hurt, knockdown, getup, grab, throw, special)
+- Parallax backgrounds per stage with Indonesian details: warung, angkot, gerobak bakso, rice terraces, sawit rows, factory gates, pasar stalls, trading screens, protest banners, glass tower
 - Batik border patterns on menus and HUD
-- Simple sound effects generated with the Web Audio API (hits, whooshes, pickups); keep code ready for gamelan-style music later
+- Simple sound effects with the Web Audio API; keep code ready for gamelan-style music later
 
 Players and multiplayer:
-- Single player first
-- Then local co-op for 2 players on one keyboard or with gamepads (Gamepad API)
+- Single player first, then local co-op for 2 players (keyboard or Gamepad API)
 - Keep game logic separate from rendering and design player actions as input messages, so online co-op (PeerJS/WebRTC host-and-join) can be added later
 
 Screen and controls:
-- Responsive canvas that works in landscape (main) and portrait (show the stage letterboxed with controls in the extra space below)
-- Fixed internal resolution (for example 480x270) scaled up with crisp pixels, using devicePixelRatio
-- Desktop: arrows/WASD move, J light, K heavy, L jump, I special, Shift dodge; second player on numpad or gamepad
+- Responsive canvas for landscape (main) and portrait (stage letterboxed, controls in the extra space below)
+- Fixed internal resolution (480x270) scaled with crisp pixels, using devicePixelRatio
+- Desktop: arrows/WASD move, J light, K heavy, L jump, I special, Shift dodge; player 2 on numpad or gamepad
 - Gamepad support for all players
-- Mobile: virtual joystick on the left, attack/heavy/jump/special buttons on the right, positioned for portrait vs landscape
+- Mobile: virtual joystick left, attack/heavy/jump/special buttons right, positioned for portrait vs landscape
 - UI text in Bahasa Indonesia with an English option (all text in one language file)
 
 Save:
-- Save progress, unlocked heroes, era, and bribe choices to localStorage or IndexedDB
+- Save progress, unlocked heroes, era, coins, and bribe choices to localStorage or IndexedDB
 - Menu: Mulai (Start), Lanjutkan (Continue), Pilih Jagoan (Character Select), Pengaturan (Settings)
 
 Project setup:
 - index.html, style.css, and ES modules in /src
 - No build step; runs with a simple local server
-- Clean structure: core (loop, input, audio, save, i18n), combat (hitboxes, damage, combos), entities (player, enemies, bosses, pickups), ai, stages (data-driven stage files), render (camera, parallax, sprites, effects), ui (HUD, menus, dialogue), systems (era, choices)
-- Stages, enemies, and dialogue defined as data so new content is easy to add
-- Fixed timestep loop with requestAnimationFrame, target 60 FPS on mid-range phones
-- Debug toggle (F3) to show FPS and hitboxes
+- Structure: core (loop, input, audio, save, i18n), combat (hitboxes, damage, combos), entities (player, enemies, bosses, pickups), ai, stages (data-driven stage files), render (camera, parallax, sprites, effects), ui (HUD, menus, dialogue, shop), systems (era, choices, economy)
+- Stages, enemies, bosses, and dialogue defined as data so new content is easy to add
+- Fixed timestep loop with requestAnimationFrame, 60 FPS on mid-range phones
+- Debug toggle (F3) for FPS and hitboxes
 
 Milestones (each must be playable before the next):
-1. Bayu moving on a 2.5D floor, light combo, jump, simple placeholder art, camera
-2. Hitboxes, hitstop, knockback, knockdown, one Preman enemy with basic AI
-3. Stage 1 with scrolling sections, enemy waves, pickups, breakables, boss
+1. Bayu moving on a 2.5D floor, light combo, jump, placeholder art, camera
+2. Hitboxes, hitstop, knockback, knockdown, Preman enemy with basic AI
+3. Stage 0 complete: scrolling sections, waves, pickups, breakables, Preman Kampung boss
 4. HUD, health, Semangat meter, special move, combo counter, game over and continue
-5. Mobile touch controls, gamepad, portrait/landscape, Indonesian/English, menus, save
-6. Stages 2-4, new enemies, Buldoser Liar mini-boss, era system with background changes
-7. Story scenes, Pejabat bribe choices, evidence collection, endings
-8. Stages 5-7, folklore enemies, Raja Sawit and Batara Kala bosses
-9. Extra heroes (Sri, Ujang, Mak Inah) and local 2-player co-op
+5. Mobile controls, gamepad, portrait/landscape, Indonesian/English, menus, save
+6. Stage 1 (Environment) with Raja Sawit, era system and background changes
+7. Stage 2 (Jobs) and Stage 3 (Economy) with their enemies and bosses, warung shop and inflation
+8. Story scenes, Pejabat bribe choices, evidence collection, endings
+9. Stage 4 (Society) and Stage 5 (Corruption), Pejabat Tinggi and Batara Kala
+10. Extra heroes (Sri, Ujang, Mak Inah) and local 2-player co-op
 
-After each milestone, tell me how to run and test it, and commit. Add a README in English and Indonesian explaining the structure, controls, the meaning of Kalabendu and the eras, the game's message, and how online co-op could be added later.
+After each milestone, tell me how to run and test it, and commit. Add a README in English and Indonesian explaining the structure, controls, stage list, the meaning of Kalabendu and the eras, the game's message, and how online co-op could be added later.

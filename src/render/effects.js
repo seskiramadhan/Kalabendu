@@ -26,6 +26,19 @@ export class Effects {
         const sp = 60 + Math.random() * (ev.heavy ? 140 : 80);
         this.items.push({ kind: 'chip', x: ev.x, y: ev.y, z: ev.z, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, age: 0, life: 0.25 });
       }
+    } else if (ev.type === 'break') {
+      const n = ev.big ? 14 : 7;
+      for (let i = 0; i < n; i++) {
+        const a = -Math.random() * Math.PI;
+        const sp = 60 + Math.random() * 120;
+        this.items.push({
+          kind: 'debris', x: ev.x, y: ev.y, z: ev.z ?? 10, vx: Math.cos(a) * sp, vz: -Math.sin(a) * sp + 60,
+          color: ev.colors[i % ev.colors.length], size: 2 + Math.floor(Math.random() * 3), age: 0, life: 0.7,
+        });
+      }
+    } else if (ev.type === 'pickup') {
+      const text = ev.rupiah ? `Rp ${ev.rupiah.toLocaleString('id-ID')}` : `+${ev.amount}`;
+      this.items.push({ kind: 'popup', x: ev.x, y: ev.y, z: 24, text, color: ev.rupiah ? '#f2c94c' : '#7ce07a', age: 0, life: 0.9 });
     } else if (ev.type === 'swing') {
       this.items.push({ kind: 'swing', who: ev.who, move: ev.move, age: 0, life: 0.12 });
     }
@@ -34,11 +47,17 @@ export class Effects {
   update(dt) {
     for (const e of this.items) {
       e.age += dt;
-      if (e.kind === 'dust' || e.kind === 'chip') {
+      if (e.kind === 'dust' || e.kind === 'chip' || e.kind === 'debris') {
         e.x += e.vx * dt;
         e.z += e.vz * dt;
-        if (e.kind === 'chip') e.vz -= 500 * dt;
+        if (e.kind !== 'dust') e.vz -= 500 * dt;
+        if (e.kind === 'debris' && e.z < 0) {
+          e.z = 0;
+          e.vz = 0;
+          e.vx *= 0.8;
+        }
       }
+      if (e.kind === 'popup') e.z += 30 * dt;
     }
     this.items = this.items.filter((e) => e.age < e.life);
   }
@@ -61,6 +80,19 @@ export class Effects {
           const len = i % 2 ? r * 0.55 : r;
           for (let d = 3; d < len; d++) ctx.fillRect(Math.round(x + Math.cos(a) * d), Math.round(y + Math.sin(a) * d), 2, 2);
         }
+      } else if (e.kind === 'debris') {
+        ctx.globalAlpha = Math.min(1, k * 2);
+        ctx.fillStyle = e.color;
+        ctx.fillRect(Math.round(e.x - camX), Math.round(e.y - e.z), e.size, e.size);
+        ctx.globalAlpha = 1;
+      } else if (e.kind === 'popup') {
+        ctx.font = 'bold 8px monospace';
+        ctx.globalAlpha = Math.min(1, k * 2);
+        ctx.fillStyle = '#120c0a';
+        ctx.fillText(e.text, Math.round(e.x - camX - 10 + 1), Math.round(e.y - e.z + 1));
+        ctx.fillStyle = e.color;
+        ctx.fillText(e.text, Math.round(e.x - camX - 10), Math.round(e.y - e.z));
+        ctx.globalAlpha = 1;
       } else if (e.kind === 'chip') {
         ctx.fillStyle = `rgba(255,236,170,${k})`;
         ctx.fillRect(Math.round(e.x - camX), Math.round(e.y - e.z), 2, 2);
