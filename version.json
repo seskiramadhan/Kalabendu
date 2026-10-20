@@ -1,17 +1,17 @@
 {
-  "version": "0.10.0",
+  "version": "0.11.0",
   "notes": {
     "id": [
-      "Stage 2 Pabrik Tutup: Satpam Bayaran (menangkis dari depan), Mandor Kejam, Robot Pengganti, bos Juragan Outsourcing — buruh bergabung membantu!",
-      "Stage 3 Pasar Rakyat → Lantai Bursa: Spekulan, Penimbun, Rentenir (rantai utang), lilin merah berjatuhan, bos Hantu Bursa",
-      "Warung Mak Inah antar-stage: Jamu, Sabuk, Kopi, Nasi Padang, Masker — harga naik tiap stage (inflasi)",
-      "Bukti (dokumen) mulai dijatuhkan musuh"
+      "Cerita antar-stage: adegan wayang kulit dengan Ki Dalang, dialog dengan potret (tekan Lanjut atau Lewati)",
+      "Pak Pejabat menawarkan suap sebelum stage 1–5: terima (uang + serangan, tapi zaman makin gelap & harga naik) atau tolak",
+      "Kumpulkan Bukti dari musuh dan bos (lihat ikon map di panel)",
+      "Tiga akhir cerita: Kalasuba, setengah jalan, atau Kalabendu berlanjut"
     ],
     "en": [
-      "Stage 2 Closed Factory: Hired Guards (block from the front), Cruel Foreman, Replacement Robots, boss Outsourcing Boss — laid-off workers join you!",
-      "Stage 3 People's Market → Trading Floor: Speculators, Hoarders, Loan Sharks (debt chain), falling red candles, boss Stock Market Ghost",
-      "Mak Inah's warung between stages: Jamu, Belt, Coffee, Nasi Padang, Face Mask — prices rise every stage (inflation)",
-      "Enemies start dropping evidence documents"
+      "Story between stages: wayang shadow-puppet scenes with Ki Dalang, dialogue with portraits (Next or Skip)",
+      "Mr. Official offers a bribe before stages 1–5: take it (money + attack, but a darker age & higher prices) or refuse",
+      "Collect Evidence from enemies and bosses (folder icon in your panel)",
+      "Three endings: Kalasuba, halfway, or Kalabendu goes on"
     ]
   }
 }

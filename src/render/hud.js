@@ -89,6 +89,15 @@ export class Hud {
     ctx.fillStyle = '#f3e3c3';
     ctx.font = `bold ${Math.round(8 * u)}px system-ui, sans-serif`;
     ctx.fillText(t(hero.def.nameKey).toUpperCase(), X(36), Y(13));
+    if (game.evidence) {
+      ctx.fillStyle = '#e6d6a0';
+      ctx.fillRect(X(104), Y(9), 8 * u, 6 * u);
+      ctx.fillStyle = '#c8322a';
+      ctx.fillRect(X(108), Y(10), 3 * u, 2 * u);
+      ctx.fillStyle = '#f2e090';
+      ctx.font = `bold ${Math.round(6.5 * u)}px system-ui, sans-serif`;
+      ctx.fillText(`${game.evidence}`, X(114), Y(13));
+    }
     bar(ctx, X(36), Y(18), 88 * u, 5 * u, hero.hp / hero.def.maxHp, '#4aa03c', u);
     this.drawSemangat(ctx, hero, X(36), Y(26), 88 * u, 3 * u, u);
     ctx.font = `${Math.round(6.5 * u)}px system-ui, sans-serif`;

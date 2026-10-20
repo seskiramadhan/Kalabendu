@@ -1,6 +1,6 @@
 # NEXT — Kalabendu (beat 'em up) plan
 
-Status line: **Milestone 7 done, Milestone 8 next (user asked to finish all milestones in one go, then review)** (2026-10-20; stage list updated by the user the same day)
+Status line: **Milestone 8 done, Milestone 9 next (user asked to finish all milestones in one go, then review)** (2026-10-20; stage list updated by the user the same day)
 
 ## Milestones (each playable before the next)
 | # | Milestone | Status |
@@ -12,7 +12,7 @@ Status line: **Milestone 7 done, Milestone 8 next (user asked to finish all mile
 | 5 | Gamepad, menus (Mulai, Lanjutkan, Pilih Jagoan, Pengaturan), save; touch + ID/EN | done (v0.8.0; money spill v0.7.1) |
 | 6 | Stage 1 Hutan Terbakar → Kebun Sawit: Asap, Pembakar Lahan, Penebang Liar, Buldoser Liar, Raja Sawit; era system + background changes; karhutla flames/haze | done (v0.9.0) |
 | 7 | Stage 2 Pabrik Tutup (Satpam Bayaran, Mandor Kejam, Robot Pengganti, Juragan Outsourcing + worker allies) and Stage 3 Pasar Rakyat → Lantai Bursa (Spekulan, Penimbun, Rentenir, candlestick hazards, Hantu Bursa); warung shop + inflation | done (v0.10.0) |
-| 8 | Story scenes (dialogue + wayang silhouettes), Pejabat bribes before stages 1-5, bukti, endings | todo |
+| 8 | Story scenes (dialogue + wayang silhouettes), Pejabat bribes before stages 1-5, bukti, endings | done (v0.11.0) |
 | 9 | Stage 4 Jalan Raya Demo (Preman Bayaran, Provokator, Buzzer, Komandan Preman) and Stage 5 Gedung Pejabat (Tikus Berdasi, Ajudan, Makelar Kasus, Jaksa Palsu, Pejabat Tinggi, Batara Kala) | todo |
 | 10 | Sri, Ujang, Mak Inah; local 2-player co-op | todo |
 | — | README in English + Indonesian | todo |
@@ -23,6 +23,7 @@ Status line: **Milestone 7 done, Milestone 8 next (user asked to finish all mile
 - GitHub Pages is live: https://seskiramadhan.github.io/Kalabendu/
 
 ## Notes
+- Story: src/story/story.js (STORY per stage, ENDINGS, EVIDENCE_NEEDED=8), src/story/wayang.js (scenes), src/ui/story.js. Ending chosen after FINAL_STAGE (stage5): bad if any bribe, good if Batara Kala beaten (section requires flag kala = no bribes + evidence), else neutral.
 - Shared engine (M7): blocking (def.block), shots (combat/shots.js, effects freeze/pull/fine), allies (entities/allies.js, kind ally), candle hazards, generic AIs in ai/common.js (ranged, ally, thief, support, provokator, boss with def.attacks + def.summons).
 - Shop: systems/economy.js; save.upgrades (permanent), save.boosts (next stage only), inflation from stages cleared and bribes.
 - Stages register in main.js STAGES + STAGE_ORDER; clearing one unlocks the next and sets save.stage. Era gain per stage = stage.eraGain + 2 per villager saved (systems/era.js; save.era starts at 10). M8 bribes should subtract era.

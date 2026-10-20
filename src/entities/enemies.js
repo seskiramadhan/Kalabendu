@@ -53,7 +53,7 @@ export const ENEMIES = {
     ai: 'arsonist',
     reach: 44,
     score: 300,
-    drops: { koin: 0.4, es_teh: 0.1 },
+    drops: { koin: 0.4, es_teh: 0.1, bukti: 0.12 },
     look: { ...PREMAN_LOOK, top: '#e86a1a', clothLight: '#f2c94c', pants: '#3a3a3a', headgear: 'bandana', bandana: '#3a3a3a' },
   },
   penebang: {
@@ -67,7 +67,7 @@ export const ENEMIES = {
     ai: 'brawler',
     reach: 54,
     score: 400,
-    drops: { koin: 0.5, nasi_bungkus: 0.08 },
+    drops: { koin: 0.5, nasi_bungkus: 0.08, bukti: 0.15 },
     look: { ...PREMAN_LOOK, top: '#4a6a8a', clothLight: '#6a8aaa', pants: '#5a4a3a', headgear: 'helmet', helmet: '#f2c94c' },
   },
   asap: {
@@ -104,7 +104,7 @@ export const ENEMIES = {
     body: { w: 34, h: 50 },
     reach: 60,
     score: 3000,
-    drops: { nasi_bungkus: 1, uang: 1 },
+    drops: { nasi_bungkus: 1, uang: 1, bukti: 1 },
     look: PREMAN_LOOK,
   },
   raja_sawit: {
@@ -125,7 +125,7 @@ export const ENEMIES = {
     body: { w: 30, h: 110 },
     reach: 70,
     score: 12000,
-    drops: { uang: 1 },
+    drops: { uang: 1, bukti: 1 },
     look: PREMAN_LOOK,
   },
   // ---- Stage 2: Pabrik Tutup ----

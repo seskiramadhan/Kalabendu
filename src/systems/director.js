@@ -48,6 +48,8 @@ export class Director {
     }
     if (alive > 0) return;
     this.index++;
+    // Some sections only happen on the true path (e.g. Batara Kala).
+    while (this.index < this.sections.length && this.sections[this.index].requires && !g.flags?.[this.sections[this.index].requires]) this.index++;
     if (this.index >= this.sections.length) {
       this.done = true;
       g.stageClear();

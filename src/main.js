@@ -15,11 +15,14 @@ import { STAGE1 } from './stages/stage1_hutan.js';
 import { STAGE2 } from './stages/stage2_pabrik.js';
 import { STAGE3 } from './stages/stage3_pasar.js';
 import { buy, applyToHero } from './systems/economy.js';
+import { Story } from './ui/story.js';
+import { STORY, ENDINGS, endingFor, canFaceKala, totalEvidence } from './story/story.js';
 import { SPECIAL_COST } from './entities/fighter.js';
 
 const STAGES = { padepokan: PADEPOKAN, stage0: STAGE0, stage1: STAGE1, stage2: STAGE2, stage3: STAGE3 };
 const STAGE_ORDER = ['stage0', 'stage1', 'stage2', 'stage3'];
 const nextStageOf = (id) => STAGE_ORDER[STAGE_ORDER.indexOf(id) + 1] ?? null;
+const FINAL_STAGE = 'stage5';
 const urlStage = new URLSearchParams(location.search).get('stage');
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
@@ -57,11 +60,14 @@ function applySettings() {
   document.body.dataset.buttons = s.buttons;
 }
 
-function newGame(stageId, { rupiah = 0 } = {}) {
-  game = new Game(STAGES[stageId] ?? STAGE0, (Math.random() * 1e9) >>> 0, { era: save.era });
+function newGame(stageId, { rupiah = 0, preview = false } = {}) {
+  game = new Game(STAGES[stageId] ?? STAGE0, (Math.random() * 1e9) >>> 0, { era: save.era, flags: { kala: canFaceKala(save) } });
   const hero = game.addHero('p1', save.hero);
-  applyToHero(hero, save);
-  persist();
+  // A preview (behind a story scene) must not use up one-stage boosts.
+  if (!preview) {
+    applyToHero(hero, save);
+    persist();
+  }
   game.rupiah = rupiah;
   renderer.setStage(game.stage);
   applySettings();
@@ -69,7 +75,7 @@ function newGame(stageId, { rupiah = 0 } = {}) {
   continueBtn.hidden = true;
   nextBtn.hidden = true;
   savedThisClear = false;
-  globalThis.kalabendu = { game, renderer, keyboard, menu, screens, loop, save };
+  globalThis.kalabendu = { game, renderer, keyboard, menu, screens, loop, save, story, totalEvidence };
 }
 
 function play(stageId, opts) {
@@ -85,11 +91,64 @@ function play(stageId, opts) {
   setTimeout(() => (hint.style.opacity = '0'), 8000);
 }
 
+// Opens a stage with its story scene (and the Pejabat's offer, if any).
+function startStage(stageId, opts = {}) {
+  const scene = STORY[stageId]?.intro;
+  if (!scene || opts.skipStory) {
+    play(stageId, { rupiah: save.rupiah });
+    return;
+  }
+  mode = 'story';
+  paused = true;
+  releaseInputs();
+  screens.hide();
+  renderer.showHud = false;
+  document.body.classList.add('in-menu');
+  newGame(stageId, { rupiah: save.rupiah, preview: true });
+  story.play(scene, {
+    onBribe: (accept, amount) => applyBribe(stageId, accept, amount),
+    onDone: () => play(stageId, { rupiah: save.rupiah }),
+  });
+}
+
+// Accepting: money and +30% attack for the stage, but the era sinks and
+// prices climb. Refusing: the era rises a little.
+function applyBribe(stageId, accept, amount) {
+  save.bribes = save.bribes.filter((id) => id !== stageId);
+  save.refused = save.refused.filter((id) => id !== stageId);
+  if (accept) {
+    save.bribes.push(stageId);
+    save.rupiah += amount;
+    save.bribePower = true;
+    save.era = Math.max(0, save.era - 8);
+    audio.play('pickup');
+  } else {
+    save.refused.push(stageId);
+    save.bribePower = false;
+    save.era = Math.min(100, save.era + 3);
+    audio.play('combo');
+  }
+  persist();
+}
+
+function showEnding() {
+  const type = endingFor(save, game.beatKala);
+  save.ending = type;
+  persist();
+  mode = 'story';
+  paused = true;
+  renderer.showHud = false;
+  document.body.classList.add('in-menu');
+  nextBtn.hidden = true;
+  againBtn.hidden = true;
+  story.play(ENDINGS[type], { onDone: () => toMenu() });
+}
+
 function toMenu() {
   mode = 'menu';
   document.body.classList.add('in-menu');
   renderer.showHud = false;
-  newGame(save.stage);
+  newGame(save.stage, { preview: true });
   paused = true;
   releaseInputs();
   if (menu.isOpen) menu.close();
@@ -119,15 +178,15 @@ const screens = new Screens(ui, {
     save.hero = hero;
     save.started = true;
     persist();
-    play(urlStage ?? 'stage0');
+    startStage(urlStage ?? 'stage0');
   },
-  onContinue: () => play(save.stage, { rupiah: save.rupiah }),
+  onContinue: () => startStage(save.stage),
   getStages: () =>
     STAGE_ORDER.map((id) => ({ id, stage: STAGES[id], unlocked: save.unlocked.includes(id), best: save.best[id] ?? 0 })),
   onPickStage: (id) => {
     save.started = true;
     persist();
-    play(id, { rupiah: save.rupiah });
+    startStage(id);
   },
   onPickHero: (id) => {
     save.hero = id;
@@ -148,12 +207,14 @@ const screens = new Screens(ui, {
     } else audio.play('deny');
     return ok;
   },
-  onShopDone: () => play(save.stage, { rupiah: save.rupiah }),
+  onShopDone: () => startStage(save.stage),
   onReset: () => {
     save = resetSave();
     applySettings();
   },
 });
+
+const story = new Story(ui);
 
 const menu = new Menu(ui, {
   running: await fetchVersion(),
@@ -187,6 +248,7 @@ menu.button.addEventListener('click', () => {
 });
 
 function activeOverlay() {
+  if (story.isOpen) return story.el;
   if (menu.isOpen) return menu.overlay;
   if (screens.isOpen) return screens.el;
   return null;
@@ -221,7 +283,8 @@ keyboard.onKey = (e) => {
   }
   if (e.code === 'Escape') {
     if (e.repeat) return true;
-    if (menu.isOpen) menu.close();
+    if (story.isOpen) story.skip();
+    else if (menu.isOpen) menu.close();
     else if (mode === 'play') openPause();
     else screens.back();
     return true;
@@ -281,6 +344,9 @@ function onClear() {
   save.rupiah = game.rupiah;
   save.best[game.stage.id] = Math.max(save.best[game.stage.id] ?? 0, game.score);
   save.era = game.eraAfter;
+  save.evidenceBy ??= {};
+  save.evidenceBy[game.stage.id] = Math.max(save.evidenceBy[game.stage.id] ?? 0, game.evidence);
+  save.bribePower = false;
   const next = nextStageOf(game.stage.id);
   if (next) {
     if (!save.unlocked.includes(next)) save.unlocked.push(next);
@@ -336,9 +402,10 @@ const loop = startLoop({
       againBtn.hidden = !showAgain;
     }
     const next = nextStageOf(game.stage.id);
-    const showNext = playing && game.cleared && !!next;
+    const isFinal = game.stage.id === FINAL_STAGE;
+    const showNext = playing && game.cleared && (!!next || isFinal);
     if (nextBtn.hidden === showNext) {
-      nextBtn.textContent = next ? `${t('nextStage')}: ${t(STAGES[next].nameKey)} →` : '';
+      nextBtn.textContent = isFinal ? `${t('seeEnding')} →` : next ? `${t('nextStage')}: ${t(STAGES[next].nameKey)} →` : '';
       nextBtn.hidden = !showNext;
     }
     const showContinue = playing && game.over && !game.finished;
@@ -354,9 +421,13 @@ const loop = startLoop({
   },
 });
 
-againBtn.addEventListener('click', () => play(game.stage.id, { rupiah: save.rupiah }));
+againBtn.addEventListener('click', () => startStage(game.stage.id, { skipStory: true }));
 continueBtn.addEventListener('click', () => (continueQueued = true));
 nextBtn.addEventListener('click', () => {
+  if (game.stage.id === FINAL_STAGE) {
+    showEnding();
+    return;
+  }
   // Between stages: the warung, then the next stage.
   mode = 'shop';
   paused = true;
@@ -368,7 +439,7 @@ nextBtn.addEventListener('click', () => {
   screens.show('shop');
 });
 
-newGame(urlStage ?? 'stage0');
+newGame(urlStage ?? 'stage0', { preview: !urlStage });
 if (urlStage) play(urlStage);
 else {
   document.body.classList.add('in-menu');

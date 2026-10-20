@@ -60,7 +60,7 @@ const isFighter = (e) => e.kind === 'hero' || e.kind === 'enemy' || e.kind === '
 // The whole simulation. Input arrives as messages; renderer and audio read
 // state and drain `events`.
 export class Game {
-  constructor(stage, seed = 1, { era = 10 } = {}) {
+  constructor(stage, seed = 1, { era = 10, flags = {} } = {}) {
     this.stage = stage;
     this.heroes = new Map();
     this.entities = [];
@@ -86,6 +86,8 @@ export class Game {
     this.eraAfter = era;
     this.darkness = 0;
     this.evidence = 0;
+    this.flags = flags;
+    this.beatKala = false;
     for (const p of stage.props ?? []) this.entities.push(createProp(p.type, p.x, p.y, p.drops));
     for (const it of stage.items ?? []) this.entities.push(createItem(it.type, it.x, it.y));
     this.director = stage.sections ? new Director(this) : null;
