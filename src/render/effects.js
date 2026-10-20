@@ -39,8 +39,11 @@ export class Effects {
     } else if (ev.type === 'special') {
       this.items.push({ kind: 'ring', who: ev.who, age: 0, life: 0.45 });
     } else if (ev.type === 'pickup') {
-      const text = ev.rupiah ? `Rp ${ev.rupiah.toLocaleString('id-ID')}` : `+${ev.amount}`;
-      this.items.push({ kind: 'popup', x: ev.x, y: ev.y, z: 24, text, color: ev.rupiah ? '#f2c94c' : '#7ce07a', age: 0, life: 0.9 });
+      const lost = ev.rupiah < 0 || ev.snatched;
+      const amount = ev.rupiah ? `Rp ${Math.abs(ev.rupiah).toLocaleString('id-ID')}` : `+${ev.amount}`;
+      const text = lost ? `-${amount}` : amount;
+      const color = lost ? '#ff6a4a' : ev.rupiah ? '#f2c94c' : '#7ce07a';
+      this.items.push({ kind: 'popup', x: ev.x, y: ev.y, z: 24, text, color, age: 0, life: 0.9 });
     } else if (ev.type === 'swing') {
       this.items.push({ kind: 'swing', who: ev.who, move: ev.move, age: 0, life: 0.12 });
     }

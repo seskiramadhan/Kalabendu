@@ -51,7 +51,7 @@ export function drawItem(ctx, it, camX, time) {
   const bob = it.z <= 0 ? Math.round(Math.sin(time * 4 + it.uid) * 1) : 0;
   const x = Math.round(it.x - camX);
   const y = Math.round(it.y - it.z - 2 + bob);
-  if (it.def.kind === 'coin' && it.t > 11 && Math.floor(time * 10) % 2) return;
+  if (it.def.kind === 'coin' && it.t > (it.lost ? 2 : 11) && Math.floor(time * 10) % 2) return;
   switch (it.type) {
     case 'nasi_bungkus':
       r(ctx, OUT, x - 8, y - 8, 16, 9);

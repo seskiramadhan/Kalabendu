@@ -44,6 +44,18 @@ export function thinkBrawler(e, game, dt, rand) {
   const isEngaged = engaged.has(e.uid);
   if (!isEngaged && engaged.size < MAX_ENGAGED && b.cool <= 0) engaged.add(e.uid);
 
+  // Greedy: a thug who is not attacking goes for spilled coins nearby.
+  {
+    const coin = nearestLostCoin(e, game, engaged.has(e.uid) ? 80 : 160);
+    if (coin) {
+      let held = 0;
+      if (Math.abs(coin.x - e.x) > 4) held |= coin.x > e.x ? BTN.RIGHT : BTN.LEFT;
+      if (Math.abs(coin.y - e.y) > 3) held |= coin.y > e.y ? BTN.DOWN : BTN.UP;
+      e.input.held = held;
+      return;
+    }
+  }
+
   const side = Math.sign(e.x - target.x) || b.side;
   const reach = e.def.reach;
   let tx;
@@ -90,6 +102,20 @@ function nearestHero(e, game) {
     if (d < bestD) {
       bestD = d;
       best = h;
+    }
+  }
+  return best;
+}
+
+function nearestLostCoin(e, game, range) {
+  let best = null;
+  let bestD = range;
+  for (const it of game.entities) {
+    if (it.kind !== 'item' || !it.lost || it.remove || it.z > 4) continue;
+    const d = Math.abs(it.x - e.x) + Math.abs(it.y - e.y);
+    if (d < bestD) {
+      bestD = d;
+      best = it;
     }
   }
   return best;

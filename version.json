@@ -1,17 +1,15 @@
 {
-  "version": "0.7.0",
+  "version": "0.7.1",
   "notes": {
     "id": [
-      "Meter Semangat (biru, 2 bagian) terisi saat memukul dan dipukul",
-      "Jurus Badai Sabit (I / tombol Jurus): tendangan berputar ke dua arah, kebal, bisa untuk lolos saat dipukul",
-      "Penghitung combo \"PUKULAN\" dengan bonus skor untuk combo panjang",
-      "3 nyawa: Bayu turun dari atas dan menghempas musuh; GAME OVER dengan hitungan mundur Lanjutkan"
+      "Uang keamanan! Setiap kena pukul, sebagian rupiah jatuh jadi koin (berkedip 6 detik)",
+      "Ambil kembali koinmu — preman di dekatmu akan berebut merampasnya",
+      "Kalahkan preman itu untuk mendapatkan uangmu kembali"
     ],
     "en": [
-      "Semangat meter (blue, 2 segments) fills as you hit and get hit",
-      "Crescent Storm special (I / Special button): spinning kick both ways, invincible, can break out of hitstun",
-      "HITS combo counter with bonus score for long combos",
-      "3 lives: Bayu drops back in and knocks enemies away; GAME OVER with a Continue countdown"
+      "Protection money! Every hit you take knocks some rupiah out as coins (they blink for 6 seconds)",
+      "Grab your coins back — nearby thugs rush to snatch them",
+      "Beat that thug to get your money back"
     ]
   }
 }

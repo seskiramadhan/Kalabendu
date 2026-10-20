@@ -22,6 +22,10 @@ const CONTINUE_TIME = 10;
 const RESPAWN_DELAY = 1.1;
 const SEMANGAT_DEAL = 0.9;
 const SEMANGAT_TAKE = 0.7;
+const COIN_VALUE = 500;
+const MAX_LOST_COINS = 8;
+const SNATCH_X = 14;
+const SNATCH_Y = 8;
 let nextProjectileUid = 3_000_000;
 
 function rng(seed) {
@@ -128,6 +132,7 @@ export class Game {
     for (const h of this.heroes.values()) h.input.pressed = 0;
     resolveHits(this);
     this.collectTouching();
+    this.snatchCoins();
     this.separateEnemies();
     for (const e of this.entities) if (isFighter(e)) this.keepOnStage(e);
     for (const h of this.heroes.values()) this.checkHeroDown(h);
@@ -159,6 +164,39 @@ export class Game {
     hero.semangat = Math.min(100, hero.semangat + m.damage * SEMANGAT_TAKE);
     this.endCombo();
     this.emit({ type: 'heroHurt', who: hero });
+    this.spillMoney(hero, m);
+  }
+
+  // "Uang keamanan": every hit knocks some rupiah out as coins on the floor.
+  // The hero can grab them back; nearby thugs try to snatch them first.
+  spillMoney(hero, m) {
+    if (this.rupiah <= 0) return;
+    const share = 0.04 + m.damage * 0.003;
+    let loss = Math.max(COIN_VALUE, Math.round((this.rupiah * share) / COIN_VALUE) * COIN_VALUE);
+    loss = Math.min(this.rupiah, loss);
+    this.rupiah -= loss;
+    const coins = Math.min(MAX_LOST_COINS, Math.max(1, Math.round(loss / COIN_VALUE)));
+    const each = Math.floor(loss / coins);
+    for (let i = 0; i < coins; i++) {
+      const value = i === coins - 1 ? loss - each * (coins - 1) : each;
+      const vx = (this.rand() - 0.5) * 160;
+      this.entities.push(createItem('koin', hero.x, hero.y + (this.rand() - 0.5) * 10, { z: 24, vz: 150 + this.rand() * 80, vx, value, lost: true }));
+    }
+    this.emit({ type: 'pickup', x: hero.x, y: hero.y - 20, rupiah: -loss });
+  }
+
+  snatchCoins() {
+    for (const e of this.entities) {
+      if (e.kind !== 'enemy' || e.def.boss || (e.state !== 'idle' && e.state !== 'walk')) continue;
+      for (const it of this.entities) {
+        if (it.kind !== 'item' || it.remove || !it.lost || it.z > 4) continue;
+        if (Math.abs(it.x - e.x) > SNATCH_X || Math.abs(it.y - e.y) > SNATCH_Y) continue;
+        it.remove = true;
+        e.loot = (e.loot ?? 0) + it.value;
+        this.emit({ type: 'pickup', x: e.x, y: e.y - 30, rupiah: it.value, snatched: true });
+        this.emit({ type: 'sfx', name: 'deny' });
+      }
+    }
   }
 
   updateCombo(dt) {
@@ -258,9 +296,9 @@ export class Game {
           h.hp = Math.min(h.def.maxHp, h.hp + it.def.heal);
           this.emit({ type: 'pickup', x: it.x, y: it.y, key: it.def.nameKey, amount: it.def.heal });
         } else {
-          this.rupiah += it.def.rupiah;
-          this.addScore(it.def.score);
-          this.emit({ type: 'pickup', x: it.x, y: it.y, rupiah: it.def.rupiah });
+          this.rupiah += it.value;
+          if (!it.lost) this.addScore(it.def.score);
+          this.emit({ type: 'pickup', x: it.x, y: it.y, rupiah: it.value });
         }
         this.emit({ type: 'sfx', name: 'pickup' });
       }
@@ -352,6 +390,10 @@ export class Game {
       }
     }
     if (e.weapon) this.dropWeapon(e);
+    if (e.loot) {
+      this.entities.push(createItem('uang', e.x, e.y, { z: 20, vz: 180, vx: (this.rand() - 0.5) * 60, value: e.loot }));
+      e.loot = 0;
+    }
     if (e.def.boss) this.emit({ type: 'bossDown', who: e });
   }
 
