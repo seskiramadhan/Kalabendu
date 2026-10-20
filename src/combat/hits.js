@@ -33,13 +33,15 @@ function boxAround(e, h) {
 
 export function hurtbox(f) {
   if (f.kind === 'prop') return { x0: f.x - f.def.w / 2, x1: f.x + f.def.w / 2, z0: 0, z1: f.def.h };
-  if (f.kind === 'item' || f.kind === 'projectile') return null;
+  if (f.kind !== 'hero' && f.kind !== 'enemy') return null;
   if (f.thrown || f.state === 'knockdown' || f.state === 'getup' || f.state === 'dead') return null;
   const scale = f.def.size ?? 1;
   if (f.state === 'airborne') {
     return { x0: f.x - 16 * scale, x1: f.x + 16 * scale, z0: f.z, z1: f.z + 30 * scale };
   }
-  return { x0: f.x - BODY_W * scale, x1: f.x + BODY_W * scale, z0: f.z, z1: f.z + BODY_H * scale };
+  const bw = f.def.body?.w ?? BODY_W * scale;
+  const bh = f.def.body?.h ?? BODY_H * scale;
+  return { x0: f.x - bw, x1: f.x + bw, z0: f.z, z1: f.z + bh };
 }
 
 export function resolveHits(game) {
@@ -100,7 +102,9 @@ function wearWeapon(game, attacker, m) {
 // launchDir + thrown (Bantingan).
 export function react(game, attacker, target, m, contact, opts = {}) {
   const hero = owner(game, attacker);
-  target.hp = Math.max(0, target.hp - m.damage);
+  // Guarded bosses take reduced damage until they are dizzy.
+  const guard = target.def.guard && target.state !== 'dizzy' ? target.def.guard : 1;
+  target.hp = Math.max(0, target.hp - m.damage * guard);
   target.lastHitAt = game.time;
   if (hero?.team === 'hero' && target.team !== 'hero') game.heroLanded(hero, m);
   if (target.team === 'hero') game.heroHurt(target, m);
@@ -117,6 +121,22 @@ export function react(game, attacker, target, m, contact, opts = {}) {
 
   if (armored) return;
   if (opts.keepGrabbed && target.hp > 0) return;
+  // Machines and giants never flinch; haze spirits only drift back.
+  if (target.def.immovable || target.def.float) {
+    if (target.hp <= 0) {
+      target.state = 'dead';
+      target.t = 0;
+      target.move = null;
+      game.emit({ type: 'break', x: target.x, y: target.y, z: 30, colors: target.def.float ? ['#9a9a9a', '#c8c8c8', '#7a7a7a'] : ['#f2c94c', '#3a3a3a', '#7a4e24'], big: true });
+      game.onKill(target);
+    } else if (target.def.float) {
+      target.state = 'hurt';
+      target.t = 0;
+      target.stun = 0.25;
+      target.vx = dir * m.push * 0.8;
+    }
+    return;
+  }
 
   target.facing = -dir;
   target.move = null;

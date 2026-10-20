@@ -95,6 +95,20 @@ class Audio {
         this.tone(0.35, { freq: 220, to: 880, type: 'sawtooth', gain: 0.12 });
         this.noise(0.4, { freq: 400, sweepTo: 3000, q: 0.6, gain: 0.25 });
         break;
+      case 'fire':
+        this.noise(0.3, { freq: 600, type: 'lowpass', gain: 0.25 });
+        break;
+      case 'steam':
+        this.noise(0.35, { freq: 3000, type: 'highpass', gain: 0.18 });
+        break;
+      case 'saw':
+        this.tone(0.3, { freq: 110, to: 160, type: 'sawtooth', gain: 0.1 });
+        this.noise(0.3, { freq: 1500, q: 2, gain: 0.12 });
+        break;
+      case 'horn':
+        this.tone(0.45, { freq: 196, type: 'square', gain: 0.12 });
+        this.tone(0.45, { freq: 247, type: 'square', gain: 0.1 });
+        break;
       case 'deny':
         this.tone(0.12, { freq: 180, to: 120, type: 'square', gain: 0.12 });
         break;

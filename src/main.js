@@ -11,9 +11,12 @@ import { Menu, fetchVersion } from './ui/menu.js';
 import { Screens, navigate } from './ui/screens.js';
 import { PADEPOKAN } from './stages/padepokan.js';
 import { STAGE0 } from './stages/stage0_kampung.js';
+import { STAGE1 } from './stages/stage1_hutan.js';
 import { SPECIAL_COST } from './entities/fighter.js';
 
-const STAGES = { padepokan: PADEPOKAN, stage0: STAGE0 };
+const STAGES = { padepokan: PADEPOKAN, stage0: STAGE0, stage1: STAGE1 };
+const STAGE_ORDER = ['stage0', 'stage1'];
+const nextStageOf = (id) => STAGE_ORDER[STAGE_ORDER.indexOf(id) + 1] ?? null;
 const urlStage = new URLSearchParams(location.search).get('stage');
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
@@ -26,6 +29,7 @@ const hint = document.getElementById('hint');
 const moveLabel = document.getElementById('move-label');
 const againBtn = document.getElementById('again');
 const continueBtn = document.getElementById('continue');
+const nextBtn = document.getElementById('next');
 const renderer = new Renderer(canvas);
 const keyboard = new Keyboard();
 const pads = new Gamepads();
@@ -51,13 +55,14 @@ function applySettings() {
 }
 
 function newGame(stageId, { rupiah = 0 } = {}) {
-  game = new Game(STAGES[stageId] ?? STAGE0, (Math.random() * 1e9) >>> 0);
+  game = new Game(STAGES[stageId] ?? STAGE0, (Math.random() * 1e9) >>> 0, { era: save.era });
   game.addHero('p1', save.hero);
   game.rupiah = rupiah;
   renderer.setStage(game.stage);
   applySettings();
   againBtn.hidden = true;
   continueBtn.hidden = true;
+  nextBtn.hidden = true;
   savedThisClear = false;
   globalThis.kalabendu = { game, renderer, keyboard, menu, screens, loop, save };
 }
@@ -85,6 +90,7 @@ function toMenu() {
   if (menu.isOpen) menu.close();
   againBtn.hidden = true;
   continueBtn.hidden = true;
+  nextBtn.hidden = true;
   screens.show('title');
 }
 
@@ -111,6 +117,13 @@ const screens = new Screens(ui, {
     play(urlStage ?? 'stage0');
   },
   onContinue: () => play(save.stage, { rupiah: save.rupiah }),
+  getStages: () =>
+    STAGE_ORDER.map((id) => ({ id, stage: STAGES[id], unlocked: save.unlocked.includes(id), best: save.best[id] ?? 0 })),
+  onPickStage: (id) => {
+    save.started = true;
+    persist();
+    play(id, { rupiah: save.rupiah });
+  },
   onPickHero: (id) => {
     save.hero = id;
     persist();
@@ -253,6 +266,12 @@ function onClear() {
   save.started = true;
   save.rupiah = game.rupiah;
   save.best[game.stage.id] = Math.max(save.best[game.stage.id] ?? 0, game.score);
+  save.era = game.eraAfter;
+  const next = nextStageOf(game.stage.id);
+  if (next) {
+    if (!save.unlocked.includes(next)) save.unlocked.push(next);
+    save.stage = next;
+  }
   persist();
 }
 
@@ -302,6 +321,12 @@ const loop = startLoop({
       againBtn.textContent = t('playAgain');
       againBtn.hidden = !showAgain;
     }
+    const next = nextStageOf(game.stage.id);
+    const showNext = playing && game.cleared && !!next;
+    if (nextBtn.hidden === showNext) {
+      nextBtn.textContent = next ? `${t('nextStage')}: ${t(STAGES[next].nameKey)} →` : '';
+      nextBtn.hidden = !showNext;
+    }
     const showContinue = playing && game.over && !game.finished;
     if (continueBtn.hidden === showContinue) {
       continueBtn.textContent = t('continueBtn');
@@ -317,6 +342,7 @@ const loop = startLoop({
 
 againBtn.addEventListener('click', () => play(game.stage.id, { rupiah: save.rupiah }));
 continueBtn.addEventListener('click', () => (continueQueued = true));
+nextBtn.addEventListener('click', () => play(nextStageOf(game.stage.id), { rupiah: save.rupiah }));
 
 newGame(urlStage ?? 'stage0');
 if (urlStage) play(urlStage);

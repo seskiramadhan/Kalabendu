@@ -48,6 +48,7 @@ const ATTACK = {
   sweep: ['sweep_wind', 'sweep_hit'],
   airkick: ['airkick', 'airkick'],
   airpunch: ['airpunch', 'airpunch'],
+  throwPose: ['grab', 'throwPose'],
 };
 
 const LOOPS = {
@@ -91,7 +92,7 @@ function attackPose(f) {
     if (f.t < s0 + a0) return { ...POSES.sabit_hit, spin: ((f.t - s0) / a0) * 720 };
     return lerpPose(POSES.sabit_hit, POSES.stance, ease(Math.min(1, (f.t - s0 - a0) / (m.recovery * FRAME))));
   }
-  const [wind, hit] = ATTACK[m.anim];
+  const [wind, hit] = ATTACK[m.anim] ?? ATTACK.jab;
   const s = m.startup * FRAME;
   const a = m.active * FRAME;
   const r = m.recovery * FRAME;

@@ -23,6 +23,31 @@ export function drawProp(ctx, p, camX, time) {
     r(ctx, '#a07a48', x - 11, y - 18, 22, 4);
     r(ctx, '#e0d6b0', x - 2, y - 18, 4, 17);
     r(ctx, '#8a6a3a', x + 4, y - 10, 5, 3);
+  } else if (p.type === 'jerigen') {
+    r(ctx, OUT, x - 8, y - 21, 16, 21);
+    r(ctx, '#c8322a', x - 7, y - 20, 14, 19);
+    r(ctx, '#e8574a', x - 5, y - 18, 3, 15);
+    r(ctx, OUT, x + 1, y - 24, 5, 4);
+    r(ctx, '#3a3a3a', x - 4, y - 23, 6, 3);
+  } else if (p.type === 'warga') {
+    // a villager tied to a post, waving for help
+    r(ctx, '#5e3b1a', x - 2, y - 56, 5, 56);
+    const wave = Math.round(Math.sin(time * 6) * 3);
+    r(ctx, OUT, x - 8, y - 46, 16, 30);
+    r(ctx, '#5a8a6a', x - 7, y - 45, 14, 20);
+    r(ctx, '#6a4a2a', x - 7, y - 26, 14, 26);
+    r(ctx, '#b07a4f', x - 6, y - 56, 12, 10);
+    r(ctx, '#c8a050', x - 10, y - 60, 20, 4);
+    r(ctx, '#d8b56a', x - 6, y - 64, 12, 4);
+    r(ctx, OUT, x - 2, y - 52, 2, 2);
+    r(ctx, '#e6e0cc', x - 8, y - 36, 16, 2);
+    r(ctx, '#e6e0cc', x - 8, y - 30, 16, 2);
+    r(ctx, '#b07a4f', x + 7, y - 52 + wave, 3, 8);
+    if (Math.floor(time * 2) % 2) {
+      ctx.fillStyle = '#f6f2e4';
+      ctx.font = 'bold 7px monospace';
+      ctx.fillText('TOLONG!', x - 14, y - 70);
+    }
   } else if (p.type === 'gerobak') {
     // gerobak bakso: wooden cart with a glass case, wheel and sign
     r(ctx, OUT, x - 31, y - 47, 62, 40);
@@ -83,8 +108,26 @@ export function drawItem(ctx, it, camX, time) {
   }
 }
 
+function flamesSmall(ctx, x, y) {
+  const t = performance.now() / 60;
+  for (let i = -2; i <= 2; i++) {
+    const h = 4 + Math.sin(t + i * 2) * 2 + (2 - Math.abs(i)) * 2;
+    r(ctx, '#e0402a', x + i * 2, y - h, 2, h);
+    r(ctx, '#ffd25a', x + i * 2, y - h * 0.5, 1, h * 0.5);
+  }
+}
+
 function drawWeaponFlat(ctx, id, x, y) {
   const w = WEAPONS[id];
+  if (w.draw === 'bag') {
+    r(ctx, OUT, x - 9, y - 14, 18, 15);
+    r(ctx, w.color, x - 8, y - 13, 16, 13);
+    r(ctx, '#8a6a3a', x - 2, y - 16, 4, 3);
+    ctx.fillStyle = '#5a3a1a';
+    ctx.font = 'bold 6px monospace';
+    ctx.fillText('Rp', x - 5, y - 4);
+    return;
+  }
   if (w.draw === 'pole') {
     r(ctx, OUT, x - w.len / 2 - 1, y - 4, w.len + 2, 4);
     r(ctx, w.color, x - w.len / 2, y - 3, w.len, 2);
@@ -133,6 +176,26 @@ export function drawHeldWeapon(ctx, pts, id, facing) {
     r(ctx, w.color, cx - 8, cy - 8, 16, 3);
     r(ctx, w.color, cx - 8 * facing, cy - 8, 3, 16);
     r(ctx, w.color, cx - 8, cy, 16, 3);
+  } else if (w.draw === 'torch') {
+    for (let i = -4; i < w.len; i++) r(ctx, i < 0 ? OUT : w.color, hx + dx * i - 1, hy + dy * i - 1, 2, 2);
+    const tx = hx + dx * w.len;
+    const ty = hy + dy * w.len;
+    flamesSmall(ctx, tx, ty);
+  } else if (w.draw === 'saw') {
+    const cx = hx + dx * 6;
+    const cy = hy + dy * 6;
+    r(ctx, OUT, cx - 6, cy - 5, 12, 10);
+    r(ctx, w.color, cx - 5, cy - 4, 10, 8);
+    const bx = cx + dx * 8;
+    const by = cy + dy * 8;
+    for (let i = 0; i < 22; i++) {
+      const tooth = (i + Math.floor(performance.now() / 40)) % 3 === 0;
+      r(ctx, OUT, bx + dx * i - 2, by + dy * i - 2, 4, 4);
+      r(ctx, tooth ? '#f6f2e4' : '#9a9a9a', bx + dx * i - 1, by + dy * i - 1, 3, 3);
+    }
+  } else if (w.draw === 'bag') {
+    r(ctx, OUT, hx - 7, hy - 7, 14, 14);
+    r(ctx, w.color, hx - 6, hy - 6, 12, 12);
   } else if (w.draw === 'bucket') {
     const cx = hx + dx * 4;
     const cy = hy + dy * 4;

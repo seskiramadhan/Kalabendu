@@ -67,6 +67,7 @@ export function thinkBrawler(e, game, dt, rand) {
     tx = target.x + side * b.wait;
     ty = target.y + b.yOff;
   }
+  tx = Math.max(game.camera.x + 20, Math.min(game.camera.x + 460, tx));
 
   const dx = tx - e.x;
   const dy = ty - e.y;

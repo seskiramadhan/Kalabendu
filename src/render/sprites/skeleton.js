@@ -150,6 +150,15 @@ function drawHeadgear(ctx, look, hx, hy, facing) {
     ctx.fillRect(facing > 0 ? hx - 1 : hx - 7, hy - 2, 8, 3);
     ctx.fillStyle = '#4a4a5a';
     ctx.fillRect(facing > 0 ? hx + 1 : hx - 5, hy - 2, 2, 1);
+  } else if (look.headgear === 'helmet') {
+    ctx.fillStyle = look.helmet;
+    ctx.fillRect(hx - 7, hy - 10, 15, 6);
+    ctx.fillRect(hx - 9, hy - 5, 19, 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillRect(hx - 4, hy - 9, 4, 1);
+  } else if (look.headgear === 'caping') {
+    ctx.fillStyle = '#d8b56a';
+    for (let i = 0; i < 6; i++) ctx.fillRect(hx - 2 - i * 2, hy - 12 + i, 5 + i * 4, 1);
   } else if (look.headgear === 'bandana') {
     ctx.fillStyle = look.bandana;
     ctx.fillRect(hx - 7, hy - 8, 15, 5);

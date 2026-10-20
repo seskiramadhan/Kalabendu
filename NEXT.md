@@ -1,6 +1,6 @@
 # NEXT — Kalabendu (beat 'em up) plan
 
-Status line: **Milestone 5 done, Milestone 6 next** (2026-10-20; stage list updated by the user the same day)
+Status line: **Milestone 6 done, Milestone 7 next** (2026-10-20; stage list updated by the user the same day)
 
 ## Milestones (each playable before the next)
 | # | Milestone | Status |
@@ -10,7 +10,7 @@ Status line: **Milestone 5 done, Milestone 6 next** (2026-10-20; stage list upda
 | 3 | Stage 0 Kampung Saat Fajar: go-arrow sections, waves, pickups (nasi bungkus, es teh, coins, weapons), breakables (gerobak, drum, kardus), grab + throw (Kuncian), Preman Kampung boss, tutorial hints, basic HUD | done (v0.6.0) |
 | 4 | Full HUD, Semangat meter + special move, combo counter, score, game over + continue | done (v0.7.0; enemy bars SoR-style v0.6.1) |
 | 5 | Gamepad, menus (Mulai, Lanjutkan, Pilih Jagoan, Pengaturan), save; touch + ID/EN | done (v0.8.0; money spill v0.7.1) |
-| 6 | Stage 1 Hutan Terbakar → Kebun Sawit: Asap, Pembakar Lahan, Penebang Liar, Buldoser Liar, Raja Sawit; era system + background changes; karhutla flames/haze | todo |
+| 6 | Stage 1 Hutan Terbakar → Kebun Sawit: Asap, Pembakar Lahan, Penebang Liar, Buldoser Liar, Raja Sawit; era system + background changes; karhutla flames/haze | done (v0.9.0) |
 | 7 | Stage 2 Pabrik Tutup (Satpam Bayaran, Mandor Kejam, Robot Pengganti, Juragan Outsourcing + worker allies) and Stage 3 Pasar Rakyat → Lantai Bursa (Spekulan, Penimbun, Rentenir, candlestick hazards, Hantu Bursa); warung shop + inflation | todo |
 | 8 | Story scenes (dialogue + wayang silhouettes), Pejabat bribes before stages 1-5, bukti, endings | todo |
 | 9 | Stage 4 Jalan Raya Demo (Preman Bayaran, Provokator, Buzzer, Komandan Preman) and Stage 5 Gedung Pejabat (Tikus Berdasi, Ajudan, Makelar Kasus, Jaksa Palsu, Pejabat Tinggi, Batara Kala) | todo |
@@ -23,6 +23,9 @@ Status line: **Milestone 5 done, Milestone 6 next** (2026-10-20; stage list upda
 - GitHub Pages is live: https://seskiramadhan.github.io/Kalabendu/
 
 ## Notes
+- Stages register in main.js STAGES + STAGE_ORDER; clearing one unlocks the next and sets save.stage. Era gain per stage = stage.eraGain + 2 per villager saved (systems/era.js; save.era starts at 10). M8 bribes should subtract era.
+- Stage 1 systems: systems/environment.js (fire hazards, ember douses fire, Asap poison, haze level, mud slow via stage.zones[].slow, rescue NPCs), ai/stage1.js (arsonist, haze, dozer, rajaSawit).
+- Bot playthrough scripts lived in the session scratchpad; a real player clears Stage 1 faster than the bot (bot took ~9 min game time).
 - Save (localStorage kalabendu.save.v1): started, stage, unlocked, heroes, hero, era, rupiah, bribes, best, settings. Written on stage clear and on settings change; Lanjutkan starts save.stage with save.rupiah. M6 must add stage1 to unlocked and set save.stage on clear.
 - Gamepad: A jump, B special, X light, Y heavy, bumpers/triggers dodge, Start pause. Pad 1 reserved for player 2 (M10).
 - Continue is an input message {type:'continue', playerId} so online co-op can send it too.

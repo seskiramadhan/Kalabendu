@@ -9,10 +9,19 @@ import { resolveHits, react } from './combat/hits.js';
 import { thinkBrawler } from './ai/brawler.js';
 import { thinkBossPreman } from './ai/boss_preman.js';
 import { Director } from './systems/director.js';
+import { updateEnvironment, spawnFire, spawnFireAhead, throwBag, landBag, rescue, zoneAt } from './systems/environment.js';
+import { thinkArsonist, thinkHaze, thinkDozer, thinkRajaSawit } from './ai/stage1.js';
 import { VIEW_W } from './core/view.js';
 
 const EDGE = 14;
-const BRAINS = { brawler: thinkBrawler, bossPreman: thinkBossPreman };
+const BRAINS = {
+  brawler: thinkBrawler,
+  bossPreman: thinkBossPreman,
+  arsonist: thinkArsonist,
+  haze: thinkHaze,
+  dozer: thinkDozer,
+  rajaSawit: thinkRajaSawit,
+};
 const PICKUP_X = 16;
 const PICKUP_Y = 9;
 const GRAB_X = 24;
@@ -41,7 +50,7 @@ const isFighter = (e) => e.kind === 'hero' || e.kind === 'enemy';
 // The whole simulation. Input arrives as messages; renderer and audio read
 // state and drain `events`.
 export class Game {
-  constructor(stage, seed = 1) {
+  constructor(stage, seed = 1, { era = 10 } = {}) {
     this.stage = stage;
     this.heroes = new Map();
     this.entities = [];
@@ -61,6 +70,10 @@ export class Game {
     this.over = false;
     this.continueTimer = 0;
     this.taughtSpecial = false;
+    this.haze = stage.haze ?? 0;
+    this.saved = 0;
+    this.era = era;
+    this.eraAfter = era;
     for (const p of stage.props ?? []) this.entities.push(createProp(p.type, p.x, p.y, p.drops));
     for (const it of stage.items ?? []) this.entities.push(createItem(it.type, it.x, it.y));
     this.director = stage.sections ? new Director(this) : null;
@@ -75,8 +88,10 @@ export class Game {
     return hero;
   }
 
-  spawnEnemy(type, x, y) {
-    const e = createFighter(ENEMIES[type], 'enemy', x, y);
+  // minion: a boss-type enemy called in as a helper (no boss bar of its own).
+  spawnEnemy(type, x, y, { minion = false } = {}) {
+    const def = minion ? { ...ENEMIES[type], boss: false, miniBoss: false } : ENEMIES[type];
+    const e = createFighter(def, 'enemy', x, y);
     e.facing = -1;
     this.entities.push(e);
     if (e.def.boss) this.boss = e;
@@ -123,7 +138,10 @@ export class Game {
     }
     for (const e of this.entities) {
       if (isFighter(e)) {
-        if (e.kind === 'enemy' && !this.cleared) BRAINS[e.def.ai]?.(e, this, dt, this.rand);
+        if (e.kind === 'enemy' && !this.cleared) {
+          BRAINS[e.def.ai]?.(e, this, dt, this.rand);
+          if (e.entering && (e.state === 'idle' || e.state === 'walk')) this.walkIntoView(e);
+        }
         updateFighter(e, this, dt);
         if (e.kind === 'enemy') e.input.pressed = 0;
       } else if (e.kind === 'item') updateItem(e, dt);
@@ -131,6 +149,7 @@ export class Game {
     }
     for (const h of this.heroes.values()) h.input.pressed = 0;
     resolveHits(this);
+    updateEnvironment(this, dt);
     this.collectTouching();
     this.snatchCoins();
     this.separateEnemies();
@@ -211,7 +230,7 @@ export class Game {
     this.combo.count = 0;
     this.combo.timer = 0;
     if (n >= 5) {
-      const bonus = n * n * 5;
+      const bonus = Math.min(n, 40) ** 2 * 5;
       this.addScore(bonus);
       this.emit({ type: 'comboEnd', count: n, bonus });
       this.emit({ type: 'sfx', name: 'combo' });
@@ -322,6 +341,7 @@ export class Game {
 
   dropWeapon(f) {
     if (!f.weapon) return;
+    if (WEAPONS[f.weapon.id].fixed) return;
     const it = createItem(f.weapon.id, f.x, f.y, { z: 20, vz: 120, vx: -f.facing * 40, durability: f.weapon.durability });
     this.entities.push(it);
     f.weapon = null;
@@ -354,6 +374,16 @@ export class Game {
   updateProjectile(p, dt) {
     p.t += dt;
     p.x += p.vx * dt;
+    if (p.gravity) {
+      p.vz -= 500 * dt;
+      p.z += p.vz * dt;
+      if (p.z <= 0) {
+        landBag(this, p);
+        return;
+      }
+      if (p.spent) p.remove = true;
+      return;
+    }
     const out = p.x < this.camera.x - 40 || p.x > this.camera.x + VIEW_W + 40;
     if (p.spent || p.t > 1.2 || out) {
       p.remove = true;
@@ -361,9 +391,26 @@ export class Game {
     }
   }
 
+  spawnFire(x, y, life) {
+    spawnFire(this, x, y, life);
+  }
+
+  spawnFireAhead(f, n) {
+    spawnFireAhead(this, f, n);
+  }
+
+  throwBag(f) {
+    throwBag(this, f);
+  }
+
+  slowAt(f) {
+    if (f.z > 1) return 1;
+    return zoneAt(this.stage, f.x)?.slow ?? 1;
+  }
+
   findGrabTarget(h, dirX) {
     for (const e of this.entities) {
-      if (e.kind !== 'enemy') continue;
+      if (e.kind !== 'enemy' || e.def.immovable || e.def.float) continue;
       const ok = e.def.boss ? e.state === 'dizzy' : e.state === 'idle' || e.state === 'walk' || e.state === 'hurt';
       if (!ok || e.z > 0 || e.entering) continue;
       const dx = e.x - h.x;
@@ -399,6 +446,10 @@ export class Game {
 
   breakProp(prop) {
     prop.remove = true;
+    if (prop.def.rescue) {
+      rescue(this, prop);
+      return;
+    }
     this.emit({ type: 'break', x: prop.x, y: prop.y, z: prop.def.h / 2, colors: prop.def.debris, big: true });
     this.emit({ type: 'sfx', name: 'hitHeavy' });
     this.emit({ type: 'shake', amount: 2 });
@@ -411,7 +462,15 @@ export class Game {
 
   stageClear() {
     this.cleared = true;
+    this.eraAfter = Math.min(100, this.era + (this.stage.eraGain ?? 10) + this.saved * 2);
     this.emit({ type: 'clear' });
+  }
+
+  // New arrivals walk onto the screen before their AI takes over.
+  walkIntoView(e) {
+    const mid = this.camera.x + VIEW_W / 2;
+    e.input.held = e.x < mid ? 2 : 1;
+    e.input.pressed = 0;
   }
 
   updateTrainingSpawner(dt) {

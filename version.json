@@ -1,13 +1,19 @@
 {
-  "version": "0.8.1",
+  "version": "0.9.0",
   "notes": {
     "id": [
-      "Perbaikan iPhone: layar tidak lagi ikut zoom saat menekan joystick dan tombol bersamaan atau mengetuk cepat",
-      "Ukuran tombol Besar/Kecil kini lebih stabil"
+      "Stage 1 Hutan Terbakar → Kebun Sawit → sungai banjir (lumpur memperlambat)",
+      "Musuh baru: Asap (meracuni, kabut makin tebal), Pembakar Lahan (menyalakan api), Penebang Liar (gergaji mesin)",
+      "Api di tanah — padamkan dengan ember! Selamatkan warga yang terikat",
+      "Mini-bos Buldoser Liar dan bos Raja Sawit (karung uang, dinding api, memanggil buldoser)",
+      "Sistem zaman: Kalabendu → Kalatidha → Kalasuba, warna dunia berubah; tombol Lanjut ke stage berikutnya dan Pilih Stage"
     ],
     "en": [
-      "iPhone fix: the screen no longer zooms when you hold the joystick and tap buttons together, or tap quickly",
-      "Large/Small button size is more stable now"
+      "Stage 1 Burning Forest → Oil Palm Plantation → flooded river (mud slows you)",
+      "New enemies: Haze (poisons, thickens the smog), Land Burner (lights fires), Illegal Logger (chainsaw)",
+      "Fires on the ground — put them out with a bucket! Rescue tied-up villagers",
+      "Wild Bulldozer mini-boss and the Palm Oil King boss (money bags, fire walls, calls bulldozers)",
+      "Era system: Kalabendu → Kalatidha → Kalasuba changes the colours; Next button and Stage Select"
     ]
   }
 }

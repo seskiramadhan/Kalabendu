@@ -9,6 +9,10 @@ export const STAGE0 = {
   floorBottom: 262,
   spawn: { x: 70, y: 220 },
   theme: 'kampung',
+  clearKey: 'stage0_clear',
+  clearSubKey: 'stage0_clear_sub',
+  eraGain: 12,
+  haze: 0.05,
   sky: ['#ffd9a0', '#f4a77a', '#9e6f8e'],
   houses: [
     { type: 'gapura', x: 40 },

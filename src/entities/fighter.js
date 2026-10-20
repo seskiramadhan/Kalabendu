@@ -28,7 +28,7 @@ export function createFighter(def, team, x, y) {
     def,
     x,
     y,
-    z: 0,
+    z: def.float ?? 0,
     vx: 0,
     vy: 0,
     vz: 0,
@@ -158,8 +158,9 @@ export function updateFighter(f, game, dt) {
       else if (pressed & BTN.HEAVY && def.heavy) startMove(f, game, def.heavy);
       else if (pressed & BTN.SPECIAL && def.special) trySpecial(f, game);
       else {
-        f.vx = dir.x * def.walkX;
-        f.vy = dir.y * def.walkY;
+        const slow = game.slowAt?.(f) ?? 1;
+        f.vx = dir.x * def.walkX * slow;
+        f.vy = dir.y * def.walkY * slow;
         if (dir.x) f.facing = dir.x;
         setState(f, dir.x || dir.y ? 'walk' : 'idle');
         const target = def.canGrab && dir.x ? game.findGrabTarget(f, dir.x) : null;
@@ -177,10 +178,10 @@ export function updateFighter(f, game, dt) {
       if (!f.activeEmitted && f.t >= s) {
         f.activeEmitted = true;
         if (m.throws) game.throwWeapon(f);
-        else {
-          game.emit({ type: 'sfx', name: m.sfx ?? 'whoosh', power: f.chain });
-          game.emit({ type: 'swing', who: f, move: m });
-        }
+        else if (m.spawnFire) game.spawnFireAhead(f, m.spawnFire);
+        else if (m.throwsBag) game.throwBag(f);
+        if (!m.throws) game.emit({ type: 'sfx', name: m.sfx ?? 'whoosh', power: f.chain });
+        if (!m.throws && m.hit) game.emit({ type: 'swing', who: f, move: m });
       }
       if (m.lunge) f.vx = f.t >= s && f.t < s + a ? f.facing * m.lunge : 0;
       else f.vx = f.t < s + a ? (f.facing * m.step) / (s + a) : 0;
@@ -295,6 +296,7 @@ export function updateFighter(f, game, dt) {
       break;
     case 'dead':
       f.vx = 0;
+      if (def.float) f.z += dt * 20;
       if (f.t >= DEAD_TIME && f.kind !== 'hero') f.remove = true;
       break;
   }

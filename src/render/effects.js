@@ -1,3 +1,5 @@
+import { t } from '../core/i18n.js';
+
 // Visual-only particles fed by game events. Never touches game state.
 export class Effects {
   constructor() {
@@ -36,6 +38,12 @@ export class Effects {
           color: ev.colors[i % ev.colors.length], size: 2 + Math.floor(Math.random() * 3), age: 0, life: 0.7,
         });
       }
+    } else if (ev.type === 'steam') {
+      for (let i = 0; i < 6; i++) {
+        this.items.push({ kind: 'dust', x: ev.x + (Math.random() - 0.5) * 16, y: ev.y, vx: (Math.random() - 0.5) * 20, vz: 30 + Math.random() * 30, z: 4, life: 0.8, age: 0, r: 2 + Math.floor(Math.random() * 2), steam: true });
+      }
+    } else if (ev.type === 'saved') {
+      this.items.push({ kind: 'popup', x: ev.x - 10, y: ev.y, z: 60, text: t('saved'), color: '#7ce07a', age: 0, life: 1.6 });
     } else if (ev.type === 'special') {
       this.items.push({ kind: 'ring', who: ev.who, age: 0, life: 0.45 });
     } else if (ev.type === 'pickup') {
@@ -71,7 +79,7 @@ export class Effects {
     for (const e of this.items) {
       const k = 1 - e.age / e.life;
       if (e.kind === 'dust') {
-        ctx.fillStyle = `rgba(214,190,150,${0.7 * k})`;
+        ctx.fillStyle = e.steam ? `rgba(240,240,240,${0.7 * k})` : `rgba(214,190,150,${0.7 * k})`;
         ctx.fillRect(Math.round(e.x - camX - e.r), Math.round(e.y - e.z - e.r), e.r * 2, e.r * 2);
       } else if (e.kind === 'spark') {
         const x = Math.round(e.x - camX);

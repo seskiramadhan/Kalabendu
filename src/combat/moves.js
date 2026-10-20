@@ -171,6 +171,46 @@ export const MOVES = {
     damage: 14, push: 190, launch: 220, knockdown: true,
     hit: { x: -6, w: 40, z: 10, h: 60, depth: 14 }, sfx: 'whooshBig', shake: 4,
   },
+
+  // Stage 1 enemies
+  obor_l1: {
+    anim: 'palm', weapon: true,
+    startup: 12, active: 4, recovery: 20, step: 6,
+    damage: 7, push: 80, stun: 20,
+    hit: { x: 8, w: 34, z: 26, h: 22, depth: 9 }, sfx: 'whoosh',
+  },
+  pembakar_fire: {
+    anim: 'throwPose', telegraph: true, spawnFire: 3,
+    startup: 24, active: 4, recovery: 26, step: 0, hit: null,
+  },
+  gergaji_l1: {
+    anim: 'jab', weapon: true, telegraph: true, rehit: 5,
+    startup: 16, active: 22, recovery: 22, step: 14,
+    damage: 3, push: 25, stun: 12,
+    hit: { x: 10, w: 40, z: 22, h: 22, depth: 10 }, sfx: 'saw',
+  },
+  dozer_charge: {
+    anim: 'none', telegraph: true, lunge: 250, dizzyAfter: 2.2,
+    startup: 48, active: 110, recovery: 4, step: 0,
+    damage: 16, push: 220, launch: 260, knockdown: true,
+    hit: { x: 20, w: 30, z: 0, h: 44, depth: 18 }, sfx: 'horn', shake: 5,
+  },
+  raja_smash: {
+    anim: 'none', telegraph: true, dizzyAfter: 1.9,
+    startup: 32, active: 6, recovery: 10, step: 0,
+    damage: 18, push: 200, launch: 260, knockdown: true,
+    hit: { x: 10, w: 80, z: 0, h: 40, depth: 22 }, sfx: 'whooshBig', shake: 7,
+  },
+  raja_firewave: {
+    anim: 'none', telegraph: true, spawnFire: 6,
+    startup: 30, active: 4, recovery: 34, step: 0, hit: null,
+  },
+  raja_bag: {
+    anim: 'none', telegraph: true, throwsBag: true,
+    startup: 22, active: 4, recovery: 26, step: 0, hit: null,
+  },
+  raja_bag_hit: { damage: 10, push: 140, launch: 160, knockdown: true, hit: { x: -12, w: 24, z: -10, h: 22, depth: 14 }, shake: 3 },
+  fire_burn: { damage: 5, push: 70, stun: 14, hitstop: 0.04, shake: 1 },
 };
 
 for (const [id, m] of Object.entries(MOVES)) m.id = id;

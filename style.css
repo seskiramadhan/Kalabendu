@@ -317,7 +317,7 @@ body.is-touch:not(.portrait) #hint {
 .again {
   position: absolute;
   left: 50%;
-  top: 62%;
+  top: 74%;
   transform: translateX(-50%);
   pointer-events: auto;
   font-size: 18px;
@@ -479,4 +479,66 @@ body.portrait[data-buttons] .touch .pad { transform-origin: center; }
 @keyframes jurus-ready {
   0%, 100% { box-shadow: 0 4px 0 rgba(0, 0, 0, 0.45), 0 0 0 0 rgba(120, 200, 255, 0.0); }
   50% { box-shadow: 0 4px 0 rgba(0, 0, 0, 0.45), 0 0 18px 6px rgba(120, 200, 255, 0.85); }
+}
+
+.clear-buttons {
+  position: absolute;
+  left: 50%;
+  top: calc(74% + 52px);
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+.clear-buttons .menu-btn {
+  font-size: 16px;
+  padding: 10px 22px;
+  white-space: nowrap;
+}
+
+.clear-buttons [hidden] {
+  display: none;
+}
+
+.stage-panel {
+  width: min(420px, 100%);
+}
+
+.stage-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+}
+
+.stage-card span {
+  font-size: 12px;
+}
+
+.era-name {
+  text-align: center;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.era-meter {
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #c8643a, #c8a050, #5aa84a);
+  position: relative;
+  border: 2px solid #120c0a;
+}
+
+.era-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-right: 3px solid #fff;
+  background: transparent;
+}
+
+.era-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: rgba(243, 227, 195, 0.7);
 }

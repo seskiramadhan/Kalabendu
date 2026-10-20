@@ -1,4 +1,5 @@
 import { t } from '../core/i18n.js';
+import { eraOf } from '../systems/era.js';
 
 const TUTORIAL_TIME = 7;
 const TARGET_TIME = 3;
@@ -265,21 +266,73 @@ export class Hud {
   }
 
   drawClear(ctx, game, X, Y, u) {
-    ctx.fillStyle = 'rgba(18,12,10,0.55)';
-    ctx.fillRect(X(0), Y(80), 480 * u, 90 * u);
+    const stage = game.stage;
+    ctx.fillStyle = 'rgba(18,12,10,0.6)';
+    ctx.fillRect(X(0), Y(56), 480 * u, 150 * u);
     ctx.textAlign = 'center';
     ctx.fillStyle = '#f2c94c';
     ctx.strokeStyle = '#120c0a';
     ctx.lineWidth = 3 * u;
-    ctx.font = `900 ${Math.round(22 * u)}px system-ui, sans-serif`;
-    ctx.strokeText(t('stage0_clear'), X(240), Y(108));
-    ctx.fillText(t('stage0_clear'), X(240), Y(108));
-    ctx.font = `bold ${Math.round(9 * u)}px system-ui, sans-serif`;
+    ctx.font = `900 ${Math.round(20 * u)}px system-ui, sans-serif`;
+    ctx.strokeText(t(stage.clearKey), X(240), Y(80));
+    ctx.fillText(t(stage.clearKey), X(240), Y(80));
+    ctx.font = `bold ${Math.round(8.5 * u)}px system-ui, sans-serif`;
     ctx.fillStyle = '#f3e3c3';
-    ctx.fillText(`${t('score')} ${game.score}  ·  Rp ${game.rupiah.toLocaleString('id-ID')}`, X(240), Y(130));
+    const saved = game.saved ? `  ·  ${t('villagersSaved')} ${game.saved}` : '';
+    ctx.fillText(`${t('score')} ${game.score}  ·  Rp ${game.rupiah.toLocaleString('id-ID')}${saved}`, X(240), Y(98));
     ctx.font = `${Math.round(7 * u)}px system-ui, sans-serif`;
-    ctx.fillText(t('stage0_clear_sub'), X(240), Y(146));
+    ctx.fillText(t(stage.clearSubKey), X(240), Y(111));
+    this.drawEraMeter(ctx, game.era, game.eraAfter, X, Y, u);
     ctx.textAlign = 'left';
+  }
+
+  // Era meter, Kalabendu (left) to Kalasuba (right); a wayang-style card
+  // announces it when the era's name changes.
+  drawEraMeter(ctx, before, after, X, Y, u) {
+    const w = 220;
+    const x = X(240 - w / 2);
+    const y = Y(124);
+    const grad = ctx.createLinearGradient(x, 0, x + w * u, 0);
+    grad.addColorStop(0, '#c8643a');
+    grad.addColorStop(0.5, '#c8a050');
+    grad.addColorStop(1, '#5aa84a');
+    ctx.fillStyle = '#120c0a';
+    ctx.fillRect(x - u, y - u, w * u + 2 * u, 7 * u);
+    ctx.fillStyle = grad;
+    ctx.fillRect(x, y, w * u, 5 * u);
+    for (const [v, col] of [[before, 'rgba(255,255,255,0.5)'], [after, '#ffffff']]) {
+      ctx.fillStyle = col;
+      ctx.fillRect(x + (w * u * v) / 100 - u, y - 3 * u, 2 * u, 11 * u);
+    }
+    ctx.font = `${Math.round(6 * u)}px system-ui, sans-serif`;
+    ctx.fillStyle = '#c8643a';
+    ctx.textAlign = 'left';
+    ctx.fillText('KALABENDU', x, y + 13 * u);
+    ctx.fillStyle = '#5aa84a';
+    ctx.textAlign = 'right';
+    ctx.fillText('KALASUBA', x + w * u, y + 13 * u);
+    ctx.textAlign = 'center';
+    const now = eraOf(after);
+    const changed = eraOf(before).id !== now.id;
+    // wayang card: a dark band with gunungan-like points and the era name
+    const cy = Y(160);
+    ctx.fillStyle = '#0c0806';
+    ctx.fillRect(X(120), cy - 14 * u, 240 * u, 30 * u);
+    ctx.fillStyle = now.color;
+    for (const side of [-1, 1]) {
+      const bx = X(240 + side * 104);
+      ctx.beginPath();
+      ctx.moveTo(bx, cy - 12 * u);
+      ctx.lineTo(bx + 8 * u, cy + 14 * u);
+      ctx.lineTo(bx - 8 * u, cy + 14 * u);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.font = `900 ${Math.round(10 * u)}px system-ui, sans-serif`;
+    ctx.fillText(`${changed ? t('eraChanged') + ' ' : ''}${t(now.nameKey).toUpperCase()}`, X(240), cy - 2 * u);
+    ctx.fillStyle = '#f3e3c3';
+    ctx.font = `${Math.round(6.5 * u)}px system-ui, sans-serif`;
+    ctx.fillText(t(now.descKey), X(240), cy + 9 * u);
   }
 }
 

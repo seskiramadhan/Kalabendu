@@ -302,9 +302,158 @@ function kampungFloor(stage) {
   return { canvas: c, factor: 1, y: stage.floorTop };
 }
 
+// ---- Stage 1: Hutan Terbakar -> Kebun Sawit -> river ----
+
+function zoneKind(stage, worldX) {
+  const z = stage.zones?.find((z) => worldX >= z.x0 && worldX < z.x1);
+  return z?.kind ?? stage.zones?.[stage.zones.length - 1]?.kind;
+}
+
+function sawitPalm(ctx, x, baseY, h, trunk, frond) {
+  px(ctx, trunk, x - 2, baseY - h, 5, h);
+  for (let i = 0; i < h; i += 4) px(ctx, frond, x - 3, baseY - h + i, 2, 1);
+  for (const dir of [-1, 1]) {
+    for (let k = 0; k < 12; k++) {
+      px(ctx, frond, x + dir * k, baseY - h + Math.round((k * k) / 12) - 2, 2, 2);
+      px(ctx, frond, x + dir * Math.round(k * 0.7), baseY - h - 5 + Math.round((k * k) / 9), 2, 2);
+    }
+  }
+}
+
+function hutanFar(stage) {
+  const r = rng(131);
+  const f = 0.12;
+  const width = VIEW_W + (stage.width - VIEW_W) * f;
+  const c = canvas(width, VIEW_H);
+  const ctx = c.getContext('2d');
+  ridge(ctx, width, 120, 5, '#5a3a48', r, 8);
+  for (let x = 0; x < width; x += 4) {
+    const kind = zoneKind(stage, x / f);
+    if (kind === 'forest') {
+      px(ctx, 'rgba(255,120,40,0.35)', x, 128, 4, 10);
+      if (r() < 0.05) {
+        for (let i = 0; i < 18; i++) {
+          ctx.fillStyle = `rgba(90,80,80,${0.45 - i * 0.02})`;
+          ctx.beginPath();
+          ctx.arc(x + i * i * 0.1, 128 - i * 5, 5 + i * 0.7, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    } else if (kind === 'river') {
+      px(ctx, '#6a6a7e', x, 126, 4, 20);
+    }
+  }
+  return { canvas: c, factor: f, y: 0 };
+}
+
+function hutanMid(stage) {
+  const r = rng(149);
+  const f = 0.4;
+  const width = VIEW_W + (stage.width - VIEW_W) * f;
+  const c = canvas(width, VIEW_H);
+  const ctx = c.getContext('2d');
+  ridge(ctx, width, 144, 3, '#3e2e30', r, 8);
+  let x = 0;
+  while (x < width) {
+    const kind = zoneKind(stage, x / f);
+    if (kind === 'forest') {
+      const hgt = 40 + Math.floor(r() * 30);
+      px(ctx, '#2a1e1c', x, 150 - hgt, 4, hgt);
+      for (let k = 0; k < 4; k++) px(ctx, '#2a1e1c', x - 8 + k * 3, 150 - hgt + 8 + k * 7, 10, 2);
+      px(ctx, 'rgba(255,110,40,0.5)', x + 3, 150 - hgt, 1, hgt);
+      x += 22 + Math.floor(r() * 26);
+    } else if (kind === 'sawit') {
+      // the same palm, the same height, the same gap — on and on
+      sawitPalm(ctx, x, 150, 26, '#4a4a2a', '#5a6a2e');
+      x += 18;
+    } else {
+      px(ctx, '#3a4a3a', x, 120, 6, 30);
+      px(ctx, '#4a5a44', x - 8, 112, 22, 12);
+      x += 40 + Math.floor(r() * 30);
+    }
+  }
+  return { canvas: c, factor: f, y: 0 };
+}
+
+function hutanWall(stage) {
+  const r = rng(167);
+  const c = canvas(stage.width, VIEW_H);
+  const ctx = c.getContext('2d');
+  const top = stage.floorTop;
+  let x = 0;
+  while (x < stage.width) {
+    const kind = zoneKind(stage, x);
+    if (kind === 'forest') {
+      // burnt rainforest giants
+      const w = 14 + Math.floor(r() * 10);
+      px(ctx, '#1e1412', x - 1, 40, w + 2, top - 40);
+      px(ctx, '#3a2620', x, 40, w, top - 40);
+      px(ctx, '#5a3a2a', x + 2, 40, 2, top - 40);
+      for (let k = 0; k < 3; k++) px(ctx, '#1e1412', x - 20 + k * 14, 60 + k * 18, 30, 4);
+      px(ctx, '#ff7a2a', x + w - 2, 80 + Math.floor(r() * 40), 2, 12);
+      if (r() < 0.3) {
+        px(ctx, '#2a1e1c', x + w + 10, top - 10, 30, 10);
+        px(ctx, '#7a5a3a', x + w + 10, top - 10, 6, 10);
+      }
+      x += 70 + Math.floor(r() * 60);
+    } else if (kind === 'sawit') {
+      sawitPalm(ctx, x, top, 70, '#5e4e2e', '#6f7f3a');
+      px(ctx, '#8a3a1a', x - 4, top - 66, 8, 6);
+      x += 64;
+    } else {
+      // riverbank: sandbags and a broken bridge rail
+      for (let i = 0; i < 4; i++) px(ctx, i % 2 ? '#a08a5a' : '#8a7448', x + i * 14, top - 14 - (i % 2) * 6, 14, 8);
+      px(ctx, '#5e3b1a', x + 70, top - 50, 4, 50);
+      px(ctx, '#5e3b1a', x + 70, top - 46, 50, 3);
+      px(ctx, '#5e3b1a', x + 116, top - 40, 4, 40);
+      x += 160 + Math.floor(r() * 60);
+    }
+  }
+  // signs (all fictional)
+  const sign = (sx, w, color, text, textColor = '#f6f2e4') => {
+    px(ctx, '#2c1f16', sx + w / 2 - 2, top - 70, 4, 70);
+    px(ctx, '#2c1f16', sx - 1, top - 96, w + 2, 22);
+    px(ctx, color, sx, top - 95, w, 20);
+    ctx.fillStyle = textColor;
+    ctx.font = 'bold 7px monospace';
+    ctx.fillText(text, sx + 4, top - 82);
+  };
+  sign(560, 124, '#e6e0cc', 'DILARANG MEMBAKAR HUTAN', '#8a2a20');
+  sign(2060, 150, '#2f5a2a', 'KONSESI PT SAWIT SEJAHTERA SEKALI');
+  sign(3140, 112, '#c8a050', 'SAWIT UNTUK SIAPA?', '#2c1f16');
+  sign(3640, 96, '#8a2a20', 'AWAS BANJIR!');
+  return { canvas: c, factor: 1, y: 0 };
+}
+
+function hutanFloor(stage) {
+  const r = rng(181);
+  const h = VIEW_H - stage.floorTop;
+  const c = canvas(stage.width, h);
+  const ctx = c.getContext('2d');
+  for (let x = 0; x < stage.width; x += 4) {
+    const kind = zoneKind(stage, x);
+    const base = kind === 'forest' ? '#6a5446' : kind === 'sawit' ? '#a8683a' : '#6a5030';
+    px(ctx, base, x, 0, 4, h);
+  }
+  for (let i = 0; i < stage.width * h * 0.05; i++) {
+    const x = r() * stage.width;
+    const kind = zoneKind(stage, x);
+    const col = kind === 'forest' ? (r() < 0.06 ? '#ff8a3a' : r() < 0.5 ? '#5a4638' : '#7a6656') : kind === 'sawit' ? (r() < 0.5 ? '#94582e' : '#b8784a') : r() < 0.5 ? '#7a6040' : '#8a7454';
+    px(ctx, col, x, r() * h, 2, 1);
+  }
+  for (let x = 0; x < stage.width; x += 3) {
+    if (zoneKind(stage, x) === 'sawit') {
+      px(ctx, '#8a5028', x, 30, 3, 2);
+      px(ctx, '#8a5028', x, 58, 3, 2);
+    }
+  }
+  return { canvas: c, factor: 1, y: stage.floorTop };
+}
+
 const THEMES = {
   padepokan: [buildFar, buildMid, buildWall, buildFloor],
   kampung: [kampungFar, kampungMid, kampungWall, kampungFloor],
+  hutan: [hutanFar, hutanMid, hutanWall, hutanFloor],
 };
 
 export function buildStageArt(stage) {
@@ -316,7 +465,7 @@ export function buildStageArt(stage) {
   g.addColorStop(1, stage.sky[0]);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-  ctx.fillStyle = 'rgba(255,236,190,0.9)';
+  ctx.fillStyle = stage.theme === 'hutan' ? 'rgba(255,140,80,0.8)' : 'rgba(255,236,190,0.9)';
   ctx.beginPath();
   ctx.arc(330, 112, 16, 0, Math.PI * 2);
   ctx.fill();

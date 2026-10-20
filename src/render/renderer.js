@@ -6,6 +6,11 @@ import { drawFigure } from './sprites/skeleton.js';
 import { poseFor, animState } from './sprites/poses.js';
 import { drawProp, drawItem, drawProjectile, drawHeldWeapon } from './sprites/objects.js';
 import { activeHitbox, hurtbox } from '../combat/hits.js';
+import { drawAsap, drawBuldoser, drawRaja, drawFire, flames } from './sprites/monsters.js';
+import { applyEraGrade } from '../systems/era.js';
+import { zoneAt } from '../systems/environment.js';
+
+const MONSTERS = { asap: drawAsap, buldoser: drawBuldoser, raja: drawRaja };
 
 const FIG = 120;
 
@@ -78,15 +83,24 @@ export class Renderer {
       ctx.drawImage(layer.canvas, -Math.round(camX * layer.factor), layer.y);
     }
 
+    for (const fx of game.stage.decorFires ?? []) {
+      const sx = fx - camX;
+      if (sx > -30 && sx < VIEW_W + 30) flames(ctx, sx, game.stage.floorTop - 2, 9, 22, time + fx);
+    }
+
     const sorted = [...game.entities].sort((a, b) => a.y - b.y);
-    for (const e of sorted) if (e.kind !== 'projectile') this.drawShadow(ctx, e, camX);
+    for (const e of sorted) if (e.kind !== 'projectile' && e.kind !== 'hazard') this.drawShadow(ctx, e, camX);
+    for (const e of sorted) if (e.kind === 'hazard') drawFire(ctx, e, camX, time);
     for (const e of sorted) {
+      if (e.kind === 'hazard') continue;
       if (e.kind === 'prop') drawProp(ctx, e, camX, game.time);
       else if (e.kind === 'item') drawItem(ctx, e, camX, time);
       else if (e.kind === 'projectile') drawProjectile(ctx, e, camX, time);
       else this.drawFighter(ctx, e, game, camX, time);
     }
+    this.drawHaze(ctx, game, camX);
     this.effects.draw(ctx, camX);
+    applyEraGrade(ctx, game.era, VIEW_W, VIEW_H);
     if (debug) this.drawDebugBoxes(ctx, game, camX);
 
     const main = this.ctx;
@@ -107,6 +121,13 @@ export class Renderer {
     const jitter = game.hitstop > 0 && game.time - e.lastHitAt < 0.15 ? (Math.floor(time * 60) % 2 ? 1 : -1) : 0;
     const size = e.def.size ?? 1;
     const fx = e.x - camX + jitter;
+    if (e.def.render) {
+      MONSTERS[e.def.render](ctx, e, camX - jitter, time);
+      const m = e.move;
+      const top = e.y - e.z - (e.def.body?.h ?? 60) - 22;
+      if (m?.telegraph && e.state === 'attack' && e.t < m.startup / 60 && Math.floor(time * 12) % 2) this.drawAlert(ctx, fx, top);
+      return;
+    }
     if (size === 1) {
       const pts = drawFigure(ctx, pose, e.def.look, fx, e.y, e.z, e.facing);
       if (e.weapon) drawHeldWeapon(ctx, pts, e.weapon.id, e.facing);
@@ -121,13 +142,12 @@ export class Renderer {
     }
     const headY = e.y - e.z - 70 * size;
     const m = e.move;
-    if (m?.telegraph && e.state === 'attack' && e.t < m.startup / 60 && Math.floor(time * 12) % 2) {
-      ctx.fillStyle = '#120c0a';
-      ctx.fillRect(Math.round(fx - 3), Math.round(headY - 14), 6, 13);
-      ctx.fillStyle = '#e8571e';
-      ctx.fillRect(Math.round(fx - 2), Math.round(headY - 13), 4, 8);
-      ctx.fillRect(Math.round(fx - 2), Math.round(headY - 3), 4, 3);
+    if (m?.telegraph && e.state === 'attack' && e.t < m.startup / 60 && Math.floor(time * 12) % 2) this.drawAlert(ctx, fx, headY - 14);
+    if (e.poison > 0) {
+      ctx.fillStyle = 'rgba(120,220,90,0.8)';
+      for (let i = 0; i < 3; i++) ctx.fillRect(Math.round(fx - 8 + i * 7), Math.round(headY + 8 - ((time * 20 + i * 7) % 18)), 2, 2);
     }
+    if (game.slowAt?.(e) < 1) this.drawWading(ctx, fx, e.y, time);
     if (e.state === 'dizzy') {
       for (let i = 0; i < 3; i++) {
         const a = time * 5 + (i * Math.PI * 2) / 3;
@@ -137,9 +157,46 @@ export class Renderer {
     }
   }
 
+  drawAlert(ctx, x, y) {
+    ctx.fillStyle = '#120c0a';
+    ctx.fillRect(Math.round(x - 3), Math.round(y), 6, 13);
+    ctx.fillStyle = '#e8571e';
+    ctx.fillRect(Math.round(x - 2), Math.round(y + 1), 4, 8);
+    ctx.fillRect(Math.round(x - 2), Math.round(y + 10), 4, 3);
+  }
+
+  // Muddy flood water around the legs.
+  drawWading(ctx, x, y, time) {
+    ctx.fillStyle = 'rgba(120,88,50,0.75)';
+    ctx.fillRect(Math.round(x - 14), Math.round(y - 9), 28, 10);
+    ctx.fillStyle = 'rgba(200,170,120,0.8)';
+    const w = Math.round(Math.sin(time * 6 + x) * 2);
+    ctx.fillRect(Math.round(x - 12 + w), Math.round(y - 9), 8, 1);
+    ctx.fillRect(Math.round(x + 4 - w), Math.round(y - 9), 8, 1);
+  }
+
+  // Haze: thick orange-grey smoke, clearer close to the heroes.
+  drawHaze(ctx, game, camX) {
+    const k = game.haze;
+    if (k < 0.02) return;
+    const hero = game.heroes.get('p1');
+    const hx = hero ? hero.x - camX : VIEW_W / 2;
+    const hy = hero ? hero.y - 30 : VIEW_H / 2;
+    const g = ctx.createRadialGradient(hx, hy, 40, hx, hy, 230);
+    g.addColorStop(0, `rgba(170,120,90,${0.12 * k})`);
+    g.addColorStop(1, `rgba(150,105,80,${0.95 * k})`);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+  }
+
   drawShadow(ctx, e, camX) {
     const k = Math.max(0.4, 1 - e.z / 120);
-    const base = e.kind === 'prop' ? e.def.w / 2 + 2 : e.kind === 'item' ? 7 : 18 * (e.def.size ?? 1);
+    const base = e.kind === 'prop' ? e.def.w / 2 + 2 : e.kind === 'item' ? 7 : e.def.body ? e.def.body.w + 8 : 18 * (e.def.size ?? 1);
+    if (e.def?.float) {
+      ctx.fillStyle = 'rgba(30,18,10,0.25)';
+      ctx.fillRect(Math.round(e.x - camX - 10), Math.round(e.y - 1), 20, 3);
+      return;
+    }
     ctx.fillStyle = `rgba(30,18,10,${0.45 * k})`;
     const w = Math.round(base * k);
     ctx.fillRect(Math.round(e.x - camX - w), Math.round(e.y - 1), w * 2, 3);

@@ -6,7 +6,7 @@ const DEFAULT = {
   unlocked: ['stage0'],
   heroes: ['bayu'],
   hero: 'bayu',
-  era: 0,
+  era: 10,
   rupiah: 0,
   bribes: [],
   best: {},

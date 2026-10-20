@@ -2,6 +2,7 @@ import { t, getLang, setLang } from '../core/i18n.js';
 import { HEROES, ROSTER } from '../entities/heroes.js';
 import { drawFigure } from '../render/sprites/skeleton.js';
 import { POSES } from '../render/sprites/poses.js';
+import { ERAS, eraOf } from '../systems/era.js';
 
 // Title / main menu, character select and settings, as DOM overlays.
 export class Screens {
@@ -39,6 +40,7 @@ export class Screens {
     if (this.current === 'title') this.renderTitle(save);
     else if (this.current === 'heroes') this.renderHeroes(save);
     else if (this.current === 'settings') this.renderSettings(save);
+    else if (this.current === 'stages') this.renderStages(save);
     this.el.querySelector('button:not(:disabled)')?.focus({ preventScroll: true });
   }
 
@@ -55,11 +57,34 @@ export class Screens {
     panel.append(
       btn(t('start'), () => this.h.onStart(), 'primary'),
       btn(save.started ? `${t('continueGame')} · Rp ${save.rupiah.toLocaleString('id-ID')}` : t('continueGame'), () => this.h.onContinue(), '', !save.started),
+      btn(t('stageSelect'), () => this.show('stages'), '', !save.started),
       btn(t('heroSelect'), () => this.show('heroes')),
       btn(t('settings'), () => this.show('settings')),
     );
     wrap.append(logo, panel, h('div', t('menuNavHint'), 'muted small nav-hint'));
     this.el.append(wrap);
+  }
+
+  renderStages(save) {
+    const panel = div('menu-panel batik-frame stage-panel');
+    panel.append(h('h2', t('stageSelect')));
+    const era = eraOf(save.era);
+    const meter = div('era-meter');
+    const fill = div('era-fill');
+    fill.style.width = `${save.era}%`;
+    meter.append(fill);
+    panel.append(h('div', `${t('worldEra')}: ${t(era.nameKey)} (${Math.round(save.era)})`, 'era-name'), meter);
+    const labels = div('era-labels');
+    for (const e of ERAS) labels.append(h('span', t(e.nameKey)));
+    panel.append(labels);
+    for (const s of this.h.getStages()) {
+      const card = btn('', () => this.h.onPickStage(s.id), 'stage-card', !s.unlocked);
+      card.append(h('b', t(s.stage.nameKey)), h('span', s.unlocked ? t(s.stage.subtitleKey) : t('locked'), 'muted'));
+      if (s.best) card.append(h('span', `${t('best')} ${s.best}`, 'muted'));
+      panel.append(card);
+    }
+    panel.append(btn(t('back'), () => this.show('title')));
+    this.el.append(center(panel));
   }
 
   renderHeroes(save) {
