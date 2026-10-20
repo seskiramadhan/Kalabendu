@@ -1,6 +1,6 @@
 # NEXT — Kalabendu (beat 'em up) plan
 
-Status line: **Milestone 10 done; README next, then a full review (user asked to finish all milestones in one go)** (2026-10-20; stage list updated by the user the same day)
+Status line: **All 10 milestones + README done (v0.13.0); full review next** (2026-10-20; stage list updated by the user the same day)
 
 ## Milestones (each playable before the next)
 | # | Milestone | Status |
@@ -15,7 +15,7 @@ Status line: **Milestone 10 done; README next, then a full review (user asked to
 | 8 | Story scenes (dialogue + wayang silhouettes), Pejabat bribes before stages 1-5, bukti, endings | done (v0.11.0) |
 | 9 | Stage 4 Jalan Raya Demo (Preman Bayaran, Provokator, Buzzer, Komandan Preman) and Stage 5 Gedung Pejabat (Tikus Berdasi, Ajudan, Makelar Kasus, Jaksa Palsu, Pejabat Tinggi, Batara Kala) | done (v0.12.0) |
 | 10 | Sri, Ujang, Mak Inah; local 2-player co-op | done (v0.13.0) |
-| — | README in English + Indonesian | todo |
+| — | README in English + Indonesian | done |
 
 ## Already in place
 - Touch controls (joystick + Pukul/Tendang/Lompat/Hindar/Jurus) and phone scaling (v0.4.1).
