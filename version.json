@@ -1,17 +1,15 @@
 {
-  "version": "0.13.0",
+  "version": "0.13.1",
   "notes": {
     "id": [
-      "Jagoan baru: Sri (cangkul, sapuan lebar), Ujang (lari cepat, Jurus Ojol Ngebut naik motor), Mak Inah (pukulan berat, lempar jala yang menahan musuh)",
-      "Sri terbuka setelah Stage 1, Ujang setelah Stage 2, Mak Inah setelah Stage 3 — pilih di Pilih Jagoan",
-      "Main berdua di satu komputer: Pemain 2 pakai numpad (Enter untuk ikut) atau gamepad ke-2",
-      "Kalau satu pemain habis nyawa, tekan Pukul untuk lanjut selama temanmu masih bertarung"
+      "Zaman naik lebih pelan: Kalasuba baru tercapai di akhir perjalanan",
+      "Petunjuk tidak lagi menutupi layar stage selesai",
+      "Jagoan baru: Sri, Ujang, Mak Inah; main berdua dengan numpad atau gamepad ke-2"
     ],
     "en": [
-      "New heroes: Sri (hoe, wide sweeps), Ujang (fast dashes, Full Throttle motorbike charge), Mak Inah (heavy hits, a net throw that holds enemies)",
-      "Sri unlocks after Stage 1, Ujang after Stage 2, Mak Inah after Stage 3 — pick them in Character Select",
-      "Two players on one computer: Player 2 uses the numpad (Enter to join) or a second gamepad",
-      "If one player runs out of lives, press Punch to continue while your partner fights on"
+      "The era rises more slowly: Kalasuba now arrives at the end of the journey",
+      "Tips no longer cover the stage clear screen",
+      "New heroes: Sri, Ujang, Mak Inah; two players with the numpad or a second gamepad"
     ]
   }
 }

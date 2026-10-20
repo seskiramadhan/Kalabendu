@@ -58,7 +58,7 @@ export class Hud {
     if (hero) this.drawHeroPanel(ctx, hero, game, X, Y, u, 0);
     const p2 = game.heroes.get('p2');
     if (p2) this.drawHeroPanel(ctx, p2, game, (v) => X(v + 130), Y, u, 1);
-    else if (this.p2Hint && game.time < 12) this.drawP2Hint(ctx, X, Y, u, time);
+    else if (this.p2Hint && game.time < 12 && !game.cleared) this.drawP2Hint(ctx, X, Y, u, time);
     if (this.flash > 0) {
       ctx.fillStyle = `rgba(255,244,210,${this.flash * 0.45})`;
       ctx.fillRect(X(0), Y(0), 480 * u, 270 * u);
@@ -68,7 +68,7 @@ export class Hud {
     this.drawCombo(ctx, X, Y, u, dt);
     if (this.target) this.drawTargetBar(ctx, this.target, X, Y, u);
     if (game.go && Math.floor(time * 3) % 2 === 0) this.drawGo(ctx, X, Y, u);
-    if (this.tutorialTime > 0 && this.tutorial) this.drawTutorial(ctx, X, Y, u);
+    if (this.tutorialTime > 0 && this.tutorial && !game.cleared) this.drawTutorial(ctx, X, Y, u);
     if (game.cleared) this.drawClear(ctx, game, X, Y, u);
     if (game.over) this.drawGameOver(ctx, game, X, Y, u);
     ctx.restore();

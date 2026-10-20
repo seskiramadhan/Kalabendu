@@ -11,7 +11,7 @@ export const STAGE3 = {
   spawn: { x: 70, y: 220 },
   theme: 'pasar',
   sky: ['#f8e0b0', '#e8b878', '#8aa0c8'],
-  eraGain: 16,
+  eraGain: 10,
   haze: 0.04,
   zones: [
     { x0: 0, x1: 2200, kind: 'pasar' },

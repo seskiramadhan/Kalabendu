@@ -11,7 +11,7 @@ export const STAGE0 = {
   theme: 'kampung',
   clearKey: 'stage0_clear',
   clearSubKey: 'stage0_clear_sub',
-  eraGain: 12,
+  eraGain: 8,
   haze: 0.05,
   sky: ['#ffd9a0', '#f4a77a', '#9e6f8e'],
   houses: [

@@ -12,7 +12,7 @@ export const STAGE5 = {
   theme: 'gedung',
   sky: ['#f6d8a8', '#d8a878', '#5a6a9a'],
   sun: { x: 80, y: 60, r: 12, color: 'rgba(255,230,180,0.8)' },
-  eraGain: 20,
+  eraGain: 18,
   haze: 0,
   zones: [
     { x0: 0, x1: 1700, kind: 'lobby' },

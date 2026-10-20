@@ -11,7 +11,7 @@ export const STAGE1 = {
   spawn: { x: 70, y: 220 },
   theme: 'hutan',
   sky: ['#f0a060', '#c8643a', '#5a3a3a'],
-  eraGain: 18,
+  eraGain: 12,
   zones: [
     { x0: 0, x1: 1800, kind: 'forest', haze: 0.4 },
     { x0: 1800, x1: 3500, kind: 'sawit', haze: 0.22 },

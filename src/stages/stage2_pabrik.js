@@ -12,7 +12,7 @@ export const STAGE2 = {
   theme: 'pabrik',
   sky: ['#2a3450', '#1a2236', '#0c1020'],
   sun: { x: 380, y: 40, r: 12, color: 'rgba(240,240,220,0.9)' },
-  eraGain: 16,
+  eraGain: 10,
   haze: 0.05,
   props: [
     { type: 'kardus', x: 320, y: 230 },

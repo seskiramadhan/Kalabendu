@@ -12,7 +12,7 @@ export const STAGE4 = {
   theme: 'demo',
   sky: ['#f0c890', '#c88a6a', '#6a6a8a'],
   sun: { x: 360, y: 96, r: 14, color: 'rgba(255,210,150,0.8)' },
-  eraGain: 16,
+  eraGain: 8,
   haze: 0.06,
   decorFires: [520, 1340, 2280, 3150, 3980],
   props: [

@@ -1,6 +1,6 @@
 # NEXT — Kalabendu (beat 'em up) plan
 
-Status line: **All 10 milestones + README done (v0.13.0); full review next** (2026-10-20; stage list updated by the user the same day)
+Status line: **All 10 milestones + README done; full review done (v0.13.1). Next: the user's playtest feedback (balance, boss length)** (2026-10-20; stage list updated by the user the same day)
 
 ## Milestones (each playable before the next)
 | # | Milestone | Status |
@@ -26,7 +26,7 @@ Status line: **All 10 milestones + README done (v0.13.0); full review next** (20
 - Story: src/story/story.js (STORY per stage, ENDINGS, EVIDENCE_NEEDED=8), src/story/wayang.js (scenes), src/ui/story.js. Ending chosen after FINAL_STAGE (stage5): bad if any bribe, good if Batara Kala beaten (section requires flag kala = no bribes + evidence), else neutral.
 - Shared engine (M7): blocking (def.block), shots (combat/shots.js, effects freeze/pull/fine), allies (entities/allies.js, kind ally), candle hazards, generic AIs in ai/common.js (ranged, ally, thief, support, provokator, boss with def.attacks + def.summons).
 - Shop: systems/economy.js; save.upgrades (permanent), save.boosts (next stage only), inflation from stages cleared and bribes.
-- Stages register in main.js STAGES + STAGE_ORDER; clearing one unlocks the next and sets save.stage. Era gain per stage = stage.eraGain + 2 per villager saved (systems/era.js; save.era starts at 10). M8 bribes should subtract era.
+- Stages register in main.js STAGES + STAGE_ORDER; clearing one unlocks the next and sets save.stage. Era gain per stage = stage.eraGain (8/12/10/10/8/18 since v0.13.1, so Kalasuba lands at the end) + 2 per villager saved (systems/era.js; save.era starts at 10). M8 bribes should subtract era.
 - Stage 1 systems: systems/environment.js (fire hazards, ember douses fire, Asap poison, haze level, mud slow via stage.zones[].slow, rescue NPCs), ai/stage1.js (arsonist, haze, dozer, rajaSawit).
 - Bot playthrough scripts lived in the session scratchpad; a real player clears Stage 1 faster than the bot (bot took ~9 min game time).
 - Save (localStorage kalabendu.save.v1): started, stage, unlocked, heroes, hero, era, rupiah, bribes, best, settings. Written on stage clear and on settings change; Lanjutkan starts save.stage with save.rupiah. M6 must add stage1 to unlocked and set save.stage on clear.
