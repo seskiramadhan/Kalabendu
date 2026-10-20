@@ -1,4 +1,4 @@
-import { t, getLang, setLang } from './i18n.js';
+import { t, getLang, setLang } from '../core/i18n.js';
 
 const CHECK_EVERY_MS = 5 * 60 * 1000;
 
@@ -12,11 +12,11 @@ export async function fetchVersion() {
 }
 
 export class Menu {
-  constructor(root, { running, onResume, onNewWorld, onLanguage }) {
+  constructor(root, { running, onResume, onRestart, onLanguage }) {
     this.running = running;
     this.latest = null;
     this.isOpen = false;
-    this.handlers = { onResume, onNewWorld, onLanguage };
+    this.handlers = { onResume, onRestart, onLanguage };
 
     this.button = document.createElement('button');
     this.button.type = 'button';
@@ -80,8 +80,8 @@ export class Menu {
 
     panel.append(
       btn(t('resume'), () => this.close(), 'primary'),
-      btn(t('newWorld'), () => {
-        if (confirm(t('newWorldConfirm'))) this.handlers.onNewWorld();
+      btn(t('restart'), () => {
+        if (confirm(t('restartConfirm'))) this.handlers.onRestart();
       }),
       btn(t('loadWorld') + ' — ' + t('soon'), null, '', true),
     );

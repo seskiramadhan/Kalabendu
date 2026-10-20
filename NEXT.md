@@ -1,35 +1,30 @@
-# NEXT — Kalabendu plan
+# NEXT — Kalabendu (beat 'em up) plan
 
-Status line: **Milestone 3 done, Milestone 4 next** (2026-10-20)
+Status line: **Milestone 1 done, Milestone 2 next** (2026-10-20)
 
 ## Milestones (each playable before the next)
 | # | Milestone | Status |
 |---|---|---|
-| 1 | Small flat world, movement, jumping, collision, camera, fixed-timestep loop, F3 FPS | done |
-| 2 | Mining and placing, 9-slot hotbar with stacks, Indonesian tile set with code-made pixel textures | done |
-| 3 | Full generated world 4200x1200 (seeded noise): biomes, caves, ores by depth, kampung, sawit; 32x32 chunks pre-rendered offscreen | done |
-| 4 | Save/load with IndexedDB (changed chunks + system state), autosave 60 s + on page hide, menu Dunia Baru / Muat Dunia | todo |
-| 5 | Mobile controls (joystick, jump, mine/place toggle, tap), portrait/landscape layout, batik UI, wayang title screen, ID/EN | todo |
-| 6 | Forest health per region, sawit spread, bibit replanting, rain + floods/landslides, karhutla (forest fires that start near sawit and spread) + haze | todo |
-| 7 | Era meter (Kalatidha / Kalabendu / Kalasuba), era visuals, wayang title card on era change | todo |
-| 8 | Kampung wellbeing, rupiah economy with inflation, shop NPC | todo |
-| 9 | Tikus Berdasi + Buldoser Liar enemies, Pejabat bribe choice, bukti (evidence) and exposing | todo |
-| — | README in English + Indonesian (structure, meaning, eras, message, multiplayer plan) | todo (with M9 or earlier) |
+| 1 | Bayu on a 2.5D floor (move, depth sort), light combo, heavy, jump + jump attack, dodge, procedural pose art, camera, training stage | done (v0.4.0) |
+| 2 | Hitboxes/hurtboxes, hitstop, screen shake, knockback, juggles, knockdown + get-up invincibility, one Preman with basic AI | todo |
+| 3 | Stage 1 Kampung Diserbu: go-arrow sections, enemy waves, pickups (nasi bungkus, es teh, weapons), breakables, boss | todo |
+| 4 | HUD (health, Semangat, special), combo counter, score, enemy health bars, game over + continue | todo |
+| 5 | Touch controls, gamepad, portrait/landscape layout, menus (Mulai, Lanjutkan, Pilih Jagoan, Pengaturan), save | todo |
+| 6 | Stages 2-4, Satpam Bayaran, Tikus Berdasi, Asap, Buldoser Liar mini-boss, era system + background changes | todo |
+| 7 | Story scenes (dialogue + wayang silhouettes), Pejabat bribe choices, bukti, endings | todo |
+| 8 | Stages 5-7, tuyul / genderuwo / kuntilanak, Raja Sawit, Batara Kala | todo |
+| 9 | Sri, Ujang, Mak Inah; local 2-player co-op | todo |
+| — | README in English + Indonesian | todo |
 
-## Extra (user asked, 2026-10-20)
-| What | Status |
-|---|---|
-| Esc / ☰ menu: resume, new world, language, version + update button with what's new (version.json, sw.js network-first) | done (v0.3.1) |
-| GitHub Pages hosting so Update works without git pull | waiting for user to enable Pages |
+## Already in place (kept from the sandbox)
+- Esc / ☰ menu with language switch and one-click Update (version.json + sw.js network-first).
+- GitHub Pages: waiting for the user to enable it.
 
-## Future (keep code ready, don't build yet)
-- Folklore enemies (tuyul, genderuwo, kuntilanak), bosses Raja Sawit and Batara Kala
-- Crafting: keris, golok, obor, bibit, cangkul
-- Gamelan-style music by era
-- Endings by final era and whether the player took bribes
-- Multiplayer host-and-join (PeerJS/WebRTC) using the action-message design
+## Ideas to keep in mind
+- Karhutla (forest fire) and haze visuals for Stage 2 Hutan Terbakar: flames on trees, drifting smoke, lower visibility.
+- Gamelan-style music by era (audio module is ready for it).
+- Online co-op (PeerJS/WebRTC) using the input-message design.
 
 ## Notes
-- World: west beach → forest → kampung Sukamakmur (spawn) → sawah → bambu → forest → volcano → … → kampung Tirtamulya next to the sawit side (east) → beach. Biome per column in world.biome, surface in world.surface, kampung list in world.kampungs.
-- Test a fixed world with ?seed=12345 in the URL. F3 shows FPS, position, biome, seed.
 - Full original request: CLAUDE.md.
+- Old sandbox game: branch sandbox-v0.3.1.

@@ -2,14 +2,16 @@
 
 ## How to work in this repo
 - New chat? Read NEXT.md first (what is done, what is left, in order).
+- The game is a pencak silat beat 'em up (since 2026-10-20). The old sandbox version lives on branch `sandbox-v0.3.1`; don't build on it.
 - Build one milestone at a time. Each must be playable before starting the next.
 - After each milestone: tell the user how to run and test it, update NEXT.md, commit with a clear message, push.
 - Plain JavaScript ES modules + HTML5 Canvas. No frameworks, no Three.js, no build step, no external assets.
-- Game logic separate from rendering. Every player action is an action message applied to world state (ready for multiplayer later).
-- All UI text lives in src/i18n.js (Bahasa Indonesia default, English option).
+- Game logic separate from rendering. Player actions are input messages ({type:'input', playerId, held, pressed}) applied by the game, ready for online co-op later.
+- Renderer and audio only read game state and game.events; they never change game state.
+- All UI text lives in src/core/i18n.js (Bahasa Indonesia default, English option).
 - All characters, companies and places are fictional. No real people, politicians, company names or logos.
 - Every push that changes the game: bump "version" in version.json and rewrite its "notes" (id + en, short, newest changes). The in-game Update button compares this file.
-- Push to master (the user's choice; never main).
+- Push to master (the user's choice; never main). Tag pushes are blocked by the proxy; use a branch to keep a snapshot.
 - Answer the user briefly; they don't like long waits. Start working, give short updates.
 
 ## Run
@@ -20,119 +22,110 @@ python3 -m http.server 8000
 ```
 Then open http://localhost:8000 (on a phone: http://<laptop-ip>:8000 on the same Wi-Fi).
 
-## Original request (user, 2026-10-20, verbatim)
+## Original request (user, 2026-10-20, verbatim) — beat 'em up
 
-Build "Kalabendu", a 2D sandbox game like Terraria with an Indonesian theme and a social and environmental message, in plain JavaScript using HTML5 Canvas (no frameworks, no Three.js). It must run in the browser on PC and phones.
+Build "Kalabendu", a 2D side-scrolling beat 'em up with an Indonesian theme and a social and environmental message, in plain JavaScript using HTML5 Canvas (no frameworks, no Three.js). It must run in the browser on PC and phones. Inspired by Streets of Rage 4, TMNT: Shredder's Revenge, and River City Girls, with pencak silat as the core fighting style.
 
 Repository:
-- Use the GitHub repo seskiramadhan/Kalabendu (new and empty)
+- Use the GitHub repo seskiramadhan/Kalabendu
 - Commit after each milestone with a clear message
 
 Meaning of the name:
 - In Javanese tradition (Serat Kalatidha by Ranggawarsita and the Jayabaya prophecies), Kalabendu is the "age of curse": leaders are corrupt, law can be bought, truth is twisted, nature turns against people, and the honest are pushed aside. It is followed by Kalasuba, an age of peace and prosperity.
-- The game is built around this cycle of three eras:
-  1. Kalatidha: age of doubt, the world starts to decay
-  2. Kalabendu: age of curse, damage and corruption peak
-  3. Kalasuba: age of prosperity, reached only through the player's actions
 
 Story:
-- The world of Marcapada (the human world) is falling into Kalabendu: corrupt officials, endless palm oil (sawit) monoculture, illegal logging, floods, rising prices, and suffering villages.
-- The player is an ordinary villager who restores forests, helps the kampung, and exposes corruption to bring the world into Kalasuba.
-- All characters, companies, and places are fictional. Do not use real people, real politicians, real company names, or real logos. Use satire and symbols.
-- Tone: hopeful and playful satire, not depressing. Treat Javanese and Indonesian culture respectfully.
+- The land of Marcapada has fallen into Kalabendu: corrupt officials, palm oil (sawit) companies swallowing forests, illegal logging causing floods, haze, rising prices, and suffering villages.
+- Ordinary villagers trained in pencak silat rise up to fight back, stage by stage, and bring the world into Kalasuba.
+- All characters, companies, and places are fictional. No real people, politicians, company names, or logos. Use satire and symbols.
+- Tone: energetic, funny satire with heart, not depressing. Treat Indonesian culture and pencak silat respectfully.
+- Short story scenes between stages: dialogue boxes with character portraits, plus wayang-style silhouette cutscenes.
 
-Era system (core mechanic):
-- A world "Era meter" from Kalabendu (0) to Kalasuba (100), calculated from forest health, kampung wellbeing, and corruption level
-- The current era changes visuals: Kalabendu has hazy grey-orange skies, dull colors, more enemies and disasters; Kalasuba has clear skies, vivid green, rich wildlife, and peaceful villages
-- Show the current era name on the HUD and announce era changes with a short wayang-style title card
+Playable heroes (each with different stats and special move):
+- Bayu: young pesilat, balanced, fast combos
+- Sri: rice farmer, strong sweeping attacks with a cangkul
+- Ujang: ojol driver, fast dashes and a motorcycle charge special
+- Mak Inah: fisherwoman, slow but heavy hits and a net throw that holds enemies
+- Start with Bayu only; add the others in later milestones
 
-World layers (top to bottom):
-- Sky: clouds, floating islands, candi-like ruins
-- Surface: rice terraces, tropical rainforest, bamboo groves, beaches, volcanoes, kampung villages, and spreading sawit plantations
-- Underground: red clay, andesite stone, limestone caves, coal seams
-- Deep: hot volcanic rock near magma
+Combat (the most important part, make it feel good):
+- Belt-scroll movement: left/right and up/down on a 2.5D floor plane, with depth sorting by Y
+- Light attack combo (3-4 hits), heavy attack, jump, jump attack, grab and throw, dodge/roll
+- Silat-inspired moves: sweeps, palm strikes, kicks, takedowns (named moves like "Tendangan Sabit", "Kuncian")
+- Special move that uses a "Semangat" (spirit) meter filled by dealing and taking damage
+- Hitboxes and hurtboxes, hit pause (hitstop), screen shake, knockback, juggles, knockdown and get-up invincibility
+- Enemy health bars, combo counter, score
+- Pickups: nasi bungkus and es teh to heal, weapons to pick up (bambu runcing, golok, ember, kursi plastik)
+- Breakable objects: gerobak, drums, boxes that drop items or coins
 
-Indonesian tiles and items:
-- tanah, tanah liat, batu andesit, pasir, kayu jati, bambu, daun kelapa, bata merah, emas, perak, tembaga, batu bara, belerang, pohon sawit, tunggul (tree stump), lumpur (mud), bibit (seedling)
-- Generate pixel textures in code (no external assets): warm earthy colors, terracotta, teak brown, jungle green, sawit's dull uniform green, volcanic black, subtle batik patterns on decorative blocks
+Enemies (fictional satire plus folklore):
+- Preman (thugs): basic, some with sticks
+- Satpam Bayaran (hired guards): block attacks
+- Tikus Berdasi (rats in neckties): fast, steal your coins and run
+- Buldoser Liar (wild bulldozers): mini-boss, charges across the screen
+- Asap (haze spirits): reduce visibility, poison on contact
+- Folklore enemies at night stages: tuyul (steals coins), genderuwo (big and strong), kuntilanak (floating, screams to stun)
+- Each enemy type has simple AI: approach, keep distance, surround the player, wait their turn so the player isn't overwhelmed
 
-Social and environmental systems (simple and data-driven so they can grow later):
-- Forest health: each surface region tracks how much natural forest remains
-- Sawit spread: plantations slowly expand into nearby forest, replacing diverse trees with uniform rows; wildlife and rare items disappear there
-- Floods and landslides: hillsides with too little forest can trigger mud floods or landslides during heavy rain, damaging the kampung
-- Haze (asap): forest fires near sawit areas create haze that lowers vision and health
-- Replanting: plant bibit to restore forest and stop sawit spread
-- Kampung wellbeing: affected by floods, haze, prices, and forest health; happier villages unlock helpful NPCs and trades
-- Prices: shop prices in rupiah rise slowly over time (inflation), faster during Kalabendu
-- Corruption: a fictional "Pejabat" (official) offers bribes (suap) to look away from illegal logging. Accepting gives quick money but raises corruption and pushes the world toward Kalabendu. Refusing and collecting evidence (bukti) lets the player expose them later.
+Stages (each tells part of the story):
+1. Kampung Diserbu: thugs raid the village at dawn
+2. Hutan Terbakar: burning forest full of haze
+3. Kebun Sawit: endless sawit rows, Buldoser Liar mini-boss
+4. Kota Banjir: flooded town after a landslide, wading slows movement
+5. Pasar Malam: night market, folklore creatures appear
+6. Gedung Pejabat: corrupt office tower, Tikus Berdasi everywhere, elevator fight
+7. Final: Raja Sawit (giant of palm fronds and money bags), then true final boss Batara Kala if the player refused all bribes
+- Each stage ends with a boss and has 3-4 "go arrow" sections where enemies spawn before the screen continues scrolling
 
-Enemies and bosses (fictional satire plus folklore):
-- Tikus Berdasi (rats in neckties) that steal coins and items from chests
-- Buldoser Liar (wild bulldozers) that clear forest tiles
-- Asap (haze spirits) from forest fires
-- Night and cave folklore enemies: tuyul (steals coins), genderuwo, kuntilanak
-- Future boss: Raja Sawit, a giant made of palm fronds and money bags
-- Future boss: Batara Kala, the embodiment of the cursed age, fought to end Kalabendu
+Era system:
+- World meter from Kalabendu to Kalasuba, rising as stages are cleared and villagers are saved
+- Backgrounds and colors change with the era: Kalabendu is grey-orange haze and dull colors; as the era improves, skies clear and greens get vivid
+- Show era name on stage select and announce changes with a wayang-style title card
+
+Moral choice:
+- Before some stages, a fictional "Pejabat" offers a bribe (suap): accept for a strong power-up and money, or refuse
+- Accepting keeps the world closer to Kalabendu and leads to a bad ending
+- Refusing and collecting evidence (bukti) dropped by enemies unlocks the true final boss and the good ending (Kalasuba)
+
+Graphics and audio:
+- No external assets for now. Draw characters with simple procedural pixel art or shapes in code, built so sprite sheets can replace them later (keep an animation system with named states: idle, walk, attack1-3, heavy, jump, hurt, knockdown, getup, grab, throw, special)
+- Parallax backgrounds per stage with Indonesian details: warung, angkot, gerobak bakso, rice terraces, sawit rows, flooded streets, neon night market, glass tower
+- Batik border patterns on menus and HUD
+- Simple sound effects generated with the Web Audio API (hits, whooshes, pickups); keep code ready for gamelan-style music later
+
+Players and multiplayer:
+- Single player first
+- Then local co-op for 2 players on one keyboard or with gamepads (Gamepad API)
+- Keep game logic separate from rendering and design player actions as input messages, so online co-op (PeerJS/WebRTC host-and-join) can be added later
+
+Screen and controls:
+- Responsive canvas that works in landscape (main) and portrait (show the stage letterboxed with controls in the extra space below)
+- Fixed internal resolution (for example 480x270) scaled up with crisp pixels, using devicePixelRatio
+- Desktop: arrows/WASD move, J light, K heavy, L jump, I special, Shift dodge; second player on numpad or gamepad
+- Gamepad support for all players
+- Mobile: virtual joystick on the left, attack/heavy/jump/special buttons on the right, positioned for portrait vs landscape
+- UI text in Bahasa Indonesia with an English option (all text in one language file)
+
+Save:
+- Save progress, unlocked heroes, era, and bribe choices to localStorage or IndexedDB
+- Menu: Mulai (Start), Lanjutkan (Continue), Pilih Jagoan (Character Select), Pengaturan (Settings)
 
 Project setup:
 - index.html, style.css, and ES modules in /src
-- No build step needed; runs with a simple local server
-- Clean structure: world, worldgen, player, physics, input, render, camera, inventory, save, ui, i18n, systems (era, forest, sawit, weather, economy, kampung, corruption)
-- Keep world/game logic separate from rendering, so multiplayer can be added later (host-and-join with PeerJS/WebRTC). Design all player actions as "input/action messages" that update world state.
-
-World:
-- Tile-based, large long world (start with 4200 x 1200 tiles)
-- Typed arrays (Uint8Array), split into 32x32 chunks
-- Only draw visible chunks; pre-render each chunk to an offscreen canvas, redraw only when a tile changes
-- Seeded noise world generation with the biomes above, caves, ores by depth, and starting sawit plantations on one side
-- Slow world systems (sawit spread, forest health, era) update in small batches per tick to stay fast
-
-Player:
-- Walk, jump, gravity, smooth tile collision
-- Camera follows player and clamps to world edges
-- Mine and place tiles within range
-- Health and money (rupiah)
-
-Inventory:
-- Hotbar with 9 slots, item stacks
-- Mined blocks go into inventory; selected block can be placed
-
-Save/Load:
-- IndexedDB (only changed chunks if possible), plus all world system state
-- Auto-save every 60 seconds and on page hide
-- Menu: Dunia Baru (New World), Muat Dunia (Load World)
-
-Screen and controls:
-- Responsive canvas in portrait and landscape, resizes on window resize and orientation change
-- Consistent tile size; the camera shows more or fewer tiles
-- Desktop: WASD/arrows, Space jump, mouse left mine, right place, 1-9 / wheel hotbar
-- Mobile: joystick (left), jump and mine/place toggle (right), tap a tile to mine or place
-- Reposition UI for portrait vs landscape so it never covers the player
-- devicePixelRatio for sharp rendering
-- Batik border patterns on menus and hotbar, wayang-style silhouette title screen with the title "KALABENDU"
-- UI text in Bahasa Indonesia with an English option (all text in one language file)
-- HUD shows era, forest health, kampung wellbeing, and rupiah
-
-Performance:
-- 60 FPS on mid-range phones
-- Fixed timestep loop with requestAnimationFrame
-- FPS counter (toggle F3)
+- No build step; runs with a simple local server
+- Clean structure: core (loop, input, audio, save, i18n), combat (hitboxes, damage, combos), entities (player, enemies, bosses, pickups), ai, stages (data-driven stage files), render (camera, parallax, sprites, effects), ui (HUD, menus, dialogue), systems (era, choices)
+- Stages, enemies, and dialogue defined as data so new content is easy to add
+- Fixed timestep loop with requestAnimationFrame, target 60 FPS on mid-range phones
+- Debug toggle (F3) to show FPS and hitboxes
 
 Milestones (each must be playable before the next):
-1. Small flat world, movement, jumping, collision, camera
-2. Mining and placing, hotbar, Indonesian tile set
-3. Full generated world with biomes, kampung, sawit, chunks
-4. Save/load with IndexedDB
-5. Mobile controls, portrait/landscape, batik UI, Indonesian/English
-6. Forest health, sawit spread, replanting, rain with floods/landslides, haze
-7. Era system (Kalatidha, Kalabendu, Kalasuba) with visual changes
-8. Kampung wellbeing, rupiah economy with inflation, simple shop NPC
-9. Tikus Berdasi and Buldoser Liar enemies, Pejabat bribe choice and evidence system
+1. Bayu moving on a 2.5D floor, light combo, jump, simple placeholder art, camera
+2. Hitboxes, hitstop, knockback, knockdown, one Preman enemy with basic AI
+3. Stage 1 with scrolling sections, enemy waves, pickups, breakables, boss
+4. HUD, health, Semangat meter, special move, combo counter, game over and continue
+5. Mobile touch controls, gamepad, portrait/landscape, Indonesian/English, menus, save
+6. Stages 2-4, new enemies, Buldoser Liar mini-boss, era system with background changes
+7. Story scenes, Pejabat bribe choices, evidence collection, endings
+8. Stages 5-7, folklore enemies, Raja Sawit and Batara Kala bosses
+9. Extra heroes (Sri, Ujang, Mak Inah) and local 2-player co-op
 
-After each milestone, tell me how to run and test it, and commit. Add a README in English and Indonesian explaining the structure, the meaning of Kalabendu and the three eras, the game's message, and how multiplayer could be added later.
-
-Future ideas (keep code ready, don't build yet):
-- Folklore enemies, Raja Sawit and Batara Kala bosses
-- Crafting: keris, golok, obor, bibit, cangkul
-- Gamelan-style music that changes by era
-- Endings based on the final era and whether the player took bribes
+After each milestone, tell me how to run and test it, and commit. Add a README in English and Indonesian explaining the structure, controls, the meaning of Kalabendu and the eras, the game's message, and how online co-op could be added later.

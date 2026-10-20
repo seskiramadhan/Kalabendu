@@ -1,15 +1,17 @@
 {
-  "version": "0.3.1",
+  "version": "0.4.0",
   "notes": {
     "id": [
-      "Menu (Esc atau tombol ☰): lanjutkan, dunia baru, bahasa, update",
-      "Tombol Update: muat versi terbaru dengan satu klik",
-      "Dunia penuh 4200x1200: pantai, hutan, sawah, bambu, gunung api, kampung, kebun sawit"
+      "Kalabendu kini game beat 'em up pencak silat!",
+      "Bayu: jalan 2.5D, combo J 4 pukulan (sampai Tendangan Sabit), K Sapuan Kaki, L lompat + tendangan terbang, Shift berguling",
+      "Padepokan saat fajar dengan gunung api, pendopo dan pagar bambu",
+      "F3 menampilkan FPS dan kotak serangan"
     ],
     "en": [
-      "Menu (Esc or the ☰ button): resume, new world, language, update",
-      "Update button: load the newest version in one click",
-      "Full 4200x1200 world: beach, forest, rice terraces, bamboo, volcano, kampung, oil palm"
+      "Kalabendu is now a pencak silat beat 'em up!",
+      "Bayu: 2.5D walking, 4-hit J combo (ending in Tendangan Sabit), K leg sweep, L jump + flying kick, Shift roll",
+      "Padepokan at dawn with a volcano, pendopo and bamboo fence",
+      "F3 shows FPS and hitboxes"
     ]
   }
 }

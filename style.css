@@ -23,7 +23,6 @@ html, body {
   height: 100vh;
   height: 100dvh;
   display: block;
-  image-rendering: pixelated;
 }
 
 #ui {
@@ -33,90 +32,26 @@ html, body {
   pointer-events: none;
 }
 
-.hud-stats {
-  position: absolute;
-  top: max(8px, env(safe-area-inset-top));
-  left: max(8px, env(safe-area-inset-left));
-  padding: 6px 10px;
-  border-radius: 6px;
-  background: rgba(43, 29, 20, 0.75);
-  color: var(--cream);
-  font-size: 14px;
-}
-
-.hotbar {
+#move-label {
   position: absolute;
   left: 50%;
-  bottom: max(10px, env(safe-area-inset-bottom));
+  top: max(10px, env(safe-area-inset-top));
   transform: translateX(-50%);
-  display: flex;
-  gap: 4px;
-  padding: 5px;
-  border-radius: 8px;
-  background: rgba(43, 29, 20, 0.8);
-  border: 2px solid #6b3f23;
-  pointer-events: auto;
-}
-
-.slot {
-  position: relative;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 2px solid #5a3a26;
-  border-radius: 5px;
-  background: rgba(243, 227, 195, 0.12);
-  cursor: pointer;
-}
-
-.slot.selected {
-  border-color: var(--gold);
-  background: rgba(224, 178, 82, 0.3);
-}
-
-.slot img {
-  position: absolute;
-  inset: 6px;
-  width: 28px;
-  height: 28px;
-  image-rendering: pixelated;
-}
-
-.slot .key {
-  position: absolute;
-  top: 1px;
-  left: 3px;
-  font-size: 10px;
-  color: rgba(243, 227, 195, 0.6);
-}
-
-.slot .count {
-  position: absolute;
-  right: 3px;
-  bottom: 1px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--cream);
-  text-shadow: 0 1px 0 #000;
-}
-
-.hud-label {
-  position: absolute;
-  left: 50%;
-  bottom: calc(max(10px, env(safe-area-inset-bottom)) + 64px);
-  transform: translateX(-50%);
-  color: var(--cream);
-  font-size: 15px;
-  font-weight: 600;
-  text-shadow: 0 1px 2px #000;
-  transition: opacity 0.2s;
+  color: var(--gold);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 0 #000, 0 0 8px rgba(0, 0, 0, 0.6);
+  transition: opacity 0.25s;
+  opacity: 0;
+  white-space: nowrap;
 }
 
 #hint {
   position: fixed;
   z-index: 1;
   left: 50%;
-  top: max(8px, env(safe-area-inset-top));
+  bottom: max(8px, env(safe-area-inset-bottom));
   transform: translateX(-50%);
   padding: 6px 12px;
   border-radius: 6px;
@@ -128,22 +63,6 @@ html, body {
   pointer-events: none;
   max-width: min(70vw, 640px);
   transition: opacity 1s;
-}
-
-@media (max-width: 520px) {
-  .slot {
-    width: 34px;
-    height: 34px;
-  }
-  .slot img {
-    inset: 4px;
-    width: 22px;
-    height: 22px;
-  }
-  #hint {
-    top: auto;
-    bottom: calc(max(10px, env(safe-area-inset-bottom)) + 90px);
-  }
 }
 
 .menu-button {

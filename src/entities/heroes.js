@@ -1,0 +1,23 @@
+export const HEROES = {
+  bayu: {
+    id: 'bayu',
+    nameKey: 'hero_bayu',
+    maxHp: 100,
+    walkX: 96,
+    walkY: 56,
+    jumpSpeed: 290,
+    light: ['bayu_l1', 'bayu_l2', 'bayu_l3', 'bayu_l4'],
+    heavy: 'bayu_heavy',
+    air: 'bayu_air',
+    look: {
+      skin: '#c08a5a',
+      cloth: '#24222f',
+      clothLight: '#3a3648',
+      sash: '#c8322a',
+      udeng: '#a8692e',
+      udengDots: '#e0b252',
+      hair: '#1a1210',
+      scale: 1,
+    },
+  },
+};
