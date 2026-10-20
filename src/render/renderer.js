@@ -85,7 +85,6 @@ export class Renderer {
       else if (e.kind === 'projectile') drawProjectile(ctx, e, camX, time);
       else this.drawFighter(ctx, e, game, camX, time);
     }
-    for (const e of sorted) if (e.kind === 'enemy' && !e.def.boss) this.drawEnemyBar(ctx, e, game, camX);
     this.effects.draw(ctx, camX);
     if (debug) this.drawDebugBoxes(ctx, game, camX);
 
@@ -135,19 +134,6 @@ export class Renderer {
         ctx.fillRect(Math.round(fx + Math.cos(a) * 12 - 1), Math.round(headY + Math.sin(a) * 4 - 1), 3, 3);
       }
     }
-  }
-
-  drawEnemyBar(ctx, e, game, camX) {
-    if (game.time - e.lastHitAt > 2.5 || e.state === 'dead') return;
-    const w = 26;
-    const x = Math.round(e.x - camX - w / 2);
-    const y = Math.round(e.y - e.z - 76);
-    ctx.fillStyle = '#120c0a';
-    ctx.fillRect(x - 1, y - 1, w + 2, 5);
-    ctx.fillStyle = '#5a1a14';
-    ctx.fillRect(x, y, w, 3);
-    ctx.fillStyle = '#e8571e';
-    ctx.fillRect(x, y, Math.round((w * e.hp) / e.def.maxHp), 3);
   }
 
   drawShadow(ctx, e, camX) {

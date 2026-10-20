@@ -111,7 +111,7 @@ export function react(game, attacker, target, m, contact, opts = {}) {
   const armored = target.def.armor && !m.knockdown && target.state !== 'dizzy' && target.state !== 'grabbed' && target.hp > 0;
   const heavy = m.knockdown || m.damage >= 8;
   game.hitstop = Math.max(game.hitstop, m.hitstop ?? (heavy ? 0.11 : 0.055));
-  game.emit({ type: 'hit', x: contact.x, y: target.y, z: contact.z, heavy, attacker, target });
+  game.emit({ type: 'hit', x: contact.x, y: target.y, z: contact.z, heavy, attacker, target, damage: m.damage });
   game.emit({ type: 'sfx', name: heavy ? 'hitHeavy' : 'hit', power: 1 });
   game.emit({ type: 'shake', amount: m.shake ?? (heavy ? 3 : 1) });
 

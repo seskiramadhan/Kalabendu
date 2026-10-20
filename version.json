@@ -1,19 +1,15 @@
 {
-  "version": "0.6.0",
+  "version": "0.6.1",
   "notes": {
     "id": [
-      "Stage 0 Kampung Saat Fajar: 5 bagian dengan panah MAJU, gelombang preman, dan bos Preman Kampung",
-      "Kuncian: jalan menempel ke musuh, Pukul = lutut, Tendang = Bantingan (lempar musuh ke musuh lain)",
-      "Hancurkan gerobak bakso, tong & kardus: nasi bungkus, es teh, koin",
-      "Senjata: bambu runcing, kursi plastik, ember (Tendang = lempar)",
-      "HUD: nyawa, skor, rupiah, bar bos, petunjuk tutorial"
+      "Bar musuh ala Streets of Rage: nama + nyawa musuh yang terakhir kamu pukul muncul di bawah panel Bayu",
+      "Warna bar musuh kuning → oranye → merah, dengan jejak putih saat terkena pukulan",
+      "Bos: bar berlapis dengan hitungan x2/x3"
     ],
     "en": [
-      "Stage 0 Village at Dawn: 5 sections with GO arrows, thug waves and the Preman Kampung boss",
-      "Grab (Kuncian): walk into an enemy, Punch = knee, Kick = slam (throw them into others)",
-      "Smash bakso carts, drums and boxes: nasi bungkus, es teh, coins",
-      "Weapons: bamboo spear, plastic chair, bucket (Kick = throw)",
-      "HUD: health, score, rupiah, boss bar, tutorial tips"
+      "Streets of Rage style enemy bar: the name and health of the last enemy you hit appear under Bayu’s panel",
+      "Enemy bar goes yellow → orange → red, with a white damage trail",
+      "Bosses: layered bar with an x2/x3 counter"
     ]
   }
 }
