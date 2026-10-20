@@ -16,6 +16,12 @@ Status line: **Milestone 3 done, Milestone 4 next** (2026-10-20)
 | 9 | Tikus Berdasi + Buldoser Liar enemies, Pejabat bribe choice, bukti (evidence) and exposing | todo |
 | — | README in English + Indonesian (structure, meaning, eras, message, multiplayer plan) | todo (with M9 or earlier) |
 
+## Extra (user asked, 2026-10-20)
+| What | Status |
+|---|---|
+| Esc / ☰ menu: resume, new world, language, version + update button with what's new (version.json, sw.js network-first) | done (v0.3.1) |
+| GitHub Pages hosting so Update works without git pull | waiting for user to enable Pages |
+
 ## Future (keep code ready, don't build yet)
 - Folklore enemies (tuyul, genderuwo, kuntilanak), bosses Raja Sawit and Batara Kala
 - Crafting: keris, golok, obor, bibit, cangkul

@@ -8,9 +8,13 @@
 - Game logic separate from rendering. Every player action is an action message applied to world state (ready for multiplayer later).
 - All UI text lives in src/i18n.js (Bahasa Indonesia default, English option).
 - All characters, companies and places are fictional. No real people, politicians, company names or logos.
+- Every push that changes the game: bump "version" in version.json and rewrite its "notes" (id + en, short, newest changes). The in-game Update button compares this file.
+- Push to master (the user's choice; never main).
 - Answer the user briefly; they don't like long waits. Start working, give short updates.
 
 ## Run
+Online (one-click updates): GitHub Pages at https://seskiramadhan.github.io/Kalabendu/ once Pages is enabled (Settings → Pages → Deploy from branch → master / root).
+Local:
 ```
 python3 -m http.server 8000
 ```

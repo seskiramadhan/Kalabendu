@@ -8,11 +8,17 @@ export class Input {
     this.mouse = { x: 0, y: 0, inside: false, left: false, right: false };
     this.events = [];
     this.onToggleFps = null;
+    this.onMenu = null;
 
     window.addEventListener('keydown', (e) => {
       if (e.code === 'F3') {
         e.preventDefault();
         if (!e.repeat) this.onToggleFps?.();
+        return;
+      }
+      if (e.code === 'Escape') {
+        e.preventDefault();
+        if (!e.repeat) this.onMenu?.();
         return;
       }
       const digit = /^Digit([1-9])$/.exec(e.code);
@@ -60,6 +66,12 @@ export class Input {
   anyDown(set) {
     for (const code of set) if (this.down.has(code)) return true;
     return false;
+  }
+
+  releaseAll() {
+    this.down.clear();
+    this.mouse.left = this.mouse.right = false;
+    this.events = [];
   }
 
   takeEvents() {

@@ -28,6 +28,12 @@ export class Hud {
     this.labelTimer = 0;
   }
 
+  refreshText() {
+    this.lastVersion = -1;
+    this.lastStats = '';
+    this.lastSelected = undefined;
+  }
+
   icon(id) {
     if (!this.icons.has(id)) this.icons.set(id, iconDataURL(this.atlas, id));
     return this.icons.get(id);

@@ -7,6 +7,12 @@ import { Hud } from './ui.js';
 import { t } from './i18n.js';
 import { HOTBAR_SIZE } from './inventory.js';
 import { TILE } from './world.js';
+import { Menu, fetchVersion } from './menu.js';
+
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+const running = fetchVersion();
 
 const STEP = 1 / 60;
 const MAX_STEPS = 5;
@@ -32,7 +38,40 @@ renderer.setWorld(world);
 const hud = new Hud(document.getElementById('ui'), renderer.atlas, (slot) =>
   game.applyAction({ type: 'select', playerId: LOCAL_ID, slot }),
 );
-globalThis.kalabendu = { game, camera, renderer, input, genMs };
+let paused = false;
+const menu = new Menu(document.getElementById('ui'), {
+  running: await running,
+  onResume: () => {
+    paused = false;
+    last = performance.now();
+  },
+  onNewWorld: () => {
+    const url = new URL(location.href);
+    url.searchParams.set('seed', String((Math.random() * 4294967296) >>> 0));
+    location.href = url.toString();
+  },
+  onLanguage: () => {
+    hint.textContent = t('hintDesktop');
+    hud.refreshText();
+  },
+});
+input.onMenu = () => {
+  if (menu.isOpen) {
+    menu.close();
+  } else {
+    paused = true;
+    input.releaseAll();
+    menu.open();
+  }
+};
+menu.button.addEventListener('click', () => {
+  if (menu.isOpen) {
+    paused = true;
+    input.releaseAll();
+  }
+});
+
+globalThis.kalabendu = { game, camera, renderer, input, genMs, menu };
 
 let showDebug = false;
 input.onToggleFps = () => (showDebug = !showDebug);
@@ -78,11 +117,11 @@ let fps = 0;
 function frame(now) {
   const elapsed = Math.min((now - last) / 1000, 0.25);
   last = now;
-  acc += elapsed;
+  acc = paused ? 0 : acc + elapsed;
 
   handleInputEvents();
   let steps = 0;
-  while (acc >= STEP && steps < MAX_STEPS) {
+  while (!paused && acc >= STEP && steps < MAX_STEPS) {
     game.applyAction(input.intent(LOCAL_ID, pointerTile()));
     game.step(STEP);
     acc -= STEP;

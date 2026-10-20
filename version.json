@@ -1,0 +1,15 @@
+{
+  "version": "0.3.1",
+  "notes": {
+    "id": [
+      "Menu (Esc atau tombol ☰): lanjutkan, dunia baru, bahasa, update",
+      "Tombol Update: muat versi terbaru dengan satu klik",
+      "Dunia penuh 4200x1200: pantai, hutan, sawah, bambu, gunung api, kampung, kebun sawit"
+    ],
+    "en": [
+      "Menu (Esc or the ☰ button): resume, new world, language, update",
+      "Update button: load the newest version in one click",
+      "Full 4200x1200 world: beach, forest, rice terraces, bamboo, volcano, kampung, oil palm"
+    ]
+  }
+}

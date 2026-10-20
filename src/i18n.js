@@ -35,6 +35,22 @@ const STRINGS = {
     tile_batang_sawit: 'Batang Sawit',
     tile_daun_sawit: 'Pelepah Sawit',
     loading: 'Membuat dunia Marcapada…',
+    menu: 'Menu (Esc)',
+    menuTitle: 'KALABENDU',
+    resume: 'Lanjutkan',
+    newWorld: 'Dunia Baru',
+    newWorldConfirm: 'Buat dunia baru? Dunia ini belum bisa disimpan.',
+    loadWorld: 'Muat Dunia',
+    soon: 'segera',
+    language: 'Bahasa',
+    version: 'Versi',
+    updateAvailable: 'Update baru tersedia:',
+    updateNow: 'Update sekarang',
+    checkUpdate: 'Cek update',
+    upToDate: 'Sudah versi terbaru.',
+    whatsNew: 'Yang baru:',
+    menuHint: 'Esc untuk buka / tutup menu',
+    paused: 'Jeda',
     biome_0: 'Pantai',
     biome_1: 'Hutan Hujan',
     biome_2: 'Sawah',
@@ -79,6 +95,22 @@ const STRINGS = {
     tile_batang_sawit: 'Oil Palm Trunk',
     tile_daun_sawit: 'Oil Palm Frond',
     loading: 'Creating the world of Marcapada…',
+    menu: 'Menu (Esc)',
+    menuTitle: 'KALABENDU',
+    resume: 'Resume',
+    newWorld: 'New World',
+    newWorldConfirm: 'Create a new world? This world cannot be saved yet.',
+    loadWorld: 'Load World',
+    soon: 'coming soon',
+    language: 'Language',
+    version: 'Version',
+    updateAvailable: 'New update available:',
+    updateNow: 'Update now',
+    checkUpdate: 'Check for update',
+    upToDate: 'You have the newest version.',
+    whatsNew: "What's new:",
+    menuHint: 'Esc to open / close the menu',
+    paused: 'Paused',
     biome_0: 'Beach',
     biome_1: 'Rainforest',
     biome_2: 'Rice Terraces',
@@ -89,10 +121,21 @@ const STRINGS = {
   },
 };
 
+const LANG_KEY = 'kalabendu.lang';
 let lang = 'id';
+try {
+  const saved = localStorage.getItem(LANG_KEY);
+  if (STRINGS[saved]) lang = saved;
+} catch {}
+document.documentElement.lang = lang;
 
 export function setLang(code) {
-  if (STRINGS[code]) lang = code;
+  if (!STRINGS[code]) return;
+  lang = code;
+  document.documentElement.lang = code;
+  try {
+    localStorage.setItem(LANG_KEY, code);
+  } catch {}
 }
 
 export function getLang() {
