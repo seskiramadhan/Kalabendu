@@ -7,6 +7,8 @@
 
 html, body {
   margin: 0;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
   height: 100%;
   overflow: hidden;
   background: var(--ink);
@@ -278,6 +280,8 @@ body.portrait .touch {
 
 .tbtn {
   position: absolute;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
   border-radius: 50%;
   border: 3px solid rgba(0, 0, 0, 0.5);
   color: #fff;
@@ -461,15 +465,12 @@ body.in-menu .menu-button {
 }
 
 /* Touch button size setting */
-body[data-buttons='small'] .touch .stick,
-body[data-buttons='small'] .touch .pad {
-  zoom: 0.8;
-}
-
-body[data-buttons='large'] .touch .stick,
-body[data-buttons='large'] .touch .pad {
-  zoom: 1.2;
-}
+body[data-buttons='small'] .touch .stick { transform: scale(0.8); transform-origin: left bottom; }
+body[data-buttons='small'] .touch .pad { transform: scale(0.8); transform-origin: right bottom; }
+body[data-buttons='large'] .touch .stick { transform: scale(1.18); transform-origin: left bottom; }
+body[data-buttons='large'] .touch .pad { transform: scale(1.18); transform-origin: right bottom; }
+body.portrait[data-buttons] .touch .stick,
+body.portrait[data-buttons] .touch .pad { transform-origin: center; }
 
 .tbtn.special.ready {
   animation: jurus-ready 0.8s ease-in-out infinite;

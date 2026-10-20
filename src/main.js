@@ -6,7 +6,7 @@ import { audio } from './core/audio.js';
 import { t } from './core/i18n.js';
 import { loadSave, writeSave, resetSave } from './core/save.js';
 import { Renderer } from './render/renderer.js';
-import { TouchControls, isTouchDevice } from './core/touch.js';
+import { TouchControls, isTouchDevice, blockBrowserZoom } from './core/touch.js';
 import { Menu, fetchVersion } from './ui/menu.js';
 import { Screens, navigate } from './ui/screens.js';
 import { PADEPOKAN } from './stages/padepokan.js';
@@ -31,6 +31,7 @@ const keyboard = new Keyboard();
 const pads = new Gamepads();
 const touch = isTouchDevice() ? new TouchControls(ui) : null;
 if (touch) document.body.classList.add('is-touch');
+if (touch) blockBrowserZoom();
 renderer.touch = !!touch;
 
 let save = loadSave();

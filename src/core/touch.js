@@ -127,3 +127,38 @@ export class TouchControls {
 export function isTouchDevice() {
   return matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
 }
+
+// iOS Safari ignores user-scalable=no: two fingers (stick + button) read as a
+// pinch and quick taps as a double-tap zoom. Block both, but keep one-finger
+// scrolling inside menu panels.
+export function blockBrowserZoom() {
+  const scrollable = (el) => el?.closest?.('.screens, .menu-overlay, .menu-panel');
+  document.addEventListener(
+    'touchmove',
+    (e) => {
+      if (e.touches.length > 1 || !scrollable(e.target)) e.preventDefault();
+    },
+    { passive: false },
+  );
+  document.addEventListener(
+    'touchstart',
+    (e) => {
+      if (e.touches.length > 1) e.preventDefault();
+    },
+    { passive: false },
+  );
+  let lastEnd = 0;
+  document.addEventListener(
+    'touchend',
+    (e) => {
+      const now = performance.now();
+      if (now - lastEnd < 350 && !scrollable(e.target) && e.target?.tagName !== 'INPUT') e.preventDefault();
+      lastEnd = now;
+    },
+    { passive: false },
+  );
+  for (const type of ['gesturestart', 'gesturechange', 'gestureend']) {
+    document.addEventListener(type, (e) => e.preventDefault(), { passive: false });
+  }
+  document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
+}

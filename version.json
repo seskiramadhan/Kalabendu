@@ -1,19 +1,13 @@
 {
-  "version": "0.8.0",
+  "version": "0.8.1",
   "notes": {
     "id": [
-      "Menu utama baru dengan gunungan wayang: Mulai, Lanjutkan, Pilih Jagoan, Pengaturan",
-      "Kemajuan tersimpan: rupiah dan skor terbaik setelah menamatkan stage",
-      "Pengaturan: bahasa, suara, getar, petunjuk, ukuran tombol, hapus data",
-      "Dukungan gamepad (main dan navigasi menu); tombol Jurus menyala saat siap",
-      "Jeda otomatis saat pindah aplikasi; Menu Utama di menu jeda"
+      "Perbaikan iPhone: layar tidak lagi ikut zoom saat menekan joystick dan tombol bersamaan atau mengetuk cepat",
+      "Ukuran tombol Besar/Kecil kini lebih stabil"
     ],
     "en": [
-      "New main menu with a wayang gunungan: Start, Continue, Character Select, Settings",
-      "Progress is saved: rupiah and best score after clearing a stage",
-      "Settings: language, sound, vibration, tips, button size, delete data",
-      "Gamepad support (play and menu navigation); Special button glows when ready",
-      "Auto-pause when you switch apps; Main Menu in the pause menu"
+      "iPhone fix: the screen no longer zooms when you hold the joystick and tap buttons together, or tap quickly",
+      "Large/Small button size is more stable now"
     ]
   }
 }
