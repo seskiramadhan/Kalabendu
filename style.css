@@ -323,3 +323,159 @@ body.is-touch:not(.portrait) #hint {
 .again[hidden] {
   display: none;
 }
+
+/* Title, character select, settings */
+.screens {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  background: radial-gradient(ellipse at 50% 30%, rgba(58, 38, 25, 0.55), rgba(18, 12, 10, 0.92));
+  pointer-events: auto;
+  color: var(--cream);
+}
+
+.screens[hidden] {
+  display: none;
+}
+
+.title-screen {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gunungan {
+  width: 96px;
+  height: 120px;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.6));
+}
+
+.logo h1 {
+  margin: 6px 0 0;
+  font-size: clamp(34px, 9vw, 64px);
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  text-shadow: 0 3px 0 #6b3f23, 0 6px 18px rgba(0, 0, 0, 0.7);
+}
+
+.tagline {
+  margin: 4px 0 0;
+  color: rgba(243, 227, 195, 0.8);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.title-menu {
+  width: min(320px, 100%);
+}
+
+.nav-hint {
+  opacity: 0.7;
+}
+
+.screen-center {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.hero-panel {
+  width: min(560px, 100%);
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 8px;
+}
+
+.hero-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  border: 2px solid #6b3f23;
+  border-radius: 8px;
+  background: #4d321f;
+  color: var(--cream);
+  font: inherit;
+  cursor: pointer;
+}
+
+.hero-card canvas {
+  width: 64px;
+  height: 80px;
+  image-rendering: pixelated;
+}
+
+.hero-card span {
+  font-size: 12px;
+  text-align: center;
+}
+
+.hero-card.active,
+.hero-card:focus-visible {
+  border-color: var(--gold);
+  background: rgba(224, 178, 82, 0.25);
+}
+
+.hero-card.locked {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.menu-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.menu-btn.danger {
+  background: #5a1a14;
+  border-color: #8a2a20;
+}
+
+.menu-row input[type='range'] {
+  flex: 1;
+  accent-color: var(--gold);
+}
+
+body.in-menu .touch,
+body.in-menu #hint,
+body.in-menu .menu-button {
+  display: none;
+}
+
+/* Touch button size setting */
+body[data-buttons='small'] .touch .stick,
+body[data-buttons='small'] .touch .pad {
+  zoom: 0.8;
+}
+
+body[data-buttons='large'] .touch .stick,
+body[data-buttons='large'] .touch .pad {
+  zoom: 1.2;
+}
+
+.tbtn.special.ready {
+  animation: jurus-ready 0.8s ease-in-out infinite;
+}
+
+@keyframes jurus-ready {
+  0%, 100% { box-shadow: 0 4px 0 rgba(0, 0, 0, 0.45), 0 0 0 0 rgba(120, 200, 255, 0.0); }
+  50% { box-shadow: 0 4px 0 rgba(0, 0, 0, 0.45), 0 0 18px 6px rgba(120, 200, 255, 0.85); }
+}

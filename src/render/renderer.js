@@ -29,6 +29,7 @@ export class Renderer {
     this.art = null;
     this.view = { x: 0, y: 0, scale: 1 };
     this.shake = 0;
+    this.showHud = true;
   }
 
   setStage(stage) {
@@ -96,7 +97,7 @@ export class Renderer {
     const sx = this.shake > 0 ? Math.round((Math.random() * 2 - 1) * this.shake) * scale : 0;
     const sy = this.shake > 0 ? Math.round((Math.random() * 2 - 1) * this.shake) * scale : 0;
     main.drawImage(this.buffer, x + sx, y + sy, this.view.w, this.view.h);
-    this.hud.draw(main, game, this.view, dt, time);
+    if (this.showHud) this.hud.draw(main, game, this.view, dt, time);
   }
 
   drawFighter(ctx, e, game, camX, time) {

@@ -12,6 +12,11 @@ class Audio {
     window.addEventListener('pointerdown', unlock, { once: true });
   }
 
+  setVolume(v) {
+    this.volume = v;
+    if (this.master) this.master.gain.value = v;
+  }
+
   unlock() {
     if (this.ctx) return;
     const AC = window.AudioContext || window.webkitAudioContext;

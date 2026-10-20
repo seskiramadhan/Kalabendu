@@ -101,6 +101,12 @@ export class TouchControls {
     this.held = this.stickBits | this.buttonBits;
   }
 
+  setReady(ready) {
+    if (this.ready === ready) return;
+    this.ready = ready;
+    this.el.querySelector('.special').classList.toggle('ready', !!ready);
+  }
+
   releaseAll() {
     this.stickBits = 0;
     this.buttonBits = 0;

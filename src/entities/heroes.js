@@ -26,3 +26,11 @@ export const HEROES = {
     },
   },
 };
+
+// Character select order. Locked heroes arrive in milestone 10.
+export const ROSTER = [
+  { id: 'bayu', descKey: 'hero_bayu_desc' },
+  { id: 'sri', nameKey: 'hero_sri', descKey: 'hero_sri_desc', locked: true },
+  { id: 'ujang', nameKey: 'hero_ujang', descKey: 'hero_ujang_desc', locked: true },
+  { id: 'inah', nameKey: 'hero_inah', descKey: 'hero_inah_desc', locked: true },
+];

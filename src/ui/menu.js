@@ -12,11 +12,11 @@ export async function fetchVersion() {
 }
 
 export class Menu {
-  constructor(root, { running, onResume, onRestart, onLanguage }) {
+  constructor(root, { running, onResume, onRestart, onQuit, onLanguage }) {
     this.running = running;
     this.latest = null;
     this.isOpen = false;
-    this.handlers = { onResume, onRestart, onLanguage };
+    this.handlers = { onResume, onRestart, onQuit, onLanguage };
 
     this.button = document.createElement('button');
     this.button.type = 'button';
@@ -83,7 +83,7 @@ export class Menu {
       btn(t('restart'), () => {
         if (confirm(t('restartConfirm'))) this.handlers.onRestart();
       }),
-      btn(t('loadWorld') + ' — ' + t('soon'), null, '', true),
+      btn(t('mainMenu'), () => this.handlers.onQuit()),
     );
 
     const langRow = div('menu-row');
@@ -119,6 +119,7 @@ export class Menu {
     upd.append(this.flashEl);
     panel.append(upd, h('div', t('menuHint'), 'muted small'));
     this.overlay.append(panel);
+    panel.querySelector('button')?.focus({ preventScroll: true });
   }
 
   flash(text) {

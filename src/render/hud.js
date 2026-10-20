@@ -38,7 +38,7 @@ export class Hud {
     if (ev.type === 'comboEnd') this.bonus = { text: `${t('comboBonus')} +${ev.bonus}`, time: 1.6 };
     if (ev.type === 'special') this.flash = 1;
     if (ev.type === 'noSemangat') this.deny = 0.5;
-    if (ev.type === 'tutorial') {
+    if (ev.type === 'tutorial' && this.tips !== false) {
       const touchKey = ev.key + '_touch';
       this.tutorial = this.touch && t(touchKey) !== touchKey ? touchKey : ev.key;
       this.tutorialTime = TUTORIAL_TIME;
