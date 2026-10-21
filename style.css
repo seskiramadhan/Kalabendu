@@ -808,3 +808,52 @@ body.portrait .clear-buttons {
 .controls-tips li {
   margin: 3px 0;
 }
+
+/* Phones held sideways: logo on the left, the whole menu on the right, all on one screen. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .title-screen {
+    display: grid;
+    grid-template-columns: auto minmax(260px, 420px);
+    grid-template-rows: auto auto;
+    align-content: center;
+    justify-content: center;
+    column-gap: 28px;
+    row-gap: 6px;
+    padding: max(8px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  }
+  .title-screen .logo {
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+  .title-screen .gunungan {
+    width: 64px;
+    height: 80px;
+  }
+  .title-screen .logo h1 {
+    font-size: 34px;
+  }
+  .title-screen .title-menu {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 12px;
+  }
+  .title-screen .title-menu .menu-btn {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+  .title-screen .title-menu .menu-btn.primary {
+    grid-column: 1 / -1;
+  }
+  .title-screen .lang-switch {
+    margin-top: 0;
+  }
+  .title-screen .lang-switch .menu-btn {
+    padding: 4px 12px;
+    font-size: 13px;
+  }
+  .title-screen .nav-hint {
+    display: none;
+  }
+}

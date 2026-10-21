@@ -1,11 +1,11 @@
 {
-  "version": "0.18.3",
+  "version": "0.18.4",
   "notes": {
     "id": [
-      "Halaman Kontrol baru di menu judul dan menu jeda (☰): tombol keyboard, numpad Pemain 2, dan gamepad untuk tiap aksi"
+      "Layar judul di HP miring: logo di kiri, semua tombol (termasuk Kontrol) di kanan, muat satu layar"
     ],
     "en": [
-      "New Controls page in the title menu and the pause menu (☰): keyboard, Player 2 numpad and gamepad buttons for every action"
+      "Title screen on a sideways phone: logo on the left, every button (including Controls) on the right, all on one screen"
     ]
   }
 }
