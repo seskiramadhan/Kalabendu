@@ -683,3 +683,16 @@ body.portrait[data-buttons] .touch .pad { transform-origin: center; }
 
 /* Player 2 gamepad choice only matters on a computer. */
 .is-touch .desktop-only { display: none; }
+
+/* Stage clear / game over: the fight buttons step aside so nothing overlaps. */
+body.choosing .touch {
+  display: none;
+}
+
+body.portrait .again {
+  top: calc(var(--stage-bottom, 60%) + 96px);
+}
+
+body.portrait .clear-buttons {
+  top: calc(var(--stage-bottom, 60%) + 160px);
+}

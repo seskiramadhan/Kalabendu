@@ -475,6 +475,7 @@ const loop = startLoop({
       continueBtn.textContent = t('continueBtn');
       continueBtn.hidden = !showContinue;
     }
+    document.body.classList.toggle('choosing', showAgain || showNext || showContinue);
     moveLabelTimer -= dt;
     if (moveLabelTimer <= 0) moveLabel.style.opacity = '0';
     if (debug && hero) {

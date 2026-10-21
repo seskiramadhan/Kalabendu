@@ -1,15 +1,11 @@
 {
-  "version": "0.13.1",
+  "version": "0.13.2",
   "notes": {
     "id": [
-      "Zaman naik lebih pelan: Kalasuba baru tercapai di akhir perjalanan",
-      "Petunjuk tidak lagi menutupi layar stage selesai",
-      "Jagoan baru: Sri, Ujang, Mak Inah; main berdua dengan numpad atau gamepad ke-2"
+      "Tombol Main lagi / Lanjut tidak lagi menumpuk dengan tombol sentuh (tombol sentuh disembunyikan saat memilih, posisi lebih rendah di HP)"
     ],
     "en": [
-      "The era rises more slowly: Kalasuba now arrives at the end of the journey",
-      "Tips no longer cover the stage clear screen",
-      "New heroes: Sri, Ujang, Mak Inah; two players with the numpad or a second gamepad"
+      "Play again / Next buttons no longer overlap the touch buttons (touch buttons hide while you choose; lower on phones)"
     ]
   }
 }
