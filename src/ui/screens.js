@@ -92,6 +92,9 @@ export class Screens {
       input.maxLength = 5;
       input.placeholder = t('netCodePlaceholder');
       input.className = 'code-input';
+      input.id = 'room-code';
+      input.name = 'room-code';
+      input.autocomplete = 'off';
       input.autocapitalize = 'characters';
       input.addEventListener('keydown', (e) => {
         e.stopPropagation();
@@ -192,6 +195,8 @@ export class Screens {
     const vol = div('menu-row');
     const range = document.createElement('input');
     range.type = 'range';
+    range.id = 'volume';
+    range.name = 'volume';
     range.min = '0';
     range.max = '1';
     range.step = '0.1';

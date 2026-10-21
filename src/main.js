@@ -484,6 +484,23 @@ function netStatus(text) {
   if (screens.current === 'online') screens.render();
 }
 
+// Plain-language reason for a failed connection (the code in brackets helps debugging).
+function netErrorText(why) {
+  const key = {
+    'peer-unavailable': 'netNoRoom',
+    timeout: 'netBlocked',
+    'ice-failed': 'netBlocked',
+    link: 'netBlocked',
+    'server-timeout': 'netNoServer',
+    network: 'netNoServer',
+    'server-error': 'netNoServer',
+    'socket-error': 'netNoServer',
+    'socket-closed': 'netNoServer',
+    'unavailable-id': 'netCodeTaken',
+  }[why] ?? 'netError';
+  return `${t(key)} (${why})`;
+}
+
 async function hostOnline() {
   leaveOnline();
   netStatus(t('netCreating'));
@@ -514,11 +531,12 @@ async function hostOnline() {
         p2Active = false;
         netStatus(t('netFriendLeft'));
       },
-      onError: (why) => netStatus(t('netError') + ` (${why})`),
+      onError: (why) => netStatus(netErrorText(why)),
+      onStatus: (key) => netStatus(t(key)),
     });
     net = { role: 'host', room, connected: false, code: room.code };
     screens.netCode = room.code;
-    netStatus(t('netShareCode'));
+    if (!screens.netStatus || screens.netStatus === t('netCreating')) netStatus(t('netServer'));
   } catch {
     netStatus(t('netNoLib'));
   }
@@ -557,7 +575,8 @@ async function joinOnline(code) {
           setTimeout(() => (hint.style.opacity = '0'), 5000);
         }
       },
-      onError: (why) => netStatus(t(why === 'peer-unavailable' ? 'netNoRoom' : 'netError') + (why === 'peer-unavailable' ? '' : ` (${why})`)),
+      onError: (why) => netStatus(netErrorText(why)),
+      onStatus: (key) => netStatus(t(key)),
     });
     net = { role: 'guest', room, connected: false, code: room.code };
   } catch {

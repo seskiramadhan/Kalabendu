@@ -1,11 +1,13 @@
 {
-  "version": "0.18.1",
+  "version": "0.18.2",
   "notes": {
     "id": [
-      "Raja Sawit dan Pejabat Tinggi lebih cepat dikalahkan; Pejabat lebih jarang memanggil ajudan"
+      "Main Online: setiap langkah koneksi terlihat di layar, dan jika gagal muncul alasannya (tidak lagi diam di \"Menyambung…\")",
+      "Server relay (TURN) dipakai agar HP di jaringan berbeda bisa tersambung"
     ],
     "en": [
-      "Raja Sawit and the High Official are quicker to beat; the Official calls bodyguards less often"
+      "Play Online: every connection step shows on screen, and a failure now shows the reason (no more hanging on \"Connecting…\")",
+      "Relay (TURN) servers help phones on different networks connect"
     ]
   }
 }

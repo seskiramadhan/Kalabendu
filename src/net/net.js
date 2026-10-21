@@ -31,27 +31,66 @@ function loadPeer() {
   return peerLib;
 }
 
-// handlers: { onOpen(), onMessage(msg), onClose(), onError(reason) }
+// STUN finds each device's public address; TURN relays the data when two
+// networks (e.g. mobile data) can't connect directly. These are the free
+// PeerJS servers, written out so the setup is visible.
+const ICE = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: ['turn:eu-0.turn.peerjs.com:3478', 'turn:us-0.turn.peerjs.com:3478'], username: 'peerjs', credential: 'peerjsp' },
+  ],
+};
+const TIMEOUT = 20000;
+
+// Watches one data connection: reports when it is linking, and fails it if
+// the devices can't reach each other (instead of waiting forever).
+function watch(conn, handlers) {
+  let opened = false;
+  const timer = setTimeout(() => !opened && handlers.onError?.('timeout'), TIMEOUT);
+  conn.on('open', () => {
+    opened = true;
+    clearTimeout(timer);
+    handlers.onOpen?.();
+  });
+  conn.on('data', (m) => handlers.onMessage?.(m));
+  conn.on('close', () => {
+    clearTimeout(timer);
+    handlers.onClose?.();
+  });
+  conn.on('error', () => handlers.onError?.('link'));
+  conn.on('iceStateChanged', (state) => {
+    if (state === 'checking') handlers.onStatus?.('netLinking');
+    if (state === 'failed' && !opened) handlers.onError?.('ice-failed');
+  });
+}
+
+// handlers: { onOpen(), onMessage(msg), onClose(), onError(reason), onStatus(key) }
 // Returns { code, send(msg), close() }.
 export async function hostRoom(handlers) {
   const code = newCode();
   if (local()) return localRoom(code, 'host', handlers);
   const Peer = await loadPeer();
-  const peer = new Peer(PREFIX + code);
+  handlers.onStatus?.('netServer');
+  const peer = new Peer(PREFIX + code, { config: ICE });
   let conn = null;
+  peer.on('open', () => handlers.onStatus?.('netShareCode'));
   peer.on('connection', (c) => {
-    if (conn) {
+    if (conn?.open) {
       c.close();
       return;
     }
     conn = c;
-    c.on('open', () => handlers.onOpen?.());
-    c.on('data', (m) => handlers.onMessage?.(m));
-    c.on('close', () => {
-      conn = null;
-      handlers.onClose?.();
+    handlers.onStatus?.('netGuestKnock');
+    watch(c, {
+      ...handlers,
+      onClose: () => {
+        conn = null;
+        handlers.onClose?.();
+      },
     });
   });
+  // Lost the signalling server (phone slept, Wi-Fi changed): reconnect, same code.
+  peer.on('disconnected', () => !peer.destroyed && peer.reconnect());
   peer.on('error', (e) => handlers.onError?.(e.type ?? 'error'));
   return {
     code,
@@ -64,19 +103,24 @@ export async function joinRoom(code, handlers) {
   code = code.trim().toUpperCase();
   if (local()) return localRoom(code, 'guest', handlers);
   const Peer = await loadPeer();
-  const peer = new Peer();
+  handlers.onStatus?.('netServer');
+  const peer = new Peer({ config: ICE });
   let conn = null;
+  const serverTimer = setTimeout(() => !peer.open && handlers.onError?.('server-timeout'), TIMEOUT);
   peer.on('open', () => {
+    clearTimeout(serverTimer);
+    handlers.onStatus?.('netFindRoom');
     conn = peer.connect(PREFIX + code, { reliable: true, serialization: 'json' });
-    conn.on('open', () => handlers.onOpen?.());
-    conn.on('data', (m) => handlers.onMessage?.(m));
-    conn.on('close', () => handlers.onClose?.());
+    watch(conn, handlers);
   });
   peer.on('error', (e) => handlers.onError?.(e.type ?? 'error'));
   return {
     code,
     send: (m) => conn?.open && conn.send(m),
-    close: () => peer.destroy(),
+    close: () => {
+      clearTimeout(serverTimer);
+      peer.destroy();
+    },
   };
 }
 

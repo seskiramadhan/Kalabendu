@@ -34,7 +34,7 @@ Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's 
 ## Pending
 | # | Item | Why |
 |---|---|---|
-| 1 | Confirm online play between two real devices | The sandbox blocks the PeerJS CDN and server, so only the two-tab test (?net=local) ran |
+| 1 | Confirm online play between two real devices | 2026-10-21: user's first try hung on "Menyambung ke ruang…" with no error. v0.18.2 shows each step (server → room → linking) + 20 s timeout with a reason code, and sets STUN/TURN explicitly. Waiting for the user's retry and the status text/code they see |
 | 2 | Playtest feedback from the user | Bot playtest done 2026-10-21 (6 stages × 4 heroes, no cheat health): all clear. Raja Sawit 360 → 310 hp, Pejabat Tinggi 330 → 280 hp, his bodyguard call 0.5 → 0.3. Still waiting on a human playthrough |
 | 3 | Painted sprite art | Pipeline is ready; needs art (an outside asset, only if the user wants it) |
 
