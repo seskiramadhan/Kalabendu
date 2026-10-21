@@ -3,10 +3,10 @@
 ## How to work in this repo
 - New chat? Read NEXT.md first (what is done, what is left, in order).
 - The game is a pencak silat beat 'em up (since 2026-10-20). The old sandbox version lives on branch `sandbox-v0.3.1`; don't build on it.
-- The game is finished (v0.18.3): all milestones, own gamelan soundtrack, online co-op, controls page. NEXT.md has no pending items; new work comes only from the user.
+- The game is finished (v0.18.5): all milestones, own gamelan soundtrack, online co-op, controls page. NEXT.md has no pending items; new work comes only from the user.
 - Each change must stay playable. After each change: tell the user how to test it, update NEXT.md, commit with a clear message, push.
 - Test before pushing: run a local server and drive the game with Playwright (Chromium at /opt/pw-browsers/chromium; `window.kalabendu.game` exposes the game). Bot playthroughs per stage and screenshots catch most breakage.
-- Keep README.md (English + Indonesian) in step when controls, stages, heroes or eras change.
+- Keep README.md (English + Indonesian) in step when controls, stages, heroes or eras change. The README must not spoil the endings or name the secret final boss (user's choice).
 - Plain JavaScript ES modules + HTML5 Canvas. No frameworks, no Three.js, no build step, no external assets. Exceptions: the music MP3s in assets/music/ (our own, rendered by tools/music/ — edit the song scripts, never hand-edit MP3s), and PeerJS, loaded from jsDelivr when someone opens Play Online (the sandbox can't reach it; test online with ?net=local in two tabs).
 - Game logic separate from rendering. Player actions are input messages ({type:'input', playerId, held, pressed}) applied by the game, ready for online co-op later.
 - Renderer and audio only read game state and game.events; they never change game state.

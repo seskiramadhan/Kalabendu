@@ -1,6 +1,6 @@
 # NEXT — Kalabendu (beat 'em up) plan
 
-Status line: **Finished (v0.18.3). No pending items; wait for the user's next request** (2026-10-21)
+Status line: **Finished (v0.18.5). No pending items; wait for the user's next request** (2026-10-21)
 
 ## Milestones (each playable before the next)
 | # | Milestone | Status |
@@ -31,6 +31,7 @@ Status line: **Finished (v0.18.3). No pending items; wait for the user's next re
 | — | Own music (v0.18.0) | tools/music/ (Python: gamelan.py instruments, songs/*.py, render.py, look.py). Tracks: menu, story, stage0–5, boss, kala in assets/music/ via manifest.json. fiikuri tracks removed at the user's request (2026-10-21). User reviewed and approved all 10 tracks (2026-10-21). Two <audio> players crossfade; primed with a silent MP3 on the first tap for iPhone |
 | — | Online play confirmed (2026-10-21) | User connected two devices; it failed on one network and worked on a different one. v0.18.2 shows each step + reason on failure |
 | — | Controls page (v0.18.3) | src/ui/controls.js, opened from the title menu and the pause menu (Kontrol) |
+| — | Polish (v0.18.4–0.18.5) | Title screen fits sideways phones; bribe lines use {hero} (no 'young man'/'good boy'); README: suitable age 10+, 'Represents' column for heroes, no ending spoilers (small hint only, no Batara Kala name) |
 | — | Language | Bahasa / English chips on the title screen; README opens with a language switch |
 
 ## Pending
