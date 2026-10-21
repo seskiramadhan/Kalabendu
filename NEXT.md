@@ -29,17 +29,17 @@ Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's 
 | 7 | Snapshot branch | snapshot-v0.13.1 |
 | — | Clear buttons overlapped touch buttons (user screenshot) | touch buttons hide while choosing; portrait buttons sit under the stage (v0.13.2) |
 | — | Own music (v0.18.0) | tools/music/ (Python: gamelan.py instruments, songs/*.py, render.py, look.py). Tracks: menu, story, stage0–5, boss, kala in assets/music/ via manifest.json. fiikuri tracks removed at the user's request (2026-10-21). User reviewed and approved all 10 tracks (2026-10-21). Two <audio> players crossfade; primed with a silent MP3 on the first tap for iPhone |
+| — | Online play confirmed (2026-10-21) | User connected two devices; it failed on one network and worked on a different one. v0.18.2 shows each step + reason on failure |
+| — | Controls page (v0.18.3) | src/ui/controls.js, opened from the title menu and the pause menu (Kontrol) |
 | — | Language | Bahasa / English chips on the title screen; README opens with a language switch |
 
 ## Pending
 | # | Item | Why |
 |---|---|---|
-| 1 | Confirm online play between two real devices | 2026-10-21: user's first try hung on "Menyambung ke ruang…" with no error. v0.18.2 shows each step (server → room → linking) + 20 s timeout with a reason code, and sets STUN/TURN explicitly. Waiting for the user's retry and the status text/code they see |
-| 2 | Playtest feedback from the user | Bot playtest done 2026-10-21 (6 stages × 4 heroes, no cheat health): all clear. Raja Sawit 360 → 310 hp, Pejabat Tinggi 330 → 280 hp, his bodyguard call 0.5 → 0.3. Still waiting on a human playthrough |
-| 3 | Painted sprite art | Pipeline is ready; needs art (an outside asset, only if the user wants it) |
+| 1 | Playtest feedback from the user | Bot playtest done 2026-10-21 (6 stages × 4 heroes, no cheat health): all clear. Raja Sawit 360 → 310 hp, Pejabat Tinggi 330 → 280 hp, his bodyguard call 0.5 → 0.3. Still waiting on a human playthrough |
+| 2 | Painted sprite art | Pipeline is ready; needs art (an outside asset, only if the user wants it) |
 
 ## Questions for the user
-- Did online play connect between your phone and a friend's? If not, tell me the error text on the Play Online screen.
 
 ## Already in place
 - Touch controls (joystick + Pukul/Tendang/Lompat/Hindar/Jurus) and phone scaling (v0.4.1).

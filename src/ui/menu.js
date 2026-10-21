@@ -1,4 +1,5 @@
 import { t, getLang, setLang } from '../core/i18n.js';
+import { controlsTable } from './controls.js';
 
 const CHECK_EVERY_MS = 5 * 60 * 1000;
 
@@ -60,6 +61,7 @@ export class Menu {
   close() {
     if (!this.isOpen) return;
     this.isOpen = false;
+    this.view = null;
     this.overlay.hidden = true;
     this.handlers.onResume();
   }
@@ -75,6 +77,16 @@ export class Menu {
     const notes = (this.hasUpdate ? this.latest : this.running)?.notes?.[lang] ?? [];
 
     this.overlay.innerHTML = '';
+    if (this.view === 'controls') {
+      const page = div('menu-panel batik-frame controls-panel');
+      page.append(h('h2', t('controls')), controlsTable(), btn(t('back'), () => {
+        this.view = null;
+        this.render();
+      }, 'primary'));
+      this.overlay.append(page);
+      page.querySelector('button')?.focus({ preventScroll: true });
+      return;
+    }
     const panel = div('menu-panel batik-frame');
     panel.append(h('h2', t('menuTitle')));
 
@@ -82,6 +94,10 @@ export class Menu {
       btn(t('resume'), () => this.close(), 'primary'),
       btn(t('restart'), () => {
         if (confirm(t('restartConfirm'))) this.handlers.onRestart();
+      }),
+      btn(t('controls'), () => {
+        this.view = 'controls';
+        this.render();
       }),
       btn(t('mainMenu'), () => this.handlers.onQuit()),
     );

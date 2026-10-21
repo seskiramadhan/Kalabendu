@@ -1,4 +1,5 @@
 import { t, getLang, setLang } from '../core/i18n.js';
+import { controlsTable } from './controls.js';
 import { HEROES, ROSTER, HERO_UNLOCKS } from '../entities/heroes.js';
 import { drawFigure } from '../render/sprites/skeleton.js';
 import { POSES } from '../render/sprites/poses.js';
@@ -43,6 +44,7 @@ export class Screens {
     else if (this.current === 'settings') this.renderSettings(save);
     else if (this.current === 'stages') this.renderStages(save);
     else if (this.current === 'online') this.renderOnline(save);
+    else if (this.current === 'controls') this.renderControls();
     else if (this.current === 'shop') this.renderShop(save);
     this.el.querySelector('button:not(:disabled)')?.focus({ preventScroll: true });
   }
@@ -63,6 +65,7 @@ export class Screens {
       btn(t('stageSelect'), () => this.show('stages'), '', !save.started),
       btn(t('heroSelect'), () => this.show('heroes')),
       btn(t('online'), () => this.show('online')),
+      btn(t('controls'), () => this.show('controls')),
       btn(t('settings'), () => this.show('settings')),
     );
     // Quick language switch right on the title screen.
@@ -76,6 +79,12 @@ export class Screens {
     }
     wrap.append(logo, panel, lang, h('div', t('menuNavHint'), 'muted small nav-hint'));
     this.el.append(wrap);
+  }
+
+  renderControls() {
+    const panel = div('menu-panel batik-frame controls-panel');
+    panel.append(h('h2', t('controls')), controlsTable(), btn(t('back'), () => this.show('title')));
+    this.el.append(center(panel));
   }
 
   // Online co-op: host a room (share the code) or join a friend's room.

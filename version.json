@@ -1,13 +1,11 @@
 {
-  "version": "0.18.2",
+  "version": "0.18.3",
   "notes": {
     "id": [
-      "Main Online: setiap langkah koneksi terlihat di layar, dan jika gagal muncul alasannya (tidak lagi diam di \"Menyambung…\")",
-      "Server relay (TURN) dipakai agar HP di jaringan berbeda bisa tersambung"
+      "Halaman Kontrol baru di menu judul dan menu jeda (☰): tombol keyboard, numpad Pemain 2, dan gamepad untuk tiap aksi"
     ],
     "en": [
-      "Play Online: every connection step shows on screen, and a failure now shows the reason (no more hanging on \"Connecting…\")",
-      "Relay (TURN) servers help phones on different networks connect"
+      "New Controls page in the title menu and the pause menu (☰): keyboard, Player 2 numpad and gamepad buttons for every action"
     ]
   }
 }
