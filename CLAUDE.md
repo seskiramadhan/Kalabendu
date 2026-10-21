@@ -3,11 +3,11 @@
 ## How to work in this repo
 - New chat? Read NEXT.md first (what is done, what is left, in order).
 - The game is a pencak silat beat 'em up (since 2026-10-20). The old sandbox version lives on branch `sandbox-v0.3.1`; don't build on it.
-- All 10 milestones are done (v0.13.1). New work = items in NEXT.md ("Pending" and "Questions for the user"); ask before starting anything listed as a question.
+- All 10 milestones and the follow-up list are done (v0.15.0: music, online co-op, sprite-sheet support, story per hero). New work = items in NEXT.md ("Pending" and "Questions for the user").
 - Each change must stay playable. After each change: tell the user how to test it, update NEXT.md, commit with a clear message, push.
 - Test before pushing: run a local server and drive the game with Playwright (Chromium at /opt/pw-browsers/chromium; `window.kalabendu.game` exposes the game). Bot playthroughs per stage and screenshots catch most breakage.
 - Keep README.md (English + Indonesian) in step when controls, stages, heroes or eras change.
-- Plain JavaScript ES modules + HTML5 Canvas. No frameworks, no Three.js, no build step, no external assets.
+- Plain JavaScript ES modules + HTML5 Canvas. No frameworks, no Three.js, no build step, no external assets. Only exception: PeerJS, loaded from jsDelivr when someone opens Play Online (the sandbox can't reach it; test online with ?net=local in two tabs).
 - Game logic separate from rendering. Player actions are input messages ({type:'input', playerId, held, pressed}) applied by the game, ready for online co-op later.
 - Renderer and audio only read game state and game.events; they never change game state.
 - All UI text lives in src/core/i18n.js (Bahasa Indonesia default, English option).
@@ -22,7 +22,7 @@ Local:
 ```
 python3 -m http.server 8000
 ```
-Then open http://localhost:8000 (on a phone: http://<laptop-ip>:8000 on the same Wi-Fi). `?stage=<id>` jumps to a stage (stage0–stage5, padepokan).
+Then open http://localhost:8000 (on a phone: http://<laptop-ip>:8000 on the same Wi-Fi). `?stage=<id>` jumps to a stage (stage0–stage5, padepokan); `?net=local` tests online play between two tabs.
 Code layout and controls: README.md.
 
 

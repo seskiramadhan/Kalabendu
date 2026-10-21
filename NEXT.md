@@ -1,6 +1,6 @@
 # NEXT — Kalabendu (beat 'em up) plan
 
-Status line: **All 10 milestones + README done; full review done (v0.13.1). Waiting for the user's playtest; see Pending and Questions below** (2026-10-20)
+Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's real-device online test and playtest** (2026-10-21)
 
 ## Milestones (each playable before the next)
 | # | Milestone | Status |
@@ -17,22 +17,29 @@ Status line: **All 10 milestones + README done; full review done (v0.13.1). Wait
 | 10 | Sri, Ujang, Mak Inah; local 2-player co-op | done (v0.13.0) |
 | — | README in English + Indonesian | done |
 
-## Pending (found in the final review, not started)
+## Done after the review (2026-10-21, v0.13.2 – v0.15.0)
+| # | Item | Result |
+|---|---|---|
+| 1 | Balance | Pejabat Tinggi 380 → 330 hp, Batara Kala 520 → 460 hp; era climb slowed (v0.13.1) |
+| 2 | Story names Bayu only | Story uses the chosen hero ({hero} in text, speaker 'hero'); a side character who is the hero hands the line to a villager |
+| 3 | Hero intro scenes | JOIN_SCENES in story.js, shown before the warung after the unlocking stage |
+| 4 | Music | src/core/music.js: gamelan cycle (saron, bonang, kenong, kempul, gong, kendang), pelog below era 40, slendro above; faster in boss fights; Settings toggle |
+| 5 | Sprite sheets | src/render/sprites/sheets.js + tools/sheet.html templates + assets/sprites/manifest.json (empty = code art) |
+| 6 | Online co-op | src/net/net.js (PeerJS from jsDelivr, BroadcastChannel with ?net=local) + src/net/snapshot.js (host snapshots 20/s, guest mirror) |
+| 7 | Snapshot branch | snapshot-v0.13.1 |
+| — | Clear buttons overlapped touch buttons (user screenshot) | touch buttons hide while choosing; portrait buttons sit under the stage (v0.13.2) |
+| — | Language | Bahasa / English chips on the title screen; README opens with a language switch |
+
+## Pending
 | # | Item | Why |
 |---|---|---|
-| 1 | Balance from the user's playtest: boss length, enemy damage, warung prices | Only bots have played; bosses (Pejabat Tinggi, Batara Kala) may feel long |
-| 2 | Story dialogue always names Bayu, even when Sri, Ujang or Mak Inah is played | Story lines in story.js / i18n are written for Bayu |
-| 3 | Short intro lines when Sri, Ujang and Mak Inah unlock | Now only a hint text says they joined |
-| 4 | Music: gamelan-style loop per stage (Web Audio, no files) | Request said "keep code ready for gamelan music later"; only sound effects exist |
-| 5 | Sprite sheets instead of code-drawn figures | Request: "ready to swap for sprite sheets later"; pose names already match animation states |
-| 6 | Online co-op (PeerJS / WebRTC host and join) | Plan written in README; not built |
-| 7 | Snapshot branch for v0.13.1 (tags are blocked by the proxy) | Like sandbox-v0.3.1, if the user wants a saved copy |
+| 1 | Confirm online play between two real devices | The sandbox blocks the PeerJS CDN and server, so only the two-tab test (?net=local) ran |
+| 2 | Playtest feedback from the user | Bots only so far; tune bosses, prices, music volume if asked |
+| 3 | Painted sprite art | Pipeline is ready; needs art (an outside asset, only if the user wants it) |
 
-## Questions for the user (ask before doing the matching item)
-- After playing: which bosses or stages feel too long or too hard? (item 1)
-- Should the story change its words for each hero, or stay Bayu's story with friends? (item 2)
-- Want gamelan music next, or online co-op, or sprite art? Which first? (items 4–6)
-- Two players on one phone is not supported (one touch screen). Is PC-only co-op OK?
+## Questions for the user
+- Did online play connect between your phone and a friend's? If not, tell me the error text on the Play Online screen.
+- Is the gamelan music too loud or too quiet?
 
 ## Already in place
 - Touch controls (joystick + Pukul/Tendang/Lompat/Hindar/Jurus) and phone scaling (v0.4.1).
@@ -55,3 +62,5 @@ Status line: **All 10 milestones + README done; full review done (v0.13.1). Wait
 - Full request: CLAUDE.md. Old sandbox game: branch sandbox-v0.3.1.
 - Stage 4/5 (M9): boss sections can repeat the same camX (truck then Komandan; Pejabat then Batara Kala with requires:'kala', no GO arrow). Pejabat is shielded (KEBAL) while a Makelar lives (game.updateShields). Move summons are capped at 4 alive non-boss enemies; bosses heal at 25%. Kala's eclipse sets game.darkness (renderer spotlight).
 - The padepokan training yard stays reachable with ?stage=padepokan.
+- Online (v0.15.0): main.js hostOnline/joinOnline/leaveOnline; host mode stays 'play', guest mode is 'guest' (no game.step, renders mirror.game). Guest input → {type:'input'} to host = remote p2. Snapshot leaves out zero/false fields; Mirror starts entities from ZEROES. Waiting text when the host is in menu/story/shop.
+- Music: main.js calls music.play(track) on play/story/menu/clear; 'boss' event → setBoss.

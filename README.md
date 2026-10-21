@@ -1,218 +1,179 @@
 # Kalabendu
 
-A 2D side-scrolling beat 'em up with pencak silat at its heart, set in the fictional land of Marcapada.
-Plain JavaScript + HTML5 Canvas, no frameworks, no build step, no external assets. Runs in the browser on PC and phones.
+**Language / Bahasa:** [English](#english) · [Bahasa Indonesia](#bahasa-indonesia)
 
-*Bahasa Indonesia ada di bawah.*
+### ▶ Play now / Main sekarang: **https://seskiramadhan.github.io/Kalabendu/**
 
-**Play:** https://seskiramadhan.github.io/Kalabendu/
+Works in the browser on phones and computers. No install. / Jalan di browser HP dan komputer, tanpa instal.
 
 ---
 
 ## English
 
-### The name
-In Javanese tradition (Ranggawarsita's *Serat Kalatidha* and the Jayabaya prophecies), **Kalabendu** is the "age of curse":
-leaders are corrupt, law can be bought, truth is twisted, nature turns against people and the honest are pushed aside.
-It is followed by **Kalasuba**, an age of peace and prosperity. Between them sits **Kalatidha**, the age of doubt.
+### About the game
+**Kalabendu** is a 2D side-scrolling beat 'em up with **pencak silat** at its heart, inspired by Streets of Rage 4,
+TMNT: Shredder's Revenge and River City Girls.
 
-### The story and its message
-Marcapada has fallen into Kalabendu: burning forests and haze, palm-oil plantations swallowing the land, factories closing,
-the rupiah collapsing, prices rising, protests in the streets, and corrupt officials profiting from all of it.
-Ordinary villagers trained in pencak silat rise up and fight their way from the burning forest to the corrupt tower.
+In Javanese tradition (Ranggawarsita's *Serat Kalatidha* and the Jayabaya prophecies), *Kalabendu* is the "age of curse":
+leaders are corrupt, law can be bought, nature turns against people. After it comes *Kalasuba*, an age of peace.
 
-The arc: **nature suffers → people suffer → you find who profits → people unite → you face the source.**
-The game is satire with heart: no single hero fixes things, the farmers, workers, traders, students and ojol drivers do it together,
-and the most important fight is saying **no** to the bribe. All characters, companies and places are fictional.
+The fictional land of Marcapada has fallen into Kalabendu: burning forests and haze, palm oil swallowing the land,
+factories closing, prices rising, hired thugs in the streets, and officials profiting from it all.
+Ordinary villagers who train in silat fight their way from the burning forest to the corrupt tower.
+It is funny satire with heart: the people win together, and the hardest fight is saying **no** to a bribe.
+All characters, companies and places are fictional.
 
-### Eras
-A world meter runs from 0 (Kalabendu) to 100 (Kalasuba). It starts at 10.
-- **Kalabendu** (0–39): grey-orange haze and dull colours.
-- **Kalatidha** (40–79): hope begins to grow, the sky starts to clear.
-- **Kalasuba** (80–100): clear skies, vivid green.
+### How to play
+1. Open the link above. On a phone, turn it sideways for a bigger picture, or keep it upright with the buttons below.
+2. Tap **Mulai** (Start). The first stage teaches the controls.
+3. Walk right, beat every wave, follow the **GO →** arrow, and defeat the boss at the end.
 
-Clearing a stage and saving villagers raises the era; accepting a bribe lowers it. Backgrounds are colour-graded by the era,
-and each change is announced with a wayang card.
+| Action | Phone | Keyboard | Gamepad |
+|---|---|---|---|
+| Move (left/right and up/down the street) | left joystick | Arrows / WASD | stick / d-pad |
+| Punch (tap again for a combo) | Pukul | J | X |
+| Kick (heavy, knocks down) | Tendang | K | Y |
+| Jump (+ punch/kick in the air) | Lompat | L / Space | A |
+| Dodge roll | Hindar | Shift | bumpers |
+| Jurus (special, uses Semangat) | Jurus | I | B |
+| Menu / pause | ☰ | Esc | Start |
 
-### Bribes, evidence and endings
-Before stages 1–5 the Pejabat offers a bribe (suap). Accept: money and +30% attack for that stage, but the era sinks and prices climb.
-Refuse: the era rises a little. Enemies and bosses drop **bukti** (evidence).
-- Any bribe accepted → bad ending (Kalabendu goes on).
-- Every bribe refused and enough evidence (8) → **Batara Kala** appears after the Pejabat Tinggi → good ending (Kalasuba).
-- Otherwise → the halfway ending.
+**Tips**
+- **Kuncian (grab):** walk into an enemy. Punch for knee strikes, kick to throw them into others.
+- **Semangat** (blue bar) fills when you hit and get hit. When half full, **Jurus** glows: use it to clear a crowd.
+- Punch on top of a weapon to pick it up (bambu runcing, golok, ember, kursi plastik). Kick throws it.
+- Break carts, drums and boxes for **nasi bungkus** and **es teh** (health), coins and **bukti** (evidence).
+- Getting hit makes you drop some rupiah. Grab it back before the thieves do!
+- Between stages, spend rupiah at **Warung Mak Inah**. Prices rise every stage.
+- Before stages 1–5 an official offers you a **bribe**. Taking it gives money and power, but the world gets darker.
+  **Refuse every bribe and collect evidence** to reach the true final boss and the best ending.
+- New heroes join as the story goes: **Sri** (after Stage 1), **Ujang** (after Stage 2), **Mak Inah** (after Stage 3).
+  Pick them in **Pilih Jagoan** (Character Select).
+- Press **☰ → Update** when a new version is out.
+
+**Playing with a friend**
+- **Same computer:** Player 2 presses numpad **Enter** (or any button on a second gamepad) to join.
+  Numpad: 8/4/5/6 move, 1 punch, 2 kick, 3 jump, 0 dodge, Enter jurus.
+- **Online (two phones or computers):** **Main Online → Create room**, send the code to your friend,
+  they type it under **Join**. Then the host starts the game as usual.
+- If one of you runs out of lives, press Punch to jump back in while the other keeps fighting.
 
 ### Stages
-| # | Stage | Theme | Enemies | Boss |
-|---|---|---|---|---|
-| 0 | Kampung Saat Fajar | tutorial | Preman | Preman Kampung |
-| 1 | Hutan Terbakar → Kebun Sawit | environment | Asap, Pembakar Lahan, Penebang Liar, Buldoser Liar (mini-boss) | Raja Sawit |
-| 2 | Pabrik Tutup | jobs | Satpam Bayaran, Mandor Kejam, Robot Pengganti | Juragan Outsourcing (laid-off workers help) |
-| 3 | Pasar Rakyat → Lantai Bursa | economy | Spekulan, Penimbun, Rentenir, falling red candlesticks | Hantu Bursa |
-| 4 | Jalan Raya Demo | society | Preman Bayaran, Provokator, Buzzer (students and ojol drivers help) | Komandan Preman on a water-cannon truck |
-| 5 | Gedung Pejabat | corruption | Tikus Berdasi, Ajudan, Makelar Kasus, Jaksa Palsu | Pejabat Tinggi, then Batara Kala (true final boss) |
-
-Between stages: a story scene with wayang silhouettes, the Pejabat's offer, and the **warung** where rupiah buys healing and upgrades.
-Prices rise every stage (inflation), faster if you took bribes.
+| # | Stage | Boss |
+|---|---|---|
+| 0 | Kampung Saat Fajar (village at dawn, tutorial) | Preman Kampung |
+| 1 | Hutan Terbakar → Kebun Sawit (burning forest, palm plantation, flooded river) | Raja Sawit |
+| 2 | Pabrik Tutup (closed factory) | Juragan Outsourcing in a giant mech |
+| 3 | Pasar Rakyat → Lantai Bursa (market, then trading floor) | Hantu Bursa |
+| 4 | Jalan Raya Demo (protest street) | Komandan Preman on a water-cannon truck |
+| 5 | Gedung Pejabat (official's glass tower) | Pejabat Tinggi, and Batara Kala if you refused every bribe |
 
 ### Heroes
-| Hero | Style | Jurus (special) | Unlocks |
-|---|---|---|---|
-| Bayu | young pesilat, balanced, fast combos | Badai Sabit (spinning crescent kicks) | start |
-| Sri | rice farmer, wide sweeps with a cangkul | Badai Padi (spinning sweep) | after Stage 1 |
-| Ujang | ojol driver, fast dashes | Ojol Ngebut (motorbike charge) | after Stage 2 |
-| Mak Inah | fisherwoman, slow but heavy hits | Lempar Jala (net that holds enemies) | after Stage 3 |
+| Hero | Style | Jurus |
+|---|---|---|
+| Bayu | young pesilat, balanced, fast combos | Badai Sabit (spinning crescent kicks) |
+| Sri | rice farmer with a cangkul, wide sweeps | Badai Padi (spinning sweep) |
+| Ujang | ojol driver, very fast | Ojol Ngebut (motorbike charge) |
+| Mak Inah | fisherwoman, slow but very strong | Lempar Jala (net that holds enemies) |
 
-The Jurus costs half the **Semangat** meter, which fills by dealing and taking damage.
+### Eras and endings
+The world meter goes from **Kalabendu** (0) through **Kalatidha** (40) to **Kalasuba** (80+).
+Clearing stages and saving villagers raises it, bribes lower it, and the colours of the world follow it.
+Endings: Kalabendu goes on (you took a bribe), halfway (no bribes but not enough evidence), or **Kalasuba** (you beat Batara Kala).
 
-### Controls
-| Action | Keyboard (P1) | Numpad (P2) | Gamepad | Touch |
-|---|---|---|---|---|
-| Move | Arrows / WASD | 8 4 5 6 | stick / d-pad | left joystick |
-| Punch (light combo) | J | 1 | X | Pukul |
-| Kick (heavy) | K | 2 | Y | Tendang |
-| Jump | L / Space | 3 | A | Lompat |
-| Jurus (special) | I | Enter | B | Jurus |
-| Dodge | Shift | 0 | bumpers / triggers | Hindar |
-| Menu | Esc | | Start | ☰ |
-
-- Grab (Kuncian): walk into an enemy (a boss only when it is dizzy); punch for knee strikes, kick (or away + punch) to throw.
-- Jump + punch/kick for air attacks. Pick up weapons with punch (bambu runcing, golok, ember, kursi plastik); kick throws them.
-- **2 players:** Player 2 presses numpad Enter or any button on the second gamepad to join (settings can switch P2 to the first gamepad).
-  If one player runs out of lives, they press Punch to come back while the other keeps fighting.
-- F3 shows FPS and hitboxes.
-
-### Run it
-```
-python3 -m http.server 8000
-```
-Open http://localhost:8000 (on a phone on the same Wi-Fi: http://<laptop-ip>:8000).
-Add `?stage=stage3` (or any stage id) to jump straight into a stage; `?stage=padepokan` is a training yard.
-The in-game Update button compares `version.json` with the running version.
-
-### Code structure
-```
-index.html, style.css, sw.js, version.json
-src/
-  main.js        app flow: menus, story, bribes, shop, saving, input routing (P1/P2)
-  game.js        the Game: entities, hits, drops, money, co-op, camera, stage clear
-  core/          loop (fixed 60 Hz), input (keyboard), gamepad, touch, audio (Web Audio), save (localStorage), i18n (all text, ID + EN), view
-  combat/        moves (frame data), hits (hitboxes, damage, block, juggles), weapons, shots
-  entities/      fighter (shared state machine), heroes, enemies, allies, items, props
-  ai/            brawler, bosses, stage-specific and shared brains (ranged, support, thief, ally…)
-  stages/        one data file per stage: sections, waves, props, items, zones
-  systems/       director (GO arrows, waves), environment (fire, haze, rescues), era, economy (shop, inflation)
-  story/         story scenes, endings, wayang scene drawings
-  render/        renderer, parallax backgrounds, HUD, effects, sprites (pose skeleton, monsters, objects)
-  ui/            pause menu, screens (title, heroes, stages, settings, shop), story overlay
-```
-Rules the code follows:
-- Game logic is separate from rendering and audio. The renderer and audio only read the game state and `game.events`.
-- Every player action is an input message `{type:'input', playerId, held, pressed}` (bit flags from `BTN`), plus `{type:'continue', playerId}`.
-- Stages, enemies, bosses, moves and dialogue are data, so new content is mostly new entries in those files.
-- Characters are drawn in code with a pose skeleton (idle, walk, attacks, jump, hurt, knockdown, getup, grab, throw, special…),
-  ready to be swapped for sprite sheets later.
-
-### Adding online co-op later
-The pieces are already shaped for it:
-1. **Inputs are messages.** Local co-op already feeds `p1` and `p2` messages into `game.applyInput`. Online, the guest sends its
-   messages over a WebRTC data channel (for example PeerJS: the host shares a room code, the guest connects with it).
-2. **Host runs the game.** The host applies both players' messages, steps the game at a fixed 60 Hz, and sends the guest a compact
-   snapshot (positions, states, hp, timers, events) 15–20 times a second. The guest only renders snapshots, smoothing between them.
-3. **Deterministic option.** The game uses a seeded random generator (`game.rand`), so a lockstep or rollback model (both sides
-   simulate, only inputs are sent) is possible too; it needs the frame number on every input message.
-4. **Menus and story** stay on the host; the guest gets a "waiting for host" screen and the host's choices (bribe, shop) as events.
+### For developers
+- Plain JavaScript ES modules + HTML5 Canvas, no frameworks, no build step, no external art or sound
+  (music is gamelan made with the Web Audio API).
+- Run locally: `python3 -m http.server 8000`, open http://localhost:8000. `?stage=stage3` jumps to a stage,
+  `?stage=padepokan` is a training yard, `?net=local` tests online play between two tabs. F3 shows FPS and hitboxes.
+- Code: `src/core` (loop, input, gamepad, touch, audio, music, save, i18n), `src/combat` (moves, hits, weapons, shots),
+  `src/entities` (fighters, heroes, enemies, allies, items, props), `src/ai`, `src/stages` (one data file per stage),
+  `src/systems` (director, environment, era, economy), `src/story`, `src/render` (renderer, parallax, HUD, sprites),
+  `src/ui` (menus, screens, story), `src/net` (online rooms and snapshots).
+- Game logic is separate from drawing; every player action is an input message `{type:'input', playerId, held, pressed}`.
+- Online: the host runs the game and sends snapshots ~20 times a second over WebRTC (PeerJS, loaded only when used);
+  the guest sends its buttons and draws the snapshots.
+- Sprite sheets: open `tools/sheet.html` for templates; see `assets/sprites/README.md`.
+- All text is in `src/core/i18n.js` (Bahasa Indonesia and English).
 
 ---
 
 ## Bahasa Indonesia
 
-### Arti nama
-Dalam tradisi Jawa (*Serat Kalatidha* karya Ranggawarsita dan ramalan Jayabaya), **Kalabendu** adalah "zaman kutukan":
-pemimpin korup, hukum bisa dibeli, kebenaran diputarbalikkan, alam murka, dan orang jujur tersingkir.
-Sesudahnya datang **Kalasuba**, zaman damai dan makmur. Di antaranya ada **Kalatidha**, zaman ragu.
+### Tentang game ini
+**Kalabendu** adalah game beat 'em up 2D dengan **pencak silat** sebagai jiwanya, terinspirasi Streets of Rage 4,
+TMNT: Shredder's Revenge, dan River City Girls.
 
-### Cerita dan pesannya
-Marcapada jatuh ke zaman Kalabendu: hutan terbakar dan kabut asap, kebun sawit menelan tanah, pabrik tutup, rupiah anjlok,
-harga naik, demo di jalan, dan pejabat korup mengambil untung dari semuanya.
-Warga biasa yang berlatih pencak silat bangkit dan bertarung dari hutan yang terbakar sampai menara para koruptor.
+Dalam tradisi Jawa (*Serat Kalatidha* karya Ranggawarsita dan ramalan Jayabaya), *Kalabendu* adalah "zaman kutukan":
+pemimpin korup, hukum bisa dibeli, alam murka. Sesudahnya datang *Kalasuba*, zaman damai dan makmur.
 
-Alurnya: **alam menderita → rakyat menderita → kau temukan siapa yang untung → rakyat bersatu → kau hadapi sumbernya.**
-Gamenya satire yang hangat: bukan satu jagoan yang menyelamatkan, tapi petani, buruh, pedagang, mahasiswa, dan ojol bersama-sama,
-dan pertarungan terpenting adalah berani bilang **tidak** pada suap. Semua tokoh, perusahaan, dan tempat adalah fiksi.
+Tanah Marcapada (fiksi) jatuh ke zaman Kalabendu: hutan terbakar dan kabut asap, sawit menelan tanah, pabrik tutup,
+harga naik, preman bayaran di jalan, dan pejabat yang mengambil untung dari semuanya.
+Warga biasa yang berlatih silat bertarung dari hutan yang terbakar sampai menara para koruptor.
+Satire lucu yang hangat: rakyat menang bersama-sama, dan pertarungan tersulit adalah berani bilang **tidak** pada suap.
+Semua tokoh, perusahaan, dan tempat adalah fiksi.
 
-### Zaman
-Meter dunia dari 0 (Kalabendu) sampai 100 (Kalasuba), mulai dari 10.
-- **Kalabendu** (0–39): kabut abu-oranye, warna kusam.
-- **Kalatidha** (40–79): harapan tumbuh, langit mulai cerah.
-- **Kalasuba** (80–100): langit bersih, hijau segar.
+### Cara bermain
+1. Buka link di atas. Di HP, miringkan layar untuk gambar lebih besar, atau tetap tegak dengan tombol di bawah.
+2. Tekan **Mulai**. Stage pertama mengajarkan kontrolnya.
+3. Jalan ke kanan, kalahkan setiap gelombang musuh, ikuti panah **GO →**, dan kalahkan bos di akhir.
 
-Menamatkan stage dan menyelamatkan warga menaikkan zaman; menerima suap menurunkannya. Warna latar mengikuti zaman,
-dan setiap pergantian zaman diumumkan dengan kartu wayang.
+| Aksi | HP | Keyboard | Gamepad |
+|---|---|---|---|
+| Gerak (kiri/kanan dan naik/turun jalan) | joystick kiri | Panah / WASD | stik / d-pad |
+| Pukul (tekan lagi untuk combo) | Pukul | J | X |
+| Tendang (berat, menjatuhkan) | Tendang | K | Y |
+| Lompat (+ pukul/tendang di udara) | Lompat | L / Spasi | A |
+| Menghindar (berguling) | Hindar | Shift | bumper |
+| Jurus (memakai Semangat) | Jurus | I | B |
+| Menu / jeda | ☰ | Esc | Start |
 
-### Suap, bukti, dan akhir cerita
-Sebelum stage 1–5, Pak Pejabat menawarkan suap. Terima: uang dan serangan +30% untuk stage itu, tapi zaman makin gelap dan harga naik.
-Tolak: zaman naik sedikit. Musuh dan bos menjatuhkan **bukti**.
-- Pernah menerima suap → akhir buruk (Kalabendu berlanjut).
-- Semua suap ditolak dan bukti cukup (8) → **Batara Kala** muncul setelah Pejabat Tinggi → akhir baik (Kalasuba).
-- Selain itu → akhir setengah jalan.
+**Tips**
+- **Kuncian:** jalan menabrak musuh. Pukul untuk dengkul, tendang untuk membanting dia ke musuh lain.
+- **Semangat** (bar biru) terisi saat memukul dan terkena pukulan. Saat setengah penuh, tombol **Jurus** menyala: pakai untuk menyapu keroyokan.
+- Pukul di atas senjata untuk mengambilnya (bambu runcing, golok, ember, kursi plastik). Tendang untuk melempar.
+- Hancurkan gerobak, drum, dan kardus untuk **nasi bungkus** dan **es teh** (nyawa), koin, dan **bukti**.
+- Saat terkena pukulan, sebagian rupiahmu jatuh. Ambil lagi sebelum diambil maling!
+- Di antara stage, belanja di **Warung Mak Inah**. Harga naik setiap stage.
+- Sebelum stage 1–5, Pak Pejabat menawarkan **suap**. Menerimanya memberi uang dan kekuatan, tapi dunia makin gelap.
+  **Tolak semua suap dan kumpulkan bukti** untuk bertemu bos terakhir sejati dan akhir terbaik.
+- Jagoan baru bergabung seiring cerita: **Sri** (setelah Stage 1), **Ujang** (setelah Stage 2), **Mak Inah** (setelah Stage 3).
+  Pilih di **Pilih Jagoan**.
+- Tekan **☰ → Update** saat ada versi baru.
+
+**Main bersama teman**
+- **Satu komputer:** Pemain 2 tekan **Enter** di numpad (atau tombol apa saja di gamepad ke-2) untuk ikut.
+  Numpad: 8/4/5/6 gerak, 1 pukul, 2 tendang, 3 lompat, 0 menghindar, Enter jurus.
+- **Online (dua HP atau komputer):** **Main Online → Buat Ruang**, kirim kodenya ke teman,
+  dia mengetiknya di kolom **Gabung**. Lalu tuan rumah memulai game seperti biasa.
+- Kalau salah satu kehabisan nyawa, tekan Pukul untuk kembali selama temannya masih bertarung.
 
 ### Stage
-| # | Stage | Tema | Musuh | Bos |
-|---|---|---|---|---|
-| 0 | Kampung Saat Fajar | tutorial | Preman | Preman Kampung |
-| 1 | Hutan Terbakar → Kebun Sawit | lingkungan | Asap, Pembakar Lahan, Penebang Liar, Buldoser Liar (bos kecil) | Raja Sawit |
-| 2 | Pabrik Tutup | pekerjaan | Satpam Bayaran, Mandor Kejam, Robot Pengganti | Juragan Outsourcing (buruh PHK membantu) |
-| 3 | Pasar Rakyat → Lantai Bursa | ekonomi | Spekulan, Penimbun, Rentenir, lilin merah jatuh | Hantu Bursa |
-| 4 | Jalan Raya Demo | sosial | Preman Bayaran, Provokator, Buzzer (mahasiswa dan ojol membantu) | Komandan Preman di truk air |
-| 5 | Gedung Pejabat | korupsi | Tikus Berdasi, Ajudan, Makelar Kasus, Jaksa Palsu | Pejabat Tinggi, lalu Batara Kala (bos terakhir sejati) |
-
-Di antara stage: adegan cerita dengan wayang, tawaran Pak Pejabat, dan **warung** tempat membeli makanan dan peningkatan dengan rupiah.
-Harga naik tiap stage (inflasi), lebih cepat kalau kau menerima suap.
+| # | Stage | Bos |
+|---|---|---|
+| 0 | Kampung Saat Fajar (tutorial) | Preman Kampung |
+| 1 | Hutan Terbakar → Kebun Sawit (hutan terbakar, kebun sawit, sungai banjir) | Raja Sawit |
+| 2 | Pabrik Tutup | Juragan Outsourcing dengan robot raksasa |
+| 3 | Pasar Rakyat → Lantai Bursa | Hantu Bursa |
+| 4 | Jalan Raya Demo | Komandan Preman di truk penyemprot air |
+| 5 | Gedung Pejabat (menara kaca) | Pejabat Tinggi, dan Batara Kala kalau semua suap ditolak |
 
 ### Jagoan
-| Jagoan | Gaya | Jurus | Terbuka |
-|---|---|---|---|
-| Bayu | pesilat muda, seimbang, combo cepat | Badai Sabit (tendangan sabit berputar) | dari awal |
-| Sri | petani padi, sapuan lebar dengan cangkul | Badai Padi (sapuan berputar) | setelah Stage 1 |
-| Ujang | ojol, lari cepat | Ojol Ngebut (seruduk motor) | setelah Stage 2 |
-| Mak Inah | nelayan, lambat tapi pukulannya berat | Lempar Jala (jala yang menahan musuh) | setelah Stage 3 |
+| Jagoan | Gaya | Jurus |
+|---|---|---|
+| Bayu | pesilat muda, seimbang, combo cepat | Badai Sabit (tendangan sabit berputar) |
+| Sri | petani padi dengan cangkul, sapuan lebar | Badai Padi (sapuan berputar) |
+| Ujang | ojol, sangat cepat | Ojol Ngebut (seruduk motor) |
+| Mak Inah | nelayan, lambat tapi sangat kuat | Lempar Jala (jala yang menahan musuh) |
 
-Jurus memakai setengah meter **Semangat**, yang terisi saat memukul dan terkena pukulan.
+### Zaman dan akhir cerita
+Meter dunia bergerak dari **Kalabendu** (0), lewat **Kalatidha** (40), sampai **Kalasuba** (80+).
+Menamatkan stage dan menyelamatkan warga menaikkannya, suap menurunkannya, dan warna dunia ikut berubah.
+Akhir cerita: Kalabendu berlanjut (pernah menerima suap), setengah jalan (tanpa suap tapi bukti kurang), atau **Kalasuba** (Batara Kala dikalahkan).
 
-### Kontrol
-| Aksi | Keyboard (P1) | Numpad (P2) | Gamepad | Layar sentuh |
-|---|---|---|---|---|
-| Gerak | Panah / WASD | 8 4 5 6 | stik / d-pad | joystick kiri |
-| Pukul (combo ringan) | J | 1 | X | Pukul |
-| Tendang (berat) | K | 2 | Y | Tendang |
-| Lompat | L / Spasi | 3 | A | Lompat |
-| Jurus | I | Enter | B | Jurus |
-| Menghindar | Shift | 0 | bumper / trigger | Hindar |
-| Menu | Esc | | Start | ☰ |
-
-- Kuncian: jalan menabrak musuh (bos hanya saat pusing); pukul untuk dengkul, tendang (atau arah menjauh + pukul) untuk membanting.
-- Lompat + pukul/tendang untuk serangan udara. Ambil senjata dengan pukul (bambu runcing, golok, ember, kursi plastik); tendang untuk melempar.
-- **Main berdua:** Pemain 2 tekan Enter numpad atau tombol apa saja di gamepad ke-2 untuk ikut (di Pengaturan bisa diganti ke gamepad ke-1).
-  Kalau satu pemain habis nyawa, tekan Pukul untuk kembali selama temannya masih bertarung.
-- F3 menampilkan FPS dan hitbox.
-
-### Menjalankan
-```
-python3 -m http.server 8000
-```
-Buka http://localhost:8000 (di HP dalam Wi-Fi yang sama: http://<ip-laptop>:8000).
-Tambahkan `?stage=stage3` (atau id stage lain) untuk langsung ke stage itu; `?stage=padepokan` adalah tempat latihan.
-Tombol Update di dalam game membandingkan `version.json` dengan versi yang sedang jalan.
-
-### Struktur kode
-Lihat bagian *Code structure* di atas. Intinya: logika game terpisah dari gambar dan suara, setiap aksi pemain adalah pesan input,
-dan stage, musuh, bos, jurus, serta dialog ditulis sebagai data sehingga konten baru mudah ditambahkan.
-
-### Menambah co-op online nanti
-1. **Input sudah berupa pesan.** Co-op lokal sudah mengirim pesan `p1` dan `p2` ke `game.applyInput`. Untuk online, tamu mengirim
-   pesannya lewat WebRTC (misalnya PeerJS: tuan rumah membagikan kode ruang, tamu tersambung dengan kode itu).
-2. **Tuan rumah menjalankan game.** Tuan rumah memproses input kedua pemain pada 60 Hz dan mengirim potongan keadaan game
-   (posisi, status, nyawa, event) 15–20 kali per detik. Tamu hanya menggambar dan menghaluskan gerakannya.
-3. **Pilihan deterministik.** Game memakai angka acak dengan seed (`game.rand`), jadi model lockstep atau rollback juga mungkin
-   (kedua sisi menjalankan simulasi, yang dikirim hanya input beserta nomor frame).
-4. **Menu dan cerita** tetap di tuan rumah; tamu melihat layar "menunggu tuan rumah" dan menerima pilihan tuan rumah (suap, warung) sebagai event.
+### Untuk pengembang
+- JavaScript murni (ES modules) + HTML5 Canvas, tanpa framework, tanpa build, tanpa file gambar/suara
+  (musik gamelan dibuat dengan Web Audio API).
+- Jalankan lokal: `python3 -m http.server 8000`, buka http://localhost:8000. `?stage=stage3` langsung ke stage itu,
+  `?stage=padepokan` tempat latihan, `?net=local` menguji main online di dua tab. F3 menampilkan FPS dan hitbox.
+- Struktur kode: lihat bagian *For developers* di atas. Semua teks ada di `src/core/i18n.js` (Bahasa Indonesia dan English).

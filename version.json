@@ -1,15 +1,17 @@
 {
-  "version": "0.15.0",
+  "version": "0.15.1",
   "notes": {
     "id": [
       "Main Online: buat ruang dan bagikan kodenya, teman bergabung dari HP atau komputer lain (tuan rumah memilih stage)",
       "Pilihan bahasa Bahasa / English langsung di layar judul",
-      "Dukungan sprite sheet: gambar karakter bisa diganti dengan gambar buatan sendiri (lihat tools/sheet.html)"
+      "Dukungan sprite sheet: gambar karakter bisa diganti dengan gambar buatan sendiri (lihat tools/sheet.html)",
+      "README baru: cara main singkat dan pilihan bahasa"
     ],
     "en": [
       "Play Online: create a room and share the code; a friend joins from another phone or computer (the host picks the stage)",
       "Bahasa / English language switch right on the title screen",
-      "Sprite sheet support: characters can be swapped for painted art (see tools/sheet.html)"
+      "Sprite sheet support: characters can be swapped for painted art (see tools/sheet.html)",
+      "New README: quick how-to-play and a language switch"
     ]
   }
 }
