@@ -1,6 +1,6 @@
 # NEXT — Kalabendu (beat 'em up) plan
 
-Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's real-device online test and playtest** (2026-10-21)
+Status line: **Finished (v0.18.3). No pending items; wait for the user's next request** (2026-10-21)
 
 ## Milestones (each playable before the next)
 | # | Milestone | Status |
@@ -34,12 +34,8 @@ Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's 
 | — | Language | Bahasa / English chips on the title screen; README opens with a language switch |
 
 ## Pending
-| # | Item | Why |
-|---|---|---|
-| 1 | Playtest feedback from the user | Bot playtest done 2026-10-21 (6 stages × 4 heroes, no cheat health): all clear. Raja Sawit 360 → 310 hp, Pejabat Tinggi 330 → 280 hp, his bodyguard call 0.5 → 0.3. Still waiting on a human playthrough |
-| 2 | Painted sprite art | Pipeline is ready; needs art (an outside asset, only if the user wants it) |
-
-## Questions for the user
+Nothing. The user closed every item on 2026-10-21: playtest done, painted sprite art not wanted (code art stays; the sprite-sheet pipeline remains ready if that changes).
+New work starts from a new request by the user.
 
 ## Already in place
 - Touch controls (joystick + Pukul/Tendang/Lompat/Hindar/Jurus) and phone scaling (v0.4.1).
