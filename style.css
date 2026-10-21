@@ -696,3 +696,62 @@ body.portrait .again {
 body.portrait .clear-buttons {
   top: calc(var(--stage-bottom, 60%) + 160px);
 }
+
+/* Title language switch and online room screen */
+.lang-switch {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.room-code {
+  font: 900 34px/1.2 monospace;
+  letter-spacing: 8px;
+  text-align: center;
+  color: var(--gold);
+  padding: 8px;
+  border: 2px dashed rgba(224, 178, 82, 0.6);
+  border-radius: 8px;
+}
+
+.code-input {
+  flex: 1;
+  min-width: 0;
+  font: 700 20px monospace;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 2px solid rgba(224, 178, 82, 0.55);
+  background: #2a1d14;
+  color: var(--cream);
+}
+
+.net-status {
+  margin: 0;
+  font-size: 14px;
+  color: #f2e090;
+}
+
+.net-wait {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  padding: 14px 20px;
+  border-radius: 8px;
+  background: rgba(18, 12, 10, 0.85);
+  color: var(--cream);
+  font-size: 16px;
+  text-align: center;
+  max-width: 90%;
+}
+
+.net-wait[hidden] {
+  display: none;
+}
+
+#hint:empty {
+  display: none;
+}

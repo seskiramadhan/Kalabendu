@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalabendu sprite templates</title>
+<style>
+  body { background: #2a1d14; color: #f3e3c3; font: 14px system-ui, sans-serif; margin: 16px; }
+  canvas { image-rendering: pixelated; background: #4a3a2a; display: block; margin: 6px 0 4px; max-width: 100%; }
+  a { color: #f2c94c; }
+  section { margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<h1>Sprite sheet templates</h1>
+<p>One sheet per fighter, drawn from the code poses. Download, paint over, save as <code>assets/sprites/&lt;id&gt;.png</code> and list the id in <code>assets/sprites/manifest.json</code>.</p>
+<div id="out"></div>
+<script type="module">
+import { HEROES } from '../src/entities/heroes.js';
+import { ENEMIES } from '../src/entities/enemies.js';
+import { drawFigure } from '../src/render/sprites/skeleton.js';
+import { POSES } from '../src/render/sprites/poses.js';
+import { LAYOUT, FRAME_W, FRAME_H, FOOT_Y } from '../src/render/sprites/sheets.js';
+
+const out = document.getElementById('out');
+const fighters = [...Object.values(HEROES), ...Object.values(ENEMIES).filter((e) => !e.render && e.look)];
+for (const def of fighters) {
+  const cols = Math.max(...LAYOUT.map((r) => r.poses.length));
+  const c = document.createElement('canvas');
+  c.width = cols * FRAME_W;
+  c.height = LAYOUT.length * FRAME_H;
+  const ctx = c.getContext('2d');
+  LAYOUT.forEach((row, y) => {
+    row.poses.forEach((name, x) => {
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.strokeRect(x * FRAME_W + 0.5, y * FRAME_H + 0.5, FRAME_W - 1, FRAME_H - 1);
+      drawFigure(ctx, POSES[name] ?? POSES.stance, def.look, x * FRAME_W + FRAME_W / 2, y * FRAME_H + FOOT_Y, 0, 1);
+    });
+  });
+  const sec = document.createElement('section');
+  const link = document.createElement('a');
+  link.textContent = `Download ${def.id}.png`;
+  link.download = `${def.id}.png`;
+  link.href = c.toDataURL('image/png');
+  sec.append(Object.assign(document.createElement('h3'), { textContent: def.id }), c, link);
+  out.append(sec);
+}
+</script>
+</body>
+</html>

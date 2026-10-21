@@ -42,6 +42,7 @@ export class Screens {
     else if (this.current === 'heroes') this.renderHeroes(save);
     else if (this.current === 'settings') this.renderSettings(save);
     else if (this.current === 'stages') this.renderStages(save);
+    else if (this.current === 'online') this.renderOnline(save);
     else if (this.current === 'shop') this.renderShop(save);
     this.el.querySelector('button:not(:disabled)')?.focus({ preventScroll: true });
   }
@@ -61,10 +62,48 @@ export class Screens {
       btn(save.started ? `${t('continueGame')} · Rp ${save.rupiah.toLocaleString('id-ID')}` : t('continueGame'), () => this.h.onContinue(), '', !save.started),
       btn(t('stageSelect'), () => this.show('stages'), '', !save.started),
       btn(t('heroSelect'), () => this.show('heroes')),
+      btn(t('online'), () => this.show('online')),
       btn(t('settings'), () => this.show('settings')),
     );
-    wrap.append(logo, panel, h('div', t('menuNavHint'), 'muted small nav-hint'));
+    // Quick language switch right on the title screen.
+    const lang = div('lang-switch');
+    for (const [code, label] of [['id', 'Bahasa'], ['en', 'English']]) {
+      lang.append(btn(label, () => {
+        setLang(code);
+        this.h.onLanguage();
+        this.render();
+      }, code === getLang() ? 'chip active' : 'chip'));
+    }
+    wrap.append(logo, panel, lang, h('div', t('menuNavHint'), 'muted small nav-hint'));
     this.el.append(wrap);
+  }
+
+  // Online co-op: host a room (share the code) or join a friend's room.
+  renderOnline(save) {
+    const panel = div('menu-panel batik-frame');
+    panel.append(h('h2', t('online')), h('p', t('onlineDesc'), 'muted small'));
+    if (this.netCode) {
+      panel.append(h('div', t('netYourCode'), 'muted small'), h('div', this.netCode, 'room-code'));
+    } else {
+      panel.append(btn(t('netHost'), () => this.h.onHostOnline(), 'primary'));
+      const row = div('menu-row');
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.maxLength = 5;
+      input.placeholder = t('netCodePlaceholder');
+      input.className = 'code-input';
+      input.autocapitalize = 'characters';
+      input.addEventListener('keydown', (e) => {
+        e.stopPropagation();
+        if (e.key === 'Enter') this.h.onJoinOnline(input.value);
+      });
+      row.append(input, btn(t('netJoin'), () => this.h.onJoinOnline(input.value), 'chip'));
+      panel.append(row);
+    }
+    if (this.netStatus) panel.append(h('p', this.netStatus, 'net-status'));
+    if (this.netCode) panel.append(btn(t('netLeave'), () => this.h.onLeaveOnline(), 'danger'));
+    panel.append(btn(t('back'), () => this.show('title')));
+    this.el.append(center(panel));
   }
 
   renderShop(save) {

@@ -4,6 +4,9 @@ import { Gamepads } from './core/gamepad.js';
 import { startLoop } from './core/loop.js';
 import { audio } from './core/audio.js';
 import { music } from './core/music.js';
+import { loadSheets } from './render/sprites/sheets.js';
+import { hostRoom, joinRoom } from './net/net.js';
+import { packSnapshot, Mirror } from './net/snapshot.js';
 import { t } from './core/i18n.js';
 import { loadSave, writeSave, resetSave } from './core/save.js';
 import { Renderer } from './render/renderer.js';
@@ -49,10 +52,16 @@ if (touch) document.body.classList.add('is-touch');
 if (touch) blockBrowserZoom();
 renderer.touch = !!touch;
 
+await loadSheets();
 let save = loadSave();
 syncHeroes();
 let p2Active = false;
 let joinQueue = [];
+// Online co-op: net = { role: 'host' | 'guest', room, connected, code }.
+let net = null;
+const remote = { held: 0, pressed: 0, cont: false, sentHeld: -1 };
+let netEvents = [];
+let snapClock = 0;
 let mode = 'menu';
 let paused = true;
 let debug = false;
@@ -160,9 +169,10 @@ function showEnding() {
 }
 
 function toMenu() {
+  if (mode === 'guest') leaveOnline();
   mode = 'menu';
   music.play('menu', { era: save.era });
-  p2Active = false;
+  p2Active = !!(net?.role === 'host' && net.connected);
   document.body.classList.add('in-menu');
   renderer.showHud = false;
   newGame(save.stage, { preview: true });
@@ -216,6 +226,13 @@ function persist() {
 
 const screens = new Screens(ui, {
   getSave: () => save,
+  onHostOnline: () => hostOnline(),
+  onJoinOnline: (code) => joinOnline(code),
+  onLeaveOnline: () => {
+    leaveOnline();
+    screens.netStatus = '';
+    screens.render();
+  },
   onStart: () => {
     if (save.started && !confirm(t('startConfirm'))) return;
     const settings = save.settings;
@@ -266,12 +283,14 @@ const story = new Story(ui);
 const menu = new Menu(ui, {
   running: await fetchVersion(),
   onResume: () => {
+    if (mode === 'guest') paused = false;
     if (mode !== 'play') return;
     paused = false;
     loop.resetClock();
   },
   onRestart: () => {
     menu.close();
+    if (mode === 'guest') return;
     play(game.stage.id, { rupiah: save.rupiah });
   },
   onQuit: () => toMenu(),
@@ -282,7 +301,7 @@ const menu = new Menu(ui, {
 });
 
 function openPause() {
-  if (mode !== 'play' || menu.isOpen) return;
+  if ((mode !== 'play' && mode !== 'guest') || menu.isOpen) return;
   paused = true;
   releaseInputs();
   menu.open();
@@ -332,7 +351,7 @@ keyboard.onKey = (e) => {
     if (e.repeat) return true;
     if (story.isOpen) story.skip();
     else if (menu.isOpen) menu.close();
-    else if (mode === 'play') openPause();
+    else if (mode === 'play' || mode === 'guest') openPause();
     else screens.back();
     return true;
   }
@@ -409,6 +428,162 @@ function onClear() {
   persist();
 }
 
+// ---- Online co-op ----
+// The host runs the game; the guest sends its buttons and draws snapshots.
+const mirror = new Mirror(STAGES);
+const waitBox = document.createElement('div');
+waitBox.className = 'net-wait';
+waitBox.hidden = true;
+ui.append(waitBox);
+
+function hostSend(dt) {
+  netEvents.push(...game.events);
+  snapClock += dt;
+  if (snapClock < 1 / 20) return;
+  snapClock = 0;
+  net.room.send(packSnapshot(game, netEvents, mode === 'play' ? 'play' : 'wait'));
+  netEvents = [];
+}
+
+function guestInput(msg) {
+  if (!net?.connected) return;
+  if (msg.held !== remote.sentHeld || msg.pressed) {
+    net.room.send({ type: 'input', held: msg.held, pressed: msg.pressed });
+    remote.sentHeld = msg.held;
+  }
+  if (continueQueued) net.room.send({ type: 'continue' });
+  continueQueued = false;
+}
+
+function guestRender(time, dt) {
+  pollPadMenus(dt);
+  const g = mirror.game;
+  const playing = g && mirror.mode === 'play';
+  waitBox.hidden = playing;
+  if (!playing) waitBox.textContent = t(net?.connected ? 'netWaitHost' : 'netConnecting');
+  if (!g) return;
+  renderer.draw(g, time, dt, debug);
+  for (const ev of g.events) {
+    if (ev.type === 'sfx') audio.play(ev.name, ev.power ?? 1);
+    if (ev.type === 'boss') music.setBoss(true);
+    if (ev.type === 'clear') music.play('story', { era: g.eraAfter });
+  }
+  g.events.length = 0;
+  const me = g.heroes.get('p2');
+  touch?.setReady(me && me.semangat >= SPECIAL_COST);
+  const showContinue = playing && (g.over || me?.out);
+  if (continueBtn.hidden === showContinue) {
+    continueBtn.textContent = t('continueBtn');
+    continueBtn.hidden = !showContinue;
+  }
+  document.body.classList.toggle('choosing', !!showContinue);
+}
+
+function netStatus(text) {
+  screens.netStatus = text;
+  if (screens.current === 'online') screens.render();
+}
+
+async function hostOnline() {
+  leaveOnline();
+  netStatus(t('netCreating'));
+  try {
+    const room = await hostRoom({
+      onOpen: () => {
+        net.connected = true;
+        p2Active = true;
+        if (mode === 'play') addPlayer2(true);
+        netStatus(t('netFriendIn'));
+        audio.play('combo');
+      },
+      onMessage: (m) => {
+        if (m.type === 'input') {
+          remote.held = m.held;
+          remote.pressed |= m.pressed;
+        } else if (m.type === 'continue') remote.cont = true;
+      },
+      onClose: () => {
+        if (!net) return;
+        net.connected = false;
+        remote.held = 0;
+        const h2 = game.heroes.get('p2');
+        if (h2) {
+          h2.remove = true;
+          game.heroes.delete('p2');
+        }
+        p2Active = false;
+        netStatus(t('netFriendLeft'));
+      },
+      onError: (why) => netStatus(t('netError') + ` (${why})`),
+    });
+    net = { role: 'host', room, connected: false, code: room.code };
+    screens.netCode = room.code;
+    netStatus(t('netShareCode'));
+  } catch {
+    netStatus(t('netNoLib'));
+  }
+}
+
+async function joinOnline(code) {
+  leaveOnline();
+  if (!code) return;
+  netStatus(t('netConnecting'));
+  try {
+    const room = await joinRoom(code, {
+      onOpen: () => {
+        net.connected = true;
+        mode = 'guest';
+        paused = false;
+        screens.hide();
+        document.body.classList.remove('in-menu');
+        renderer.showHud = true;
+        renderer.hud.p2Hint = false;
+      },
+      onMessage: (m) => {
+        if (m.type !== 'snap') return;
+        const was = mirror.mode;
+        mirror.apply(m, (g) => {
+          renderer.setStage(g.stage);
+          renderer.hud.p2Hint = false;
+        });
+        if (mirror.mode !== was || !music.track) music.play(mirror.mode === 'play' ? m.stage : 'story', { era: m.g.era });
+      },
+      onClose: () => {
+        if (mode === 'guest') {
+          leaveOnline();
+          toMenu();
+          hint.textContent = t('netFriendLeft');
+          hint.style.opacity = '1';
+          setTimeout(() => (hint.style.opacity = '0'), 5000);
+        }
+      },
+      onError: (why) => netStatus(t(why === 'peer-unavailable' ? 'netNoRoom' : 'netError') + (why === 'peer-unavailable' ? '' : ` (${why})`)),
+    });
+    net = { role: 'guest', room, connected: false, code: room.code };
+  } catch {
+    netStatus(t('netNoLib'));
+  }
+}
+
+function leaveOnline() {
+  if (!net) return;
+  const n = net;
+  net = null;
+  n.room.close();
+  waitBox.hidden = true;
+  mirror.game = null;
+  if (n.role === 'guest' && mode === 'guest') mode = 'menu';
+  if (n.role === 'host') {
+    const h2 = game.heroes.get('p2');
+    if (h2) {
+      h2.remove = true;
+      game.heroes.delete('p2');
+    }
+    p2Active = false;
+  }
+  screens.netCode = null;
+}
+
 const loop = startLoop({
   isPaused: () => paused,
   update(dt) {
@@ -423,11 +598,20 @@ const loop = startLoop({
       msg.held |= pad.held;
       msg.pressed |= pad.pressed;
     }
-    // Player 2: numpad, plus the gamepad chosen in settings.
-    const msg2 = keyboard2.message('p2');
+    if (mode === 'guest') {
+      guestInput(msg);
+      return;
+    }
+    // Player 2: numpad, plus the gamepad chosen in settings (or the online guest).
+    const online = net?.role === 'host' && net.connected;
+    const msg2 = online ? { type: 'input', playerId: 'p2', held: remote.held, pressed: remote.pressed } : keyboard2.message('p2');
+    if (online) {
+      remote.pressed = 0;
+      keyboard2.message('p2');
+    }
     const p2pad = save.settings.p2pad ?? 1;
-    const pad2 = p2pad === 0 ? pad : pads.poll(1);
-    if (p2pad === 0 && pad && (p2Active || pad.pressed)) {
+    const pad2 = online ? null : p2pad === 0 ? pad : pads.poll(1);
+    if (!online && p2pad === 0 && pad && (p2Active || pad.pressed)) {
       msg.held &= ~pad.held;
       msg.pressed &= ~pad.pressed;
     }
@@ -435,7 +619,11 @@ const loop = startLoop({
       msg2.held |= pad2.held;
       msg2.pressed |= pad2.pressed;
     }
-    if (!game.heroes.has('p2') && mode === 'play' && !game.cleared && !game.over && (msg2.pressed || pad2?.start)) addPlayer2(true);
+    if (!online && !game.heroes.has('p2') && mode === 'play' && !game.cleared && !game.over && (msg2.pressed || pad2?.start)) addPlayer2(true);
+    if (online && remote.cont) {
+      remote.cont = false;
+      msg2.pressed |= BTN.LIGHT;
+    }
     if (game.over && (continueQueued || msg.pressed & BTN.LIGHT || msg2.pressed & BTN.LIGHT)) game.applyInput({ type: 'continue', playerId: 'p1' });
     continueQueued = false;
     for (const [id, m] of [['p1', msg], ['p2', msg2]]) {
@@ -446,6 +634,10 @@ const loop = startLoop({
     game.step(dt);
   },
   render(time, dt) {
+    if (mode === 'guest') {
+      guestRender(time, dt);
+      return;
+    }
     if (paused) pollPadMenus(dt);
     renderer.draw(game, time, dt, debug);
     const hero = game.heroes.get('p1');
@@ -465,6 +657,7 @@ const loop = startLoop({
         moveLabelTimer = 0.9;
       }
     }
+    if (net?.role === 'host' && net.connected) hostSend(dt);
     game.events.length = 0;
     if (game.cleared) onClear();
     touch?.setReady(hero && hero.semangat >= SPECIAL_COST);

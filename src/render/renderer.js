@@ -8,6 +8,7 @@ import { drawProp, drawItem, drawProjectile, drawHeldWeapon } from './sprites/ob
 import { activeHitbox, hurtbox } from '../combat/hits.js';
 import { drawAsap, drawBuldoser, drawRaja, drawFire, flames, drawRobot, drawMech, drawHantu, drawCandle, drawBuzzer, drawTruck, drawTikus, drawKala } from './sprites/monsters.js';
 import { applyEraGrade } from '../systems/era.js';
+import { sheetFor, frameFor, FRAME_W, FRAME_H, FOOT_Y } from './sprites/sheets.js';
 import { zoneAt } from '../systems/environment.js';
 
 const MONSTERS = { asap: drawAsap, buldoser: drawBuldoser, raja: drawRaja, robot: drawRobot, mech: drawMech, hantu: drawHantu, buzzer: drawBuzzer, truck: drawTruck, tikus: drawTikus, kala: drawKala };
@@ -130,9 +131,23 @@ export class Renderer {
       if (m?.telegraph && e.state === 'attack' && e.t < m.startup / 60 && Math.floor(time * 12) % 2) this.drawAlert(ctx, fx, top);
       return;
     }
-    const riding = e.move?.ride && e.state === 'attack';
+    const sheet = sheetFor(e.def.id);
+    if (sheet) {
+      // Painted sprite sheet instead of the code drawing.
+      const { row, col } = frameFor(e, time);
+      const w = FRAME_W * size;
+      const h = FRAME_H * size;
+      ctx.save();
+      ctx.translate(Math.round(fx), Math.round(e.y - e.z));
+      if (e.facing < 0) ctx.scale(-1, 1);
+      ctx.drawImage(sheet, col * FRAME_W, row * FRAME_H, FRAME_W, FRAME_H, Math.round(-w / 2), Math.round(-FOOT_Y * size), w, h);
+      ctx.restore();
+    }
+    const riding = !sheet && e.move?.ride && e.state === 'attack';
     if (riding) this.drawMotor(ctx, e, fx, time, false);
-    if (size === 1) {
+    if (sheet) {
+      // drawn above
+    } else if (size === 1) {
       const pts = drawFigure(ctx, pose, e.look ?? e.def.look, fx, e.y, e.z + (riding ? 10 : 0), e.facing);
       const held = e.weapon?.id ?? (riding ? null : e.def.tool);
       if (held) drawHeldWeapon(ctx, pts, held, e.facing);

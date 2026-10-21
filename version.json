@@ -1,17 +1,15 @@
 {
-  "version": "0.14.0",
+  "version": "0.15.0",
   "notes": {
     "id": [
-      "Musik gamelan buatan kode: saron, bonang, kenong, gong, kendang; lebih cepat saat bos; nada pelog di zaman Kalabendu, slendro saat zaman membaik (bisa dimatikan di Pengaturan)",
-      "Cerita mengikuti jagoan yang kau pilih (Sri, Ujang, Mak Inah, atau Bayu)",
-      "Adegan perkenalan saat Sri, Ujang, dan Mak Inah bergabung",
-      "Pejabat Tinggi dan Batara Kala sedikit lebih cepat dikalahkan"
+      "Main Online: buat ruang dan bagikan kodenya, teman bergabung dari HP atau komputer lain (tuan rumah memilih stage)",
+      "Pilihan bahasa Bahasa / English langsung di layar judul",
+      "Dukungan sprite sheet: gambar karakter bisa diganti dengan gambar buatan sendiri (lihat tools/sheet.html)"
     ],
     "en": [
-      "Gamelan music made in code: saron, bonang, kenong, gong, kendang; faster during bosses; pelog tuning in Kalabendu, slendro as the age heals (can be turned off in Settings)",
-      "The story follows the hero you pick (Sri, Ujang, Mak Inah or Bayu)",
-      "Intro scenes when Sri, Ujang and Mak Inah join",
-      "High Official and Batara Kala are a little quicker to beat"
+      "Play Online: create a room and share the code; a friend joins from another phone or computer (the host picks the stage)",
+      "Bahasa / English language switch right on the title screen",
+      "Sprite sheet support: characters can be swapped for painted art (see tools/sheet.html)"
     ]
   }
 }
