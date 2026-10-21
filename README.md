@@ -74,12 +74,13 @@ bribes and protests: younger kids may want an adult nearby.
 | 5 | Gedung Pejabat (official's glass tower) | Pejabat Tinggi, and Batara Kala if you refused every bribe |
 
 ### Heroes
-| Hero | Style | Jurus |
-|---|---|---|
-| Bayu | young pesilat, balanced, fast combos | Badai Sabit (spinning crescent kicks) |
-| Sri | rice farmer with a cangkul, wide sweeps | Badai Padi (spinning sweep) |
-| Ujang | ojol driver, very fast | Ojol Ngebut (motorbike charge) |
-| Mak Inah | fisherwoman, slow but very strong | Lempar Jala (net that holds enemies) |
+| Hero | Style | Jurus | Represents |
+|---|---|---|---|
+| Bayu | young pesilat, balanced, fast combos | Badai Sabit (spinning crescent kicks) | Young people with character and culture, the ones who refuse bribes, speak up against corruption, and demand leaders who answer to the law |
+| Sri | rice farmer with a cangkul, wide sweeps | Badai Padi (spinning sweep) | Farmers and the land, the ones who guard the forests from burning, keep land in the hands of small farmers, and grow the food we eat |
+| Ujang | ojol driver, very fast | Ojol Ngebut (motorbike charge) | Gig and informal workers, the ones who keep the city moving and deserve fair pay, job security, and real protection |
+| Mak Inah | fisherwoman, slow but very strong | Lempar Jala (net that holds enemies) | Mothers, women and coastal communities, the ones who hold families together through cooperatives, local markets, and helping each other against hoarders and loan sharks |
+| All together | — | — | The people united, the ones who stand together for honest leaders, a protected land, fair work, and strong communities |
 
 ### Eras and endings
 The world meter goes from **Kalabendu** (0) through **Kalatidha** (40) to **Kalasuba** (80+).
@@ -170,12 +171,13 @@ suap, dan demo: anak yang lebih kecil sebaiknya ditemani orang dewasa.
 | 5 | Gedung Pejabat (menara kaca) | Pejabat Tinggi, dan Batara Kala kalau semua suap ditolak |
 
 ### Jagoan
-| Jagoan | Gaya | Jurus |
-|---|---|---|
-| Bayu | pesilat muda, seimbang, combo cepat | Badai Sabit (tendangan sabit berputar) |
-| Sri | petani padi dengan cangkul, sapuan lebar | Badai Padi (sapuan berputar) |
-| Ujang | ojol, sangat cepat | Ojol Ngebut (seruduk motor) |
-| Mak Inah | nelayan, lambat tapi sangat kuat | Lempar Jala (jala yang menahan musuh) |
+| Jagoan | Gaya | Jurus | Mewakili |
+|---|---|---|---|
+| Bayu | pesilat muda, seimbang, combo cepat | Badai Sabit (tendangan sabit berputar) | Anak muda yang berkarakter dan berbudaya, mereka yang menolak suap, bersuara melawan korupsi, dan menuntut pemimpin yang tunduk pada hukum |
+| Sri | petani padi dengan cangkul, sapuan lebar | Badai Padi (sapuan berputar) | Petani dan tanah, mereka yang menjaga hutan dari api, mempertahankan tanah di tangan petani kecil, dan menanam pangan yang kita makan |
+| Ujang | ojol, sangat cepat | Ojol Ngebut (seruduk motor) | Pekerja lepas dan informal, mereka yang membuat kota terus bergerak dan layak mendapat upah adil, kepastian kerja, dan perlindungan nyata |
+| Mak Inah | nelayan, lambat tapi sangat kuat | Lempar Jala (jala yang menahan musuh) | Ibu, perempuan, dan masyarakat pesisir, mereka yang menyatukan keluarga lewat koperasi, pasar lokal, dan saling bantu melawan penimbun dan rentenir |
+| Semua bersama | — | — | Rakyat yang bersatu, mereka yang berdiri bersama untuk pemimpin yang jujur, tanah yang terjaga, kerja yang adil, dan masyarakat yang kuat |
 
 ### Zaman dan akhir cerita
 Meter dunia bergerak dari **Kalabendu** (0), lewat **Kalatidha** (40), sampai **Kalasuba** (80+).
