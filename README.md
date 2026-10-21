@@ -83,7 +83,7 @@ Endings: Kalabendu goes on (you took a bribe), halfway (no bribes but not enough
 
 ### For developers
 - Plain JavaScript ES modules + HTML5 Canvas, no frameworks, no build step, no external art or sound
-  (music is gamelan made with the Web Audio API).
+  (music is gamelan made with the Web Audio API: an explore track and a darker boss track; recorded files can replace them, see `assets/music/README.md`).
 - Run locally: `python3 -m http.server 8000`, open http://localhost:8000. `?stage=stage3` jumps to a stage,
   `?stage=padepokan` is a training yard, `?net=local` tests online play between two tabs. F3 shows FPS and hitboxes.
 - Code: `src/core` (loop, input, gamepad, touch, audio, music, save, i18n), `src/combat` (moves, hits, weapons, shots),

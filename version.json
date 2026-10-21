@@ -1,17 +1,13 @@
 {
-  "version": "0.15.1",
+  "version": "0.16.0",
   "notes": {
     "id": [
-      "Main Online: buat ruang dan bagikan kodenya, teman bergabung dari HP atau komputer lain (tuan rumah memilih stage)",
-      "Pilihan bahasa Bahasa / English langsung di layar judul",
-      "Dukungan sprite sheet: gambar karakter bisa diganti dengan gambar buatan sendiri (lihat tools/sheet.html)",
-      "README baru: cara main singkat dan pilihan bahasa"
+      "Dua musik: musik jelajah untuk stage, dan musik bos yang seram (dengung rendah, detak kendang seperti jantung, gong besar, bisikan)",
+      "Bisa memakai rekaman musik gamelan sendiri (lihat assets/music/README.md)"
     ],
     "en": [
-      "Play Online: create a room and share the code; a friend joins from another phone or computer (the host picks the stage)",
-      "Bahasa / English language switch right on the title screen",
-      "Sprite sheet support: characters can be swapped for painted art (see tools/sheet.html)",
-      "New README: quick how-to-play and a language switch"
+      "Two music tracks: explore music for stages and a scary boss track (low drone, heartbeat kendang, huge gong, whispers)",
+      "Recorded gamelan music can be dropped in (see assets/music/README.md)"
     ]
   }
 }

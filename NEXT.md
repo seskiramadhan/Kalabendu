@@ -35,7 +35,8 @@ Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's 
 |---|---|---|
 | 1 | Confirm online play between two real devices | The sandbox blocks the PeerJS CDN and server, so only the two-tab test (?net=local) ran |
 | 2 | Playtest feedback from the user | Bots only so far; tune bosses, prices, music volume if asked |
-| 3 | Painted sprite art | Pipeline is ready; needs art (an outside asset, only if the user wants it) |
+| 3 | Recorded gamelan music (explore + boss) | User asked for free gamelan music from the web; the sandbox's network policy blocks opengameart.org, freesound.org, commons.wikimedia.org, archive.org and pixabay.com. Code-made explore + horror boss tracks are in (v0.16.0). Either the user allows those domains in the environment's network settings, or downloads files and adds them to assets/music/ (manifest.json) |
+| 4 | Painted sprite art | Pipeline is ready; needs art (an outside asset, only if the user wants it) |
 
 ## Questions for the user
 - Did online play connect between your phone and a friend's? If not, tell me the error text on the Play Online screen.
@@ -63,4 +64,4 @@ Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's 
 - Stage 4/5 (M9): boss sections can repeat the same camX (truck then Komandan; Pejabat then Batara Kala with requires:'kala', no GO arrow). Pejabat is shielded (KEBAL) while a Makelar lives (game.updateShields). Move summons are capped at 4 alive non-boss enemies; bosses heal at 25%. Kala's eclipse sets game.darkness (renderer spotlight).
 - The padepokan training yard stays reachable with ?stage=padepokan.
 - Online (v0.15.0): main.js hostOnline/joinOnline/leaveOnline; host mode stays 'play', guest mode is 'guest' (no game.step, renders mirror.game). Guest input → {type:'input'} to host = remote p2. Snapshot leaves out zero/false fields; Mirror starts entities from ZEROES. Waiting text when the host is in menu/story/shop.
-- Music: main.js calls music.play(track) on play/story/menu/clear; 'boss' event → setBoss.
+- Music: main.js calls music.play(track) on play/story/menu/clear; 'boss' event → setBoss(true) crossfades to the horror boss track (drone, heartbeat kendang, pelog clusters, whispers). assets/music/manifest.json {explore, boss} swaps in recorded files.
