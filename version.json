@@ -1,13 +1,11 @@
 {
-  "version": "0.18.0",
+  "version": "0.18.1",
   "notes": {
     "id": [
-      "Semua musik sekarang gamelan buatan kita sendiri: lagu berbeda untuk tiap stage, menu, cerita, bos, dan Batara Kala",
-      "Stage 1 dengan suara api, Stage 2 dengan dentang mesin, Stage 4 dengan bedug demo, Stage 5 dengan detak jam"
+      "Raja Sawit dan Pejabat Tinggi lebih cepat dikalahkan; Pejabat lebih jarang memanggil ajudan"
     ],
     "en": [
-      "All music is now our own gamelan: a different song for each stage, the menu, story scenes, bosses and Batara Kala",
-      "Stage 1 crackles with fire, Stage 2 clanks with machines, Stage 4 marches with bedug drums, Stage 5 ticks like a clock"
+      "Raja Sawit and the High Official are quicker to beat; the Official calls bodyguards less often"
     ]
   }
 }

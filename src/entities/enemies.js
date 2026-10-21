@@ -111,7 +111,7 @@ export const ENEMIES = {
     id: 'raja_sawit',
     nameKey: 'boss_raja_sawit',
     boss: true,
-    maxHp: 360,
+    maxHp: 310,
     armor: true,
     immovable: true,
     guard: 0.65,
@@ -262,12 +262,12 @@ export const ENEMIES = {
     look: { ...PREMAN_LOOK, skin: '#c08a5a', top: '#1a1a1e', clothLight: '#f6f2e4', pants: '#1a1a1e', sleeve: '#1a1a1e', sash: '#a4302a', headgear: 'peci' },
   },
   pejabat_tinggi: {
-    id: 'pejabat_tinggi', nameKey: 'boss_pejabat', boss: true, size: 1.25, maxHp: 330, armor: true, guard: 0.6,
+    id: 'pejabat_tinggi', nameKey: 'boss_pejabat', boss: true, size: 1.25, maxHp: 280, armor: true, guard: 0.6,
     walkX: 46, walkY: 30, light: [], ai: 'boss', reach: 50, keep: 120,
     attacks: [
       { move: 'pejabat_duit', min: 60, weight: 2, align: true },
       { move: 'pejabat_slam', max: 70, weight: 2, align: true },
-      { move: 'pejabat_ajudan', weight: 0.5 },
+      { move: 'pejabat_ajudan', weight: 0.3 },
     ],
     summons: [
       { at: 0.6, enemies: ['makelar', 'makelar'], shield: true, tutorial: 'tut_kebal' },

@@ -35,7 +35,7 @@ Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's 
 | # | Item | Why |
 |---|---|---|
 | 1 | Confirm online play between two real devices | The sandbox blocks the PeerJS CDN and server, so only the two-tab test (?net=local) ran |
-| 2 | Playtest feedback from the user | Bots only so far; tune bosses, prices, music volume if asked |
+| 2 | Playtest feedback from the user | Bot playtest done 2026-10-21 (6 stages × 4 heroes, no cheat health): all clear. Raja Sawit 360 → 310 hp, Pejabat Tinggi 330 → 280 hp, his bodyguard call 0.5 → 0.3. Still waiting on a human playthrough |
 | 3 | Painted sprite art | Pipeline is ready; needs art (an outside asset, only if the user wants it) |
 
 ## Questions for the user
