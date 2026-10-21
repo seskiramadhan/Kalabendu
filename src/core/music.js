@@ -24,14 +24,15 @@ const TRACKS = {
 
 const LOOKAHEAD = 0.15;
 
-// Optional recorded music: assets/music/manifest.json like
-// {"explore": "explore.mp3", "boss": "boss.mp3"} replaces the code-made
-// tracks (explore = every stage, boss = boss fights). Missing = code music.
-// Files stream through <audio> elements (little memory on phones) routed
-// into Web Audio so they fade like the code music.
+// Recorded music: assets/music/manifest.json maps a track to a file, e.g.
+// {"menu": "menu.mp3", "stage1": "stage1.mp3", "boss": "boss.mp3", "kala": "kala.mp3"}.
+// The files are made by tools/music (gamelan written in code). A track
+// without a file falls back to the live code-made gamelan below.
+// Two <audio> players take turns (one fades out while the other starts);
+// they stream, so phones keep little in memory, and are routed into Web
+// Audio so they fade like the live music.
 const FILE_GAIN = 0.45;
 const files = {};
-const elements = {};
 const filesLoaded = (async () => {
   try {
     const res = await fetch('assets/music/manifest.json', { cache: 'no-cache' });
@@ -39,33 +40,32 @@ const filesLoaded = (async () => {
   } catch {}
 })();
 
-function element(kind) {
-  if (!files[kind]) return null;
-  if (!elements[kind]) {
-    const el = new Audio('assets/music/' + files[kind]);
-    el.loop = true;
-    el.preload = 'auto';
-    elements[kind] = { el, node: null, owner: null };
-  }
-  return elements[kind];
-}
+const players = [0, 1].map(() => {
+  const el = new Audio();
+  el.loop = true;
+  el.preload = 'auto';
+  return { el, node: null, owner: null, src: '' };
+});
+let nextPlayer = 0;
+// A tiny silent MP3, only used to unlock the players on the first tap.
+const SILENCE = 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//NwwAAAAAAAAAAAAEluZm8AAAAPAAAABAAAAlgAenp6enp6enp6enp6enp6enp6enp6enp6pqampqampqampqampqampqampqampqamptPT09PT09PT09PT09PT09PT09PT09PT09P/////////////////////////////////AAAAAExhdmM2MC4zMQAAAAAAAAAAAAAAACQCcQAAAAAAAAJY+/rsqgAAAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//NCxKMAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';
 
-// iPhones only let audio elements play after a tap: start and pause each
-// one inside the first tap so later stage changes can play them.
-async function primeElements() {
-  await filesLoaded;
-  for (const kind of Object.keys(files)) {
-    const m = element(kind);
-    m.el.muted = true;
-    m.el.play().then(() => {
-      // The music may have started this track meanwhile: then keep it playing.
-      if (!m.owner) m.el.pause();
-      m.el.muted = false;
-    }).catch(() => (m.el.muted = false));
+// iPhones only let audio elements play after a tap: start and pause both
+// players inside the first tap so later music changes can play them.
+function primePlayers() {
+  for (const p of players) {
+    if (p.owner) continue;
+    p.el.muted = true;
+    p.el.src ||= SILENCE;
+    p.el.play().then(() => {
+      // The music may have started on this player meanwhile: then keep it.
+      if (!p.owner) p.el.pause();
+      p.el.muted = false;
+    }).catch(() => (p.el.muted = false));
   }
 }
-window.addEventListener('pointerdown', primeElements, { once: true });
-window.addEventListener('keydown', primeElements, { once: true });
+window.addEventListener('pointerdown', primePlayers, { once: true });
+window.addEventListener('keydown', primePlayers, { once: true });
 
 function melody(seed) {
   let s = seed * 9301 + 49297;
@@ -98,7 +98,7 @@ class Music {
 
   // For the debug view and tests: which recorded tracks are playing.
   fileState() {
-    return Object.fromEntries(Object.entries(elements).map(([k, m]) => [k, { paused: m.el.paused, time: Math.round(m.el.currentTime) }]));
+    return players.map((p) => ({ src: p.src.split('/').pop(), paused: p.el.paused, time: Math.round(p.el.currentTime) }));
   }
 
   setEra(era) {
@@ -106,6 +106,7 @@ class Music {
   }
 
   // Boss fights switch to their own, darker track (crossfade).
+  // boss: false, true, or 'kala' for Batara Kala's own theme.
   setBoss(boss) {
     if (this.boss === boss) return;
     this.boss = boss;
@@ -160,13 +161,20 @@ class Music {
     const out = this.out;
     await filesLoaded;
     if (this.out !== out) return;
-    const m = def.calm ? null : element(this.boss ? 'boss' : 'explore');
-    if (m) {
+    const key = this.boss === 'kala' ? 'kala' : this.boss ? 'boss' : this.track;
+    const file = files[key] ?? (this.boss === 'kala' ? files.boss : null);
+    if (file) {
+      const m = players[nextPlayer];
+      nextPlayer = 1 - nextPlayer;
       m.node ??= c.createMediaElementSource(m.el);
       m.el.muted = false;
       m.node.connect(out);
       m.owner = out;
-      m.el.currentTime = 0;
+      const src = 'assets/music/' + file;
+      if (m.src !== src) {
+        m.el.src = src;
+        m.src = src;
+      } else m.el.currentTime = 0;
       m.el.play().catch(() => {});
       out.gain.cancelScheduledValues(c.currentTime);
       out.gain.setTargetAtTime(FILE_GAIN, c.currentTime, this.boss ? 0.2 : 0.5);

@@ -28,7 +28,7 @@ Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's 
 | 6 | Online co-op | src/net/net.js (PeerJS from jsDelivr, BroadcastChannel with ?net=local) + src/net/snapshot.js (host snapshots 20/s, guest mirror) |
 | 7 | Snapshot branch | snapshot-v0.13.1 |
 | — | Clear buttons overlapped touch buttons (user screenshot) | touch buttons hide while choosing; portrait buttons sit under the stage (v0.13.2) |
-| — | Recorded music (v0.17.0) | explore.mp3 = Jedag-Jedug Gamelan, boss.mp3 = Free Gamelan Horror Music (fiikuri, Pixabay Content License; user downloaded, re-encoded to 128 kbps). Streams via <audio> + MediaElementSource; primed on the first tap for iPhone |
+| — | Own music (v0.18.0) | tools/music/ (Python: gamelan.py instruments, songs/*.py, render.py, look.py). Tracks: menu, story, stage0–5, boss, kala in assets/music/ via manifest.json. fiikuri tracks removed at the user's request (2026-10-21). Two <audio> players crossfade; primed with a silent MP3 on the first tap for iPhone |
 | — | Language | Bahasa / English chips on the title screen; README opens with a language switch |
 
 ## Pending
@@ -40,7 +40,7 @@ Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's 
 
 ## Questions for the user
 - Did online play connect between your phone and a friend's? If not, tell me the error text on the Play Online screen.
-- Is the music too loud or too quiet? (file music gain = FILE_GAIN 0.45 in music.js)
+- Review the 10 own tracks (drafts): which to change? Too loud/quiet? (file music gain = FILE_GAIN 0.45 in music.js)
 
 ## Already in place
 - Touch controls (joystick + Pukul/Tendang/Lompat/Hindar/Jurus) and phone scaling (v0.4.1).
@@ -64,4 +64,4 @@ Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's 
 - Stage 4/5 (M9): boss sections can repeat the same camX (truck then Komandan; Pejabat then Batara Kala with requires:'kala', no GO arrow). Pejabat is shielded (KEBAL) while a Makelar lives (game.updateShields). Move summons are capped at 4 alive non-boss enemies; bosses heal at 25%. Kala's eclipse sets game.darkness (renderer spotlight).
 - The padepokan training yard stays reachable with ?stage=padepokan.
 - Online (v0.15.0): main.js hostOnline/joinOnline/leaveOnline; host mode stays 'play', guest mode is 'guest' (no game.step, renders mirror.game). Guest input → {type:'input'} to host = remote p2. Snapshot leaves out zero/false fields; Mirror starts entities from ZEROES. Waiting text when the host is in menu/story/shop.
-- Music: main.js calls music.play(track) on play/story/menu/clear; 'boss' event → setBoss(true) crossfades to the horror boss track (drone, heartbeat kendang, pelog clusters, whispers). assets/music/manifest.json {explore, boss} swaps in recorded files.
+- Music: main.js calls music.play(track) on play/story/menu/clear; 'boss' event → setBoss(true) crossfades to the horror boss track (drone, heartbeat kendang, pelog clusters, whispers). assets/music/manifest.json maps track ids (menu, story, stageN, boss, kala) to files; 'boss' event with batara_kala → setBoss('kala').

@@ -1,1 +1,13 @@
-{ "explore": "explore.mp3", "boss": "boss.mp3" }
+{
+  "menu": "menu.mp3",
+  "story": "story.mp3",
+  "padepokan": "stage0.mp3",
+  "stage0": "stage0.mp3",
+  "stage1": "stage1.mp3",
+  "stage2": "stage2.mp3",
+  "stage3": "stage3.mp3",
+  "stage4": "stage4.mp3",
+  "stage5": "stage5.mp3",
+  "boss": "boss.mp3",
+  "kala": "kala.mp3"
+}

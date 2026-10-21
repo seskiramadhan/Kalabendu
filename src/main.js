@@ -465,7 +465,7 @@ function guestRender(time, dt) {
   renderer.draw(g, time, dt, debug);
   for (const ev of g.events) {
     if (ev.type === 'sfx') audio.play(ev.name, ev.power ?? 1);
-    if (ev.type === 'boss') music.setBoss(true);
+    if (ev.type === 'boss') music.setBoss(ev.who?.def?.id === 'batara_kala' ? 'kala' : true);
     if (ev.type === 'clear') music.play('story', { era: g.eraAfter });
   }
   g.events.length = 0;
@@ -644,7 +644,7 @@ const loop = startLoop({
     for (const ev of game.events) {
       if (ev.type === 'sfx') audio.play(ev.name, ev.power ?? 1);
       if (ev.type === 'noSemangat') audio.play('deny');
-      if (ev.type === 'boss') music.setBoss(true);
+      if (ev.type === 'boss') music.setBoss(ev.who?.def?.id === 'batara_kala' ? 'kala' : true);
       if (ev.type === 'clear') music.play('story', { era: game.eraAfter });
       if (save.settings.vibrate && navigator.vibrate) {
         if (ev.type === 'heroHurt') navigator.vibrate(40);

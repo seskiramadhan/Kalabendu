@@ -265,3 +265,54 @@ def board_limit(x):
     x = Pedalboard([Limiter(threshold_db=-1.0, release_ms=120)])(x.astype(np.float32), SR)
     peak = np.abs(x).max()
     return x / peak * 0.89 if peak > 0.89 else x
+
+
+# ---- Stage colours ------------------------------------------------------
+
+def crackle(dur, density=18, vel=1.0, seed=21):
+    """Burning wood: random pops over a low rumble."""
+    rng = np.random.default_rng(seed)
+    n = int(dur * SR)
+    out = np.zeros(n)
+    for _ in range(int(dur * density)):
+        i = rng.integers(0, n - 800)
+        pop = rng.uniform(-1, 1, 400) * np.exp(-np.arange(400) / rng.uniform(20, 90))
+        out[i:i + 400] += pop * rng.uniform(0.2, 1.0)
+    rumble = lowpass(noise(dur, seed + 1), 180) * 0.6
+    return vel * (highpass(out, 900) * 0.5 + rumble)
+
+
+def clank(vel=1.0, pitch=1.0, seed=31):
+    """A machine part hitting metal: short, inharmonic, cold."""
+    s = ring(820 * pitch, 0.35, [1, 1.73, 2.91, 4.4], [0.08, 0.05, 0.03, 0.02], [1, 0.7, 0.5, 0.3])
+    hit = highpass(noise(0.05, seed), 2000) * np.exp(-t_axis(0.05) / 0.008)
+    s[: len(hit)] += hit * 0.6
+    return vel * s * 0.6
+
+
+def steam(dur=0.8, vel=1.0, seed=41):
+    """A hiss of steam."""
+    t = t_axis(dur)
+    return vel * highpass(noise(dur, seed), 3000) * np.minimum(1, t / 0.05) * np.exp(-t / (dur * 0.4)) * 0.4
+
+
+def bedug(vel=1.0):
+    """Big mosque drum, used here as a protest drum: deep 'dung'."""
+    t = t_axis(0.9)
+    freq = 48 + 30 * np.exp(-t / 0.06)
+    body = np.sin(2 * np.pi * np.cumsum(freq) / SR) * np.exp(-t / 0.35)
+    skin = bandpass(noise(0.9, 51), 120, 1200) * np.exp(-t / 0.03) * 0.5
+    return vel * (body + skin)
+
+
+def tick(vel=1.0, high=True):
+    """A clock tick (tik / tok)."""
+    s = ring(3200 if high else 2400, 0.08, [1, 2.3], [0.012, 0.006], [1, 0.4])
+    return vel * s * 0.5
+
+
+def hum(freq, dur, vel=1.0):
+    """Electric hum of a lift motor or air conditioning."""
+    t = t_axis(dur)
+    s = np.sin(2 * np.pi * freq * t) + 0.4 * np.sin(2 * np.pi * freq * 2 * t) + 0.15 * np.sin(2 * np.pi * freq * 3 * t)
+    return vel * s * (0.9 + 0.1 * np.sin(2 * np.pi * 0.3 * t)) * 0.3

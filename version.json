@@ -1,13 +1,13 @@
 {
-  "version": "0.17.0",
+  "version": "0.18.0",
   "notes": {
     "id": [
-      "Musik gamelan asli: \"Jedag-Jedug Gamelan\" saat menjelajah dan \"Free Gamelan Horror Music\" saat melawan bos (keduanya karya fiikuri, Pixabay)",
-      "Menu dan adegan cerita tetap memakai gamelan buatan kode"
+      "Semua musik sekarang gamelan buatan kita sendiri: lagu berbeda untuk tiap stage, menu, cerita, bos, dan Batara Kala",
+      "Stage 1 dengan suara api, Stage 2 dengan dentang mesin, Stage 4 dengan bedug demo, Stage 5 dengan detak jam"
     ],
     "en": [
-      "Real gamelan music: \"Jedag-Jedug Gamelan\" while exploring and \"Free Gamelan Horror Music\" in boss fights (both by fiikuri, Pixabay)",
-      "Menus and story scenes keep the code-made gamelan"
+      "All music is now our own gamelan: a different song for each stage, the menu, story scenes, bosses and Batara Kala",
+      "Stage 1 crackles with fire, Stage 2 clanks with machines, Stage 4 marches with bedug drums, Stage 5 ticks like a clock"
     ]
   }
 }

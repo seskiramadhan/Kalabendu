@@ -1,19 +1,20 @@
-# Recorded music (optional)
+# Music
 
-The game makes its gamelan music in code. To use recorded tracks instead:
+All music in Kalabendu is our own gamelan, written in code with the music
+workshop in `tools/music/` (no samples, no recordings, no outside music).
 
-1. Put the files here, e.g. `explore.mp3` (plays during stages) and `boss.mp3` (plays in boss fights). They loop.
-2. Create `manifest.json` in this folder:
-   ```json
-   { "explore": "explore.mp3", "boss": "boss.mp3" }
-   ```
-   You can list only one; the other stays code-made.
-3. Only use music you may share: CC0 / public domain, or a licence that allows games (credit the author below if the licence asks).
+| File | Plays | Song script |
+|---|---|---|
+| menu.mp3 | title screen | tools/music/songs/menu.py — "Fajar di Marcapada" |
+| story.mp3 | story scenes, warung, endings | songs/story.py — "Wayang Malam" |
+| stage0.mp3 | Stage 0 and the training yard | songs/stage0.py — "Pagi di Kampung" |
+| stage1.mp3 | Stage 1 | songs/stage1.py — "Api di Hulu" |
+| stage2.mp3 | Stage 2 | songs/stage2.py — "Mesin Mati" |
+| stage3.mp3 | Stage 3 | songs/stage3.py — "Harga Naik" |
+| stage4.mp3 | Stage 4 | songs/stage4.py — "Rakyat Bersatu" |
+| stage5.mp3 | Stage 5 | songs/stage5.py — "Menara Kaca" |
+| boss.mp3 | every boss fight | songs/boss.py — "Amuk" |
+| kala.mp3 | Batara Kala | songs/kala.py — "Batara Kala" |
 
-## Credits
-| File | Track | Artist | Source | Licence |
-|---|---|---|---|---|
-| explore.mp3 | Jedag-Jedug Gamelan | fiikuri | https://pixabay.com/music/upbeat-jedag-jedug-gamelan-free-for-use-328514/ | Pixabay Content License |
-| boss.mp3 | Free Gamelan Horror Music | fiikuri | https://pixabay.com/music/folk-free-gamelan-horror-music-spiritual-and-energetic-background-music-339847/ | Pixabay Content License |
-
-Both re-encoded to 128 kbps MP3 for phones. Menu and story scenes still use the code-made gamelan.
+To change one: edit its song script, then `python3 tools/music/render.py <song> --install`.
+`manifest.json` maps each game track to a file; a track missing from it uses the live code gamelan in `src/core/music.js`.
