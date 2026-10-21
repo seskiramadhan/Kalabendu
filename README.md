@@ -23,6 +23,11 @@ Ordinary villagers who train in silat fight their way from the burning forest to
 It is funny satire with heart: the people win together, and the hardest fight is saying **no** to a bribe.
 All characters, companies and places are fictional.
 
+### Suitable age
+**10 and up** (our own estimate, not an official rating; about PG / E10+).
+Cartoon-style fighting with no blood, no bad language. A scary demon boss (Batara Kala) and satire about corruption,
+bribes and protests: younger kids may want an adult nearby.
+
 ### How to play
 1. Open the link above. On a phone, turn it sideways for a bigger picture, or keep it upright with the buttons below.
 2. Tap **Mulai** (Start). The first stage teaches the controls.
@@ -113,6 +118,11 @@ harga naik, preman bayaran di jalan, dan pejabat yang mengambil untung dari semu
 Warga biasa yang berlatih silat bertarung dari hutan yang terbakar sampai menara para koruptor.
 Satire lucu yang hangat: rakyat menang bersama-sama, dan pertarungan tersulit adalah berani bilang **tidak** pada suap.
 Semua tokoh, perusahaan, dan tempat adalah fiksi.
+
+### Usia yang cocok
+**10 tahun ke atas** (perkiraan kami sendiri, bukan rating resmi; kira-kira PG / E10+).
+Perkelahian bergaya kartun tanpa darah dan tanpa kata kasar. Ada bos iblis yang seram (Batara Kala) dan satire tentang korupsi,
+suap, dan demo: anak yang lebih kecil sebaiknya ditemani orang dewasa.
 
 ### Cara bermain
 1. Buka link di atas. Di HP, miringkan layar untuk gambar lebih besar, atau tetap tegak dengan tombol di bawah.
