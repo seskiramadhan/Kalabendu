@@ -28,6 +28,7 @@ Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's 
 | 6 | Online co-op | src/net/net.js (PeerJS from jsDelivr, BroadcastChannel with ?net=local) + src/net/snapshot.js (host snapshots 20/s, guest mirror) |
 | 7 | Snapshot branch | snapshot-v0.13.1 |
 | — | Clear buttons overlapped touch buttons (user screenshot) | touch buttons hide while choosing; portrait buttons sit under the stage (v0.13.2) |
+| — | Recorded music (v0.17.0) | explore.mp3 = Jedag-Jedug Gamelan, boss.mp3 = Free Gamelan Horror Music (fiikuri, Pixabay Content License; user downloaded, re-encoded to 128 kbps). Streams via <audio> + MediaElementSource; primed on the first tap for iPhone |
 | — | Language | Bahasa / English chips on the title screen; README opens with a language switch |
 
 ## Pending
@@ -35,12 +36,11 @@ Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's 
 |---|---|---|
 | 1 | Confirm online play between two real devices | The sandbox blocks the PeerJS CDN and server, so only the two-tab test (?net=local) ran |
 | 2 | Playtest feedback from the user | Bots only so far; tune bosses, prices, music volume if asked |
-| 3 | Recorded gamelan music (explore + boss) | User asked for free gamelan music from the web; the sandbox's network policy blocks opengameart.org, freesound.org, commons.wikimedia.org, archive.org and pixabay.com. Code-made explore + horror boss tracks are in (v0.16.0). Either the user allows those domains in the environment's network settings, or downloads files and adds them to assets/music/ (manifest.json) |
-| 4 | Painted sprite art | Pipeline is ready; needs art (an outside asset, only if the user wants it) |
+| 3 | Painted sprite art | Pipeline is ready; needs art (an outside asset, only if the user wants it) |
 
 ## Questions for the user
 - Did online play connect between your phone and a friend's? If not, tell me the error text on the Play Online screen.
-- Is the gamelan music too loud or too quiet?
+- Is the music too loud or too quiet? (file music gain = FILE_GAIN 0.45 in music.js)
 
 ## Already in place
 - Touch controls (joystick + Pukul/Tendang/Lompat/Hindar/Jurus) and phone scaling (v0.4.1).

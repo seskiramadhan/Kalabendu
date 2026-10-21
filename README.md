@@ -83,7 +83,8 @@ Endings: Kalabendu goes on (you took a bribe), halfway (no bribes but not enough
 
 ### For developers
 - Plain JavaScript ES modules + HTML5 Canvas, no frameworks, no build step, no external art or sound
-  (music is gamelan made with the Web Audio API: an explore track and a darker boss track; recorded files can replace them, see `assets/music/README.md`).
+  except the music: stage music "Jedag-Jedug Gamelan" and boss music "Free Gamelan Horror Music" by fiikuri (Pixabay Content License).
+  Menus and story scenes use gamelan made in code with the Web Audio API. See `assets/music/README.md`.
 - Run locally: `python3 -m http.server 8000`, open http://localhost:8000. `?stage=stage3` jumps to a stage,
   `?stage=padepokan` is a training yard, `?net=local` tests online play between two tabs. F3 shows FPS and hitboxes.
 - Code: `src/core` (loop, input, gamepad, touch, audio, music, save, i18n), `src/combat` (moves, hits, weapons, shots),
@@ -172,8 +173,9 @@ Menamatkan stage dan menyelamatkan warga menaikkannya, suap menurunkannya, dan w
 Akhir cerita: Kalabendu berlanjut (pernah menerima suap), setengah jalan (tanpa suap tapi bukti kurang), atau **Kalasuba** (Batara Kala dikalahkan).
 
 ### Untuk pengembang
-- JavaScript murni (ES modules) + HTML5 Canvas, tanpa framework, tanpa build, tanpa file gambar/suara
-  (musik gamelan dibuat dengan Web Audio API).
+- JavaScript murni (ES modules) + HTML5 Canvas, tanpa framework, tanpa build, tanpa file gambar.
+  Musik stage "Jedag-Jedug Gamelan" dan musik bos "Free Gamelan Horror Music" karya fiikuri (Pixabay Content License);
+  menu dan cerita memakai gamelan buatan kode (Web Audio API).
 - Jalankan lokal: `python3 -m http.server 8000`, buka http://localhost:8000. `?stage=stage3` langsung ke stage itu,
   `?stage=padepokan` tempat latihan, `?net=local` menguji main online di dua tab. F3 menampilkan FPS dan hitbox.
 - Struktur kode: lihat bagian *For developers* di atas. Semua teks ada di `src/core/i18n.js` (Bahasa Indonesia dan English).

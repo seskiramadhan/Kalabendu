@@ -1,13 +1,13 @@
 {
-  "version": "0.16.0",
+  "version": "0.17.0",
   "notes": {
     "id": [
-      "Dua musik: musik jelajah untuk stage, dan musik bos yang seram (dengung rendah, detak kendang seperti jantung, gong besar, bisikan)",
-      "Bisa memakai rekaman musik gamelan sendiri (lihat assets/music/README.md)"
+      "Musik gamelan asli: \"Jedag-Jedug Gamelan\" saat menjelajah dan \"Free Gamelan Horror Music\" saat melawan bos (keduanya karya fiikuri, Pixabay)",
+      "Menu dan adegan cerita tetap memakai gamelan buatan kode"
     ],
     "en": [
-      "Two music tracks: explore music for stages and a scary boss track (low drone, heartbeat kendang, huge gong, whispers)",
-      "Recorded gamelan music can be dropped in (see assets/music/README.md)"
+      "Real gamelan music: \"Jedag-Jedug Gamelan\" while exploring and \"Free Gamelan Horror Music\" in boss fights (both by fiikuri, Pixabay)",
+      "Menus and story scenes keep the code-made gamelan"
     ]
   }
 }

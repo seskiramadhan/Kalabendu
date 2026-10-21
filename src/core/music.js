@@ -27,24 +27,45 @@ const LOOKAHEAD = 0.15;
 // Optional recorded music: assets/music/manifest.json like
 // {"explore": "explore.mp3", "boss": "boss.mp3"} replaces the code-made
 // tracks (explore = every stage, boss = boss fights). Missing = code music.
+// Files stream through <audio> elements (little memory on phones) routed
+// into Web Audio so they fade like the code music.
+const FILE_GAIN = 0.45;
 const files = {};
-let filesLoaded = null;
-function loadFiles() {
-  filesLoaded ??= (async () => {
-    try {
-      const res = await fetch('assets/music/manifest.json', { cache: 'no-cache' });
-      if (!res.ok) return;
-      const list = await res.json();
-      await Promise.all(
-        Object.entries(list).map(async ([kind, file]) => {
-          const data = await (await fetch('assets/music/' + file)).arrayBuffer();
-          files[kind] = await audio.ctx.decodeAudioData(data);
-        }),
-      );
-    } catch {}
-  })();
-  return filesLoaded;
+const elements = {};
+const filesLoaded = (async () => {
+  try {
+    const res = await fetch('assets/music/manifest.json', { cache: 'no-cache' });
+    if (res.ok) Object.assign(files, await res.json());
+  } catch {}
+})();
+
+function element(kind) {
+  if (!files[kind]) return null;
+  if (!elements[kind]) {
+    const el = new Audio('assets/music/' + files[kind]);
+    el.loop = true;
+    el.preload = 'auto';
+    elements[kind] = { el, node: null, owner: null };
+  }
+  return elements[kind];
 }
+
+// iPhones only let audio elements play after a tap: start and pause each
+// one inside the first tap so later stage changes can play them.
+async function primeElements() {
+  await filesLoaded;
+  for (const kind of Object.keys(files)) {
+    const m = element(kind);
+    m.el.muted = true;
+    m.el.play().then(() => {
+      // The music may have started this track meanwhile: then keep it playing.
+      if (!m.owner) m.el.pause();
+      m.el.muted = false;
+    }).catch(() => (m.el.muted = false));
+  }
+}
+window.addEventListener('pointerdown', primeElements, { once: true });
+window.addEventListener('keydown', primeElements, { once: true });
 
 function melody(seed) {
   let s = seed * 9301 + 49297;
@@ -73,6 +94,11 @@ class Music {
     this.on = on;
     if (!on) this.stop();
     else if (this.track) this.play(this.track, { era: this.era, force: true });
+  }
+
+  // For the debug view and tests: which recorded tracks are playing.
+  fileState() {
+    return Object.fromEntries(Object.entries(elements).map(([k, m]) => [k, { paused: m.el.paused, time: Math.round(m.el.currentTime) }]));
   }
 
   setEra(era) {
@@ -132,16 +158,27 @@ class Music {
     this.out.gain.setTargetAtTime(def.calm ? 0.22 : this.boss ? 0.34 : 0.28, c.currentTime, this.boss ? 0.2 : 0.5);
     this.out.connect(audio.musicBus);
     const out = this.out;
-    await loadFiles();
+    await filesLoaded;
     if (this.out !== out) return;
-    const file = def.calm ? null : files[this.boss ? 'boss' : 'explore'];
-    if (file) {
-      const src = c.createBufferSource();
-      src.buffer = file;
-      src.loop = true;
-      src.connect(out);
-      src.start();
-      this.live.push(src);
+    const m = def.calm ? null : element(this.boss ? 'boss' : 'explore');
+    if (m) {
+      m.node ??= c.createMediaElementSource(m.el);
+      m.el.muted = false;
+      m.node.connect(out);
+      m.owner = out;
+      m.el.currentTime = 0;
+      m.el.play().catch(() => {});
+      out.gain.cancelScheduledValues(c.currentTime);
+      out.gain.setTargetAtTime(FILE_GAIN, c.currentTime, this.boss ? 0.2 : 0.5);
+      // Stopping fades this gain out, then pauses unless a newer start took the element.
+      this.live.push({
+        stop: () => {
+          try {
+            m.node.disconnect(out);
+          } catch {}
+          if (m.owner === out) m.el.pause();
+        },
+      });
       this.timer = -1;
       return;
     }
