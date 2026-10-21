@@ -3,6 +3,7 @@ import { Keyboard, BTN, P2_KEYS } from './core/input.js';
 import { Gamepads } from './core/gamepad.js';
 import { startLoop } from './core/loop.js';
 import { audio } from './core/audio.js';
+import { music } from './core/music.js';
 import { t } from './core/i18n.js';
 import { loadSave, writeSave, resetSave } from './core/save.js';
 import { Renderer } from './render/renderer.js';
@@ -19,7 +20,7 @@ import { STAGE5 } from './stages/stage5_gedung.js';
 import { buy, applyToHero, applyUpgrades } from './systems/economy.js';
 import { HERO_UNLOCKS, ROSTER } from './entities/heroes.js';
 import { Story } from './ui/story.js';
-import { STORY, ENDINGS, endingFor, canFaceKala, totalEvidence } from './story/story.js';
+import { STORY, ENDINGS, JOIN_SCENES, endingFor, canFaceKala, totalEvidence } from './story/story.js';
 import { SPECIAL_COST } from './entities/fighter.js';
 
 const STAGES = { padepokan: PADEPOKAN, stage0: STAGE0, stage1: STAGE1, stage2: STAGE2, stage3: STAGE3, stage4: STAGE4, stage5: STAGE5 };
@@ -51,6 +52,7 @@ renderer.touch = !!touch;
 let save = loadSave();
 syncHeroes();
 let p2Active = false;
+let joinQueue = [];
 let mode = 'menu';
 let paused = true;
 let debug = false;
@@ -62,6 +64,7 @@ let game;
 function applySettings() {
   const s = save.settings;
   audio.setVolume(s.volume);
+  if (music.on !== (s.music !== false)) music.setEnabled(s.music !== false);
   renderer.hud.tips = s.tips;
   document.body.dataset.buttons = s.buttons;
 }
@@ -90,6 +93,7 @@ function play(stageId, opts) {
   newGame(stageId, opts);
   mode = 'play';
   paused = false;
+  music.play(game.stage.id, { era: game.era });
   document.body.classList.remove('in-menu');
   renderer.showHud = true;
   screens.hide();
@@ -110,10 +114,12 @@ function startStage(stageId, opts = {}) {
   paused = true;
   releaseInputs();
   screens.hide();
+  music.play('story', { era: save.era });
   renderer.showHud = false;
   document.body.classList.add('in-menu');
   newGame(stageId, { rupiah: save.rupiah, preview: true });
   story.play(scene, {
+    hero: save.hero,
     onBribe: (accept, amount) => applyBribe(stageId, accept, amount),
     onDone: () => play(stageId, { rupiah: save.rupiah }),
   });
@@ -149,11 +155,13 @@ function showEnding() {
   document.body.classList.add('in-menu');
   nextBtn.hidden = true;
   againBtn.hidden = true;
-  story.play(ENDINGS[type], { onDone: () => toMenu() });
+  music.play('story', { era: save.era });
+  story.play(ENDINGS[type], { hero: save.hero, onDone: () => toMenu() });
 }
 
 function toMenu() {
   mode = 'menu';
+  music.play('menu', { era: save.era });
   p2Active = false;
   document.body.classList.add('in-menu');
   renderer.showHud = false;
@@ -392,6 +400,7 @@ function onClear() {
     save.stage = next;
   }
   const fresh = syncHeroes();
+  joinQueue = fresh.slice();
   if (fresh.length) {
     hint.textContent = fresh.map((id) => t('heroUnlocked').replace('{name}', t(`hero_${id}`))).join(' · ');
     hint.style.opacity = '1';
@@ -443,6 +452,8 @@ const loop = startLoop({
     for (const ev of game.events) {
       if (ev.type === 'sfx') audio.play(ev.name, ev.power ?? 1);
       if (ev.type === 'noSemangat') audio.play('deny');
+      if (ev.type === 'boss') music.setBoss(true);
+      if (ev.type === 'clear') music.play('story', { era: game.eraAfter });
       if (save.settings.vibrate && navigator.vibrate) {
         if (ev.type === 'heroHurt') navigator.vibrate(40);
         else if (ev.type === 'special') navigator.vibrate(25);
@@ -491,15 +502,23 @@ nextBtn.addEventListener('click', () => {
     showEnding();
     return;
   }
-  // Between stages: the warung, then the next stage.
-  mode = 'shop';
+  // Between stages: a new hero's scene (if one just unlocked), the warung, then the next stage.
   paused = true;
   releaseInputs();
   nextBtn.hidden = true;
   againBtn.hidden = true;
   renderer.showHud = false;
   document.body.classList.add('in-menu');
-  screens.show('shop');
+  const openShop = () => {
+    mode = 'shop';
+    screens.show('shop');
+  };
+  const lines = joinQueue.flatMap((id) => JOIN_SCENES[id] ?? []);
+  joinQueue = [];
+  if (lines.length) {
+    mode = 'story';
+    story.play(lines, { hero: save.hero, onDone: openShop });
+  } else openShop();
 });
 
 newGame(urlStage ?? 'stage0', { preview: !urlStage });
@@ -508,4 +527,5 @@ else {
   document.body.classList.add('in-menu');
   renderer.showHud = false;
   screens.show('title');
+  music.play('menu', { era: save.era });
 }

@@ -188,7 +188,7 @@ export class Screens {
       }, (s.p2pad ?? 1) === v ? 'chip active' : 'chip'));
     }
 
-    panel.append(lang, vol, toggle('vibrate', 'vibrate'), toggle('tips', 'tips'), size, pad2,
+    panel.append(lang, vol, toggle('music', 'music'), toggle('vibrate', 'vibrate'), toggle('tips', 'tips'), size, pad2,
       btn(t('resetData'), () => {
         if (confirm(t('resetConfirm'))) {
           this.h.onReset();

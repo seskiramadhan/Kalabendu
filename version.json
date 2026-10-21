@@ -1,11 +1,17 @@
 {
-  "version": "0.13.2",
+  "version": "0.14.0",
   "notes": {
     "id": [
-      "Tombol Main lagi / Lanjut tidak lagi menumpuk dengan tombol sentuh (tombol sentuh disembunyikan saat memilih, posisi lebih rendah di HP)"
+      "Musik gamelan buatan kode: saron, bonang, kenong, gong, kendang; lebih cepat saat bos; nada pelog di zaman Kalabendu, slendro saat zaman membaik (bisa dimatikan di Pengaturan)",
+      "Cerita mengikuti jagoan yang kau pilih (Sri, Ujang, Mak Inah, atau Bayu)",
+      "Adegan perkenalan saat Sri, Ujang, dan Mak Inah bergabung",
+      "Pejabat Tinggi dan Batara Kala sedikit lebih cepat dikalahkan"
     ],
     "en": [
-      "Play again / Next buttons no longer overlap the touch buttons (touch buttons hide while you choose; lower on phones)"
+      "Gamelan music made in code: saron, bonang, kenong, gong, kendang; faster during bosses; pelog tuning in Kalabendu, slendro as the age heals (can be turned off in Settings)",
+      "The story follows the hero you pick (Sri, Ujang, Mak Inah or Bayu)",
+      "Intro scenes when Sri, Ujang and Mak Inah join",
+      "High Official and Batara Kala are a little quicker to beat"
     ]
   }
 }

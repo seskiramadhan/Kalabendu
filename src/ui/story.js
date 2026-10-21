@@ -22,7 +22,9 @@ export class Story {
     return !this.el.hidden;
   }
 
-  play(lines, { onDone, onBribe }) {
+  // hero: the hero being played; 'hero' lines and {hero} in text use them.
+  play(lines, { onDone, onBribe, hero = 'bayu' }) {
+    this.hero = hero;
     this.lines = lines;
     this.i = 0;
     this.onDone = onDone;
@@ -69,11 +71,14 @@ export class Story {
         this.raf = requestAnimationFrame(loop);
       };
       this.raf = requestAnimationFrame(loop);
-      box.append(c, h('div', t('sp_dalang'), 'speaker'), h('p', t(line.textKey), 'line'));
+      box.append(c, h('div', t('sp_dalang'), 'speaker'), h('p', this.text(line.textKey), 'line'));
     } else if (line.speaker) {
-      const sp = SPEAKERS[line.speaker];
+      // A side character who is also the hero being played hands the line to a villager.
+      let id = line.speaker === 'hero' ? this.hero : line.speaker;
+      if (line.speaker !== 'hero' && id === this.hero) id = 'warga';
+      const sp = SPEAKERS[id];
       const row = div('dialogue');
-      row.append(portrait(sp), wrap(h('div', t(sp.nameKey), 'speaker'), h('p', t(line.textKey), 'line')));
+      row.append(portrait(sp), wrap(h('div', t(sp.nameKey), 'speaker'), h('p', this.text(line.textKey), 'line')));
       box.append(row);
     } else if (line.bribe) {
       box.append(this.bribeChoice(line.bribe));
@@ -85,6 +90,10 @@ export class Story {
     box.append(nav);
     this.el.append(box);
     (box.querySelector('.primary') ?? box.querySelector('button'))?.focus({ preventScroll: true });
+  }
+
+  text(key) {
+    return t(key).replace('{hero}', t(`hero_${this.hero}`));
   }
 
   bribeChoice(amount) {

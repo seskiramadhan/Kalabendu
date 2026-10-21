@@ -262,7 +262,7 @@ export const ENEMIES = {
     look: { ...PREMAN_LOOK, skin: '#c08a5a', top: '#1a1a1e', clothLight: '#f6f2e4', pants: '#1a1a1e', sleeve: '#1a1a1e', sash: '#a4302a', headgear: 'peci' },
   },
   pejabat_tinggi: {
-    id: 'pejabat_tinggi', nameKey: 'boss_pejabat', boss: true, size: 1.25, maxHp: 380, armor: true, guard: 0.6,
+    id: 'pejabat_tinggi', nameKey: 'boss_pejabat', boss: true, size: 1.25, maxHp: 330, armor: true, guard: 0.6,
     walkX: 46, walkY: 30, light: [], ai: 'boss', reach: 50, keep: 120,
     attacks: [
       { move: 'pejabat_duit', min: 60, weight: 2, align: true },
@@ -277,7 +277,7 @@ export const ENEMIES = {
     look: { skin: '#c8946a', top: '#c8a050', pants: '#8a7040', sleeve: '#c8a050', clothLight: '#e0c070', sash: '#5a3a1a', headgear: 'peci', chain: '#f2c94c', hair: '#1a1210' },
   },
   batara_kala: {
-    id: 'batara_kala', nameKey: 'boss_kala', boss: true, maxHp: 520, armor: true, immovable: true, guard: 0.6,
+    id: 'batara_kala', nameKey: 'boss_kala', boss: true, maxHp: 460, armor: true, immovable: true, guard: 0.6,
     walkX: 30, walkY: 24, light: [], ai: 'boss', render: 'kala', body: { w: 34, h: 120 }, keep: 130, cooldown: 1.2,
     attacks: [
       { move: 'kala_slam', max: 90, weight: 2, align: true },
