@@ -25,7 +25,7 @@ All characters, companies and places are fictional.
 
 ### Suitable age
 **10 and up** (our own estimate, not an official rating; about PG / E10+).
-Cartoon-style fighting with no blood, no bad language. A scary demon boss (Batara Kala) and satire about corruption,
+Cartoon-style fighting with no blood, no bad language. A scary demon boss and satire about corruption,
 bribes and protests: younger kids may want an adult nearby.
 
 ### How to play
@@ -51,7 +51,7 @@ bribes and protests: younger kids may want an adult nearby.
 - Getting hit makes you drop some rupiah. Grab it back before the thieves do!
 - Between stages, spend rupiah at **Warung Mak Inah**. Prices rise every stage.
 - Before stages 1–5 an official offers you a **bribe**. Taking it gives money and power, but the world gets darker.
-  **Refuse every bribe and collect evidence** to reach the true final boss and the best ending.
+  **Your choices matter. Maybe there is more than one ending…**
 - New heroes join as the story goes: **Sri** (after Stage 1), **Ujang** (after Stage 2), **Mak Inah** (after Stage 3).
   Pick them in **Pilih Jagoan** (Character Select).
 - Press **☰ → Update** when a new version is out.
@@ -71,7 +71,7 @@ bribes and protests: younger kids may want an adult nearby.
 | 2 | Pabrik Tutup (closed factory) | Juragan Outsourcing in a giant mech |
 | 3 | Pasar Rakyat → Lantai Bursa (market, then trading floor) | Hantu Bursa |
 | 4 | Jalan Raya Demo (protest street) | Komandan Preman on a water-cannon truck |
-| 5 | Gedung Pejabat (official's glass tower) | Pejabat Tinggi, and Batara Kala if you refused every bribe |
+| 5 | Gedung Pejabat (official's glass tower) | Pejabat Tinggi… or is he the last? |
 
 ### Heroes
 | Hero | Style | Jurus | Represents |
@@ -85,11 +85,11 @@ bribes and protests: younger kids may want an adult nearby.
 ### Eras and endings
 The world meter goes from **Kalabendu** (0) through **Kalatidha** (40) to **Kalasuba** (80+).
 Clearing stages and saving villagers raises it, bribes lower it, and the colours of the world follow it.
-Endings: Kalabendu goes on (you took a bribe), halfway (no bribes but not enough evidence), or **Kalasuba** (you beat Batara Kala).
+How the story ends depends on you. Your choices matter. Maybe there is more than one ending…
 
 ### For developers
 - Plain JavaScript ES modules + HTML5 Canvas, no frameworks, no build step, no outside art or sound.
-- Music: our own gamelan written in code (`tools/music/`, Python): a theme per stage, menu, story, boss and Batara Kala.
+- Music: our own gamelan written in code (`tools/music/`, Python): a theme per stage, menu, story, bosses and the final boss.
   Render with `python3 tools/music/render.py <song> --install`; see `tools/music/README.md`.
 - Run locally: `python3 -m http.server 8000`, open http://localhost:8000. `?stage=stage3` jumps to a stage,
   `?stage=padepokan` is a training yard, `?net=local` tests online play between two tabs. F3 shows FPS and hitboxes.
@@ -122,7 +122,7 @@ Semua tokoh, perusahaan, dan tempat adalah fiksi.
 
 ### Usia yang cocok
 **10 tahun ke atas** (perkiraan kami sendiri, bukan rating resmi; kira-kira PG / E10+).
-Perkelahian bergaya kartun tanpa darah dan tanpa kata kasar. Ada bos iblis yang seram (Batara Kala) dan satire tentang korupsi,
+Perkelahian bergaya kartun tanpa darah dan tanpa kata kasar. Ada bos iblis yang seram dan satire tentang korupsi,
 suap, dan demo: anak yang lebih kecil sebaiknya ditemani orang dewasa.
 
 ### Cara bermain
@@ -148,7 +148,7 @@ suap, dan demo: anak yang lebih kecil sebaiknya ditemani orang dewasa.
 - Saat terkena pukulan, sebagian rupiahmu jatuh. Ambil lagi sebelum diambil maling!
 - Di antara stage, belanja di **Warung Mak Inah**. Harga naik setiap stage.
 - Sebelum stage 1–5, Pak Pejabat menawarkan **suap**. Menerimanya memberi uang dan kekuatan, tapi dunia makin gelap.
-  **Tolak semua suap dan kumpulkan bukti** untuk bertemu bos terakhir sejati dan akhir terbaik.
+  **Pilihanmu menentukan. Mungkin akhir ceritanya tidak hanya satu…**
 - Jagoan baru bergabung seiring cerita: **Sri** (setelah Stage 1), **Ujang** (setelah Stage 2), **Mak Inah** (setelah Stage 3).
   Pilih di **Pilih Jagoan**.
 - Tekan **☰ → Update** saat ada versi baru.
@@ -168,7 +168,7 @@ suap, dan demo: anak yang lebih kecil sebaiknya ditemani orang dewasa.
 | 2 | Pabrik Tutup | Juragan Outsourcing dengan robot raksasa |
 | 3 | Pasar Rakyat → Lantai Bursa | Hantu Bursa |
 | 4 | Jalan Raya Demo | Komandan Preman di truk penyemprot air |
-| 5 | Gedung Pejabat (menara kaca) | Pejabat Tinggi, dan Batara Kala kalau semua suap ditolak |
+| 5 | Gedung Pejabat (menara kaca) | Pejabat Tinggi… atau masih ada lagi? |
 
 ### Jagoan
 | Jagoan | Gaya | Jurus | Mewakili |
@@ -182,11 +182,11 @@ suap, dan demo: anak yang lebih kecil sebaiknya ditemani orang dewasa.
 ### Zaman dan akhir cerita
 Meter dunia bergerak dari **Kalabendu** (0), lewat **Kalatidha** (40), sampai **Kalasuba** (80+).
 Menamatkan stage dan menyelamatkan warga menaikkannya, suap menurunkannya, dan warna dunia ikut berubah.
-Akhir cerita: Kalabendu berlanjut (pernah menerima suap), setengah jalan (tanpa suap tapi bukti kurang), atau **Kalasuba** (Batara Kala dikalahkan).
+Akhir cerita tergantung padamu. Pilihanmu menentukan. Mungkin akhir ceritanya tidak hanya satu…
 
 ### Untuk pengembang
 - JavaScript murni (ES modules) + HTML5 Canvas, tanpa framework, tanpa build, tanpa gambar/suara dari luar.
-- Musik: gamelan buatan sendiri yang ditulis dengan kode (`tools/music/`, Python): satu lagu per stage, menu, cerita, bos, dan Batara Kala.
+- Musik: gamelan buatan sendiri yang ditulis dengan kode (`tools/music/`, Python): satu lagu per stage, menu, cerita, bos, dan bos terakhir.
 - Jalankan lokal: `python3 -m http.server 8000`, buka http://localhost:8000. `?stage=stage3` langsung ke stage itu,
   `?stage=padepokan` tempat latihan, `?net=local` menguji main online di dua tab. F3 menampilkan FPS dan hitbox.
 - Struktur kode: lihat bagian *For developers* di atas. Semua teks ada di `src/core/i18n.js` (Bahasa Indonesia dan English).
