@@ -28,7 +28,7 @@ Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's 
 | 6 | Online co-op | src/net/net.js (PeerJS from jsDelivr, BroadcastChannel with ?net=local) + src/net/snapshot.js (host snapshots 20/s, guest mirror) |
 | 7 | Snapshot branch | snapshot-v0.13.1 |
 | — | Clear buttons overlapped touch buttons (user screenshot) | touch buttons hide while choosing; portrait buttons sit under the stage (v0.13.2) |
-| — | Own music (v0.18.0) | tools/music/ (Python: gamelan.py instruments, songs/*.py, render.py, look.py). Tracks: menu, story, stage0–5, boss, kala in assets/music/ via manifest.json. fiikuri tracks removed at the user's request (2026-10-21). Two <audio> players crossfade; primed with a silent MP3 on the first tap for iPhone |
+| — | Own music (v0.18.0) | tools/music/ (Python: gamelan.py instruments, songs/*.py, render.py, look.py). Tracks: menu, story, stage0–5, boss, kala in assets/music/ via manifest.json. fiikuri tracks removed at the user's request (2026-10-21). User reviewed and approved all 10 tracks (2026-10-21). Two <audio> players crossfade; primed with a silent MP3 on the first tap for iPhone |
 | — | Language | Bahasa / English chips on the title screen; README opens with a language switch |
 
 ## Pending
@@ -40,7 +40,6 @@ Status line: **Everything in the plan is done (v0.15.0). Waiting for the user's 
 
 ## Questions for the user
 - Did online play connect between your phone and a friend's? If not, tell me the error text on the Play Online screen.
-- Review the 10 own tracks (drafts): which to change? Too loud/quiet? (file music gain = FILE_GAIN 0.45 in music.js)
 
 ## Already in place
 - Touch controls (joystick + Pukul/Tendang/Lompat/Hindar/Jurus) and phone scaling (v0.4.1).
