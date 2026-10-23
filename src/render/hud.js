@@ -1,6 +1,8 @@
 import { t } from '../core/i18n.js';
 import { eraOf } from '../systems/era.js';
 
+export const PLAYERS = ['p1', 'p2', 'p3', 'p4'];
+export const PLAYER_COLORS = ['#e05a4a', '#6aa0f0', '#5ac07a', '#f2c94c'];
 const TUTORIAL_TIME = 7;
 const TARGET_TIME = 3;
 const BOSS_LAYER_HP = 100;
@@ -54,11 +56,15 @@ export class Hud {
     ctx.save();
     ctx.textBaseline = 'middle';
 
-    const hero = game.heroes.get('p1');
-    if (hero) this.drawHeroPanel(ctx, hero, game, X, Y, u, 0);
-    const p2 = game.heroes.get('p2');
-    if (p2) this.drawHeroPanel(ctx, p2, game, (v) => X(v + 130), Y, u, 1);
-    else if (this.p2Hint && game.time < 12 && !game.cleared) this.drawP2Hint(ctx, X, Y, u, time);
+    // One panel per player. Up to two at full size; three or four shrink to fit.
+    const ids = PLAYERS.filter((id) => game.heroes.has(id));
+    if (ids.length <= 2) {
+      ids.forEach((id, i) => this.drawHeroPanel(ctx, game.heroes.get(id), game, (v) => X(v + i * 130), Y, u, PLAYERS.indexOf(id)));
+    } else {
+      const k = 0.88;
+      ids.forEach((id, i) => this.drawHeroPanel(ctx, game.heroes.get(id), game, (v) => X(i * 112 + v * k), (v) => Y(v * k), u * k, PLAYERS.indexOf(id)));
+    }
+    if (ids.length === 1 && this.p2Hint && game.time < 12 && !game.cleared) this.drawP2Hint(ctx, X, Y, u, time);
     if (this.flash > 0) {
       ctx.fillStyle = `rgba(255,244,210,${this.flash * 0.45})`;
       ctx.fillRect(X(0), Y(0), 480 * u, 270 * u);
@@ -78,9 +84,9 @@ export class Hud {
     batikBox(ctx, X(6), Y(6), 124 * u, 36 * u, u);
     this.drawPortrait(ctx, hero.look ?? hero.def.look, X, Y, u);
     if (slot) {
-      ctx.fillStyle = '#6aa0f0';
+      ctx.fillStyle = PLAYER_COLORS[slot];
       ctx.font = `900 ${Math.round(6 * u)}px system-ui, sans-serif`;
-      ctx.fillText('P2', X(24), Y(37));
+      ctx.fillText(`P${slot + 1}`, X(24), Y(37));
     }
     ctx.fillStyle = '#f2c94c';
     ctx.font = `900 ${Math.round(7 * u)}px system-ui, sans-serif`;

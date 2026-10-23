@@ -1,11 +1,13 @@
 {
-  "version": "0.18.5",
+  "version": "0.19.0",
   "notes": {
     "id": [
-      "Pak Pejabat sekarang memanggil jagoanmu dengan namanya (pas untuk Sri dan Mak Inah juga)"
+      "Sampai 4 pemain! Satu komputer: P2 numpad/gamepad ke-2, P3 gamepad ke-3, P4 gamepad ke-4. Online: sampai 3 teman bergabung ke satu ruang",
+      "Tiap pemain mendapat jagoan berbeda; dengan 3–4 pemain musuh lebih banyak dan bos lebih kuat"
     ],
     "en": [
-      "The Official now calls your hero by name (fits Sri and Mak Inah too)"
+      "Up to 4 players! One computer: P2 numpad/gamepad 2, P3 gamepad 3, P4 gamepad 4. Online: up to 3 friends join one room",
+      "Each player gets a different hero; with 3–4 players there are more enemies and tougher bosses"
     ]
   }
 }

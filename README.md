@@ -56,12 +56,13 @@ bribes and protests: younger kids may want an adult nearby.
   Pick them in **Pilih Jagoan** (Character Select).
 - Press **☰ → Update** when a new version is out.
 
-**Playing with a friend**
-- **Same computer:** Player 2 presses numpad **Enter** (or any button on a second gamepad) to join.
-  Numpad: 8/4/5/6 move, 1 punch, 2 kick, 3 jump, 0 dodge, Enter jurus.
-- **Online (two phones or computers):** **Main Online → Create room**, send the code to your friend,
+**Playing with friends (up to 4 players)**
+- **Same computer:** Player 2 presses numpad **Enter** (or any button on the 2nd gamepad), Player 3 uses the 3rd gamepad,
+  Player 4 the 4th gamepad. Numpad: 8/4/5/6 move, 1 punch, 2 kick, 3 jump, 0 dodge, Enter jurus.
+- **Online (phones or computers):** **Main Online → Create room**, send the code to up to 3 friends,
   they type it under **Join**. Then the host starts the game as usual.
-- If one of you runs out of lives, press Punch to jump back in while the other keeps fighting.
+- Each player gets a different hero (once unlocked); with 3–4 players there are more enemies and tougher bosses.
+- If someone runs out of lives, they press Punch to jump back in while the others keep fighting.
 
 ### Stages
 | # | Stage | Boss |
@@ -153,12 +154,13 @@ suap, dan demo: anak yang lebih kecil sebaiknya ditemani orang dewasa.
   Pilih di **Pilih Jagoan**.
 - Tekan **☰ → Update** saat ada versi baru.
 
-**Main bersama teman**
-- **Satu komputer:** Pemain 2 tekan **Enter** di numpad (atau tombol apa saja di gamepad ke-2) untuk ikut.
-  Numpad: 8/4/5/6 gerak, 1 pukul, 2 tendang, 3 lompat, 0 menghindar, Enter jurus.
-- **Online (dua HP atau komputer):** **Main Online → Buat Ruang**, kirim kodenya ke teman,
-  dia mengetiknya di kolom **Gabung**. Lalu tuan rumah memulai game seperti biasa.
-- Kalau salah satu kehabisan nyawa, tekan Pukul untuk kembali selama temannya masih bertarung.
+**Main bersama teman (sampai 4 pemain)**
+- **Satu komputer:** Pemain 2 tekan **Enter** di numpad (atau tombol apa saja di gamepad ke-2), Pemain 3 pakai gamepad ke-3,
+  Pemain 4 gamepad ke-4. Numpad: 8/4/5/6 gerak, 1 pukul, 2 tendang, 3 lompat, 0 menghindar, Enter jurus.
+- **Online (HP atau komputer):** **Main Online → Buat Ruang**, kirim kodenya ke sampai 3 teman,
+  mereka mengetiknya di kolom **Gabung**. Lalu tuan rumah memulai game seperti biasa.
+- Tiap pemain mendapat jagoan berbeda (jika sudah terbuka); dengan 3–4 pemain musuh lebih banyak dan bos lebih kuat.
+- Kalau ada yang kehabisan nyawa, tekan Pukul untuk kembali selama yang lain masih bertarung.
 
 ### Stage
 | # | Stage | Bos |

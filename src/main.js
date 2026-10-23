@@ -55,11 +55,14 @@ renderer.touch = !!touch;
 await loadSheets();
 let save = loadSave();
 syncHeroes();
-let p2Active = false;
+// Extra players (P2–P4). A seat stays taken across stages until the menu.
+// source: 'local' (numpad / gamepad on this device) or 'remote' (an online guest).
+const SLOTS = ['p2', 'p3', 'p4'];
+const seats = new Map();
 let joinQueue = [];
 // Online co-op: net = { role: 'host' | 'guest', room, connected, code }.
 let net = null;
-const remote = { held: 0, pressed: 0, cont: false, sentHeld: -1 };
+const remote = { sentHeld: -1, me: 'p2' };
 let netEvents = [];
 let snapClock = 0;
 let mode = 'menu';
@@ -90,7 +93,7 @@ function newGame(stageId, { rupiah = 0, preview = false } = {}) {
   renderer.setStage(game.stage);
   applySettings();
   renderer.hud.p2Hint = !touch && !preview;
-  if (p2Active && !preview) addPlayer2(false);
+  if (!preview) for (const id of seats.keys()) addPlayer(id, false);
   againBtn.hidden = true;
   continueBtn.hidden = true;
   nextBtn.hidden = true;
@@ -172,7 +175,7 @@ function toMenu() {
   if (mode === 'guest') leaveOnline();
   mode = 'menu';
   music.play('menu', { era: save.era });
-  p2Active = !!(net?.role === 'host' && net.connected);
+  for (const [id, seat] of seats) if (seat.source === 'local') seats.delete(id);
   document.body.classList.add('in-menu');
   renderer.showHud = false;
   newGame(save.stage, { preview: true });
@@ -198,20 +201,42 @@ function syncHeroes() {
   return fresh;
 }
 
-// Player 2 takes the next unlocked hero; with only one hero, a colour swap.
-function addPlayer2(dropIn) {
-  if (game.heroes.has('p2')) return;
-  const pick = ROSTER.map((r) => r.id).find((id) => id !== save.hero && save.heroes.includes(id));
-  const alt = pick ? undefined : { sash: '#3a7ad8', udeng: '#3a5a9a', top: '#2a3448', pants: '#2a3448', sleeve: '#2a3448', kerudung: '#7a3a6a', helmet: '#3a7ad8' };
-  const h2 = game.addHero('p2', pick ?? save.hero, { look: alt });
-  applyUpgrades(h2, save);
+// Colour swaps for a player who gets a hero someone already plays.
+const ALT_LOOKS = {
+  p2: { sash: '#3a7ad8', udeng: '#3a5a9a', top: '#2a3448', pants: '#2a3448', sleeve: '#2a3448', kerudung: '#7a3a6a', helmet: '#3a7ad8', bandana: '#3a7ad8' },
+  p3: { sash: '#3aa05a', udeng: '#2f7a3a', top: '#24402c', pants: '#24402c', sleeve: '#24402c', kerudung: '#3a7a5a', helmet: '#3aa05a', bandana: '#3aa05a' },
+  p4: { sash: '#e0b252', udeng: '#a8862e', top: '#4a3a1a', pants: '#4a3a1a', sleeve: '#4a3a1a', kerudung: '#a8862e', helmet: '#e0b252', bandana: '#e0b252' },
+};
+
+// A new player takes the next unlocked hero nobody is playing; if all are
+// taken, a colour-swapped copy.
+function addPlayer(id, dropIn) {
+  if (game.heroes.has(id)) return;
+  const taken = new Set([...game.heroes.values()].map((h) => h.def.id));
+  const pick = ROSTER.map((r) => r.id).find((h) => !taken.has(h) && save.heroes.includes(h));
+  const hero = game.addHero(id, pick ?? save.hero, { look: pick ? undefined : ALT_LOOKS[id] });
+  applyUpgrades(hero, save);
   if (dropIn) {
-    h2.x = game.heroes.get('p1').x;
-    game.respawn(h2);
-    game.emit({ type: 'tutorial', key: 'p2Joined' });
+    hero.x = game.heroes.get('p1').x;
+    game.respawn(hero);
+    game.emit({ type: 'tutorial', key: 'joined_' + id });
   }
-  p2Active = true;
   renderer.hud.p2Hint = false;
+}
+
+function removePlayer(id) {
+  const h = game.heroes.get(id);
+  if (h) {
+    h.remove = true;
+    game.heroes.delete(id);
+  }
+  seats.delete(id);
+}
+
+// Gamepad for each local seat: the 2nd pad drives P2, 3rd P3, 4th P4
+// (or one lower when P2 is set to the 1st pad and P1 plays on the keyboard).
+function padIndexFor(id) {
+  return SLOTS.indexOf(id) + ((save.settings.p2pad ?? 1) === 0 ? 0 : 1);
 }
 
 function releaseInputs() {
@@ -436,6 +461,10 @@ waitBox.className = 'net-wait';
 waitBox.hidden = true;
 ui.append(waitBox);
 
+function remoteCount() {
+  return [...seats.values()].filter((x) => x.source === 'remote').length;
+}
+
 function hostSend(dt) {
   netEvents.push(...game.events);
   snapClock += dt;
@@ -469,7 +498,7 @@ function guestRender(time, dt) {
     if (ev.type === 'clear') music.play('story', { era: g.eraAfter });
   }
   g.events.length = 0;
-  const me = g.heroes.get('p2');
+  const me = g.heroes.get(remote.me);
   touch?.setReady(me && me.semangat >= SPECIAL_COST);
   const showContinue = playing && (g.over || me?.out);
   if (continueBtn.hidden === showContinue) {
@@ -506,35 +535,36 @@ async function hostOnline() {
   netStatus(t('netCreating'));
   try {
     const room = await hostRoom({
-      onOpen: () => {
-        net.connected = true;
-        p2Active = true;
-        if (mode === 'play') addPlayer2(true);
-        netStatus(t('netFriendIn'));
+      onOpen: (guest) => {
+        // The friend takes the first free seat (P2, P3, P4).
+        const id = SLOTS.find((s) => !seats.has(s));
+        if (!id) {
+          net.room.sendTo(guest, { type: 'full' });
+          return;
+        }
+        seats.set(id, { source: 'remote', guest, held: 0, pressed: 0, cont: false });
+        net.room.sendTo(guest, { type: 'seat', playerId: id });
+        if (mode === 'play') addPlayer(id, true);
+        netStatus(t('netFriendIn').replace('{n}', remoteCount()));
         audio.play('combo');
       },
-      onMessage: (m) => {
+      onMessage: (m, guest) => {
+        const seat = [...seats.values()].find((x) => x.guest === guest);
+        if (!seat) return;
         if (m.type === 'input') {
-          remote.held = m.held;
-          remote.pressed |= m.pressed;
-        } else if (m.type === 'continue') remote.cont = true;
+          seat.held = m.held;
+          seat.pressed |= m.pressed;
+        } else if (m.type === 'continue') seat.cont = true;
       },
-      onClose: () => {
+      onClose: (guest) => {
         if (!net) return;
-        net.connected = false;
-        remote.held = 0;
-        const h2 = game.heroes.get('p2');
-        if (h2) {
-          h2.remove = true;
-          game.heroes.delete('p2');
-        }
-        p2Active = false;
+        for (const [id, seat] of seats) if (seat.guest === guest) removePlayer(id);
         netStatus(t('netFriendLeft'));
       },
       onError: (why) => netStatus(netErrorText(why)),
       onStatus: (key) => netStatus(t(key)),
     });
-    net = { role: 'host', room, connected: false, code: room.code };
+    net = { role: 'host', room, code: room.code };
     screens.netCode = room.code;
     if (!screens.netStatus || screens.netStatus === t('netCreating')) netStatus(t('netServer'));
   } catch {
@@ -558,6 +588,12 @@ async function joinOnline(code) {
         renderer.hud.p2Hint = false;
       },
       onMessage: (m) => {
+        if (m.type === 'seat') remote.me = m.playerId;
+        if (m.type === 'full') {
+          netStatus(t('netFull'));
+          leaveOnline();
+          return;
+        }
         if (m.type !== 'snap') return;
         const was = mirror.mode;
         mirror.apply(m, (g) => {
@@ -592,16 +628,12 @@ function leaveOnline() {
   waitBox.hidden = true;
   mirror.game = null;
   if (n.role === 'guest' && mode === 'guest') mode = 'menu';
-  if (n.role === 'host') {
-    const h2 = game.heroes.get('p2');
-    if (h2) {
-      h2.remove = true;
-      game.heroes.delete('p2');
-    }
-    p2Active = false;
-  }
+  if (n.role === 'host') for (const [id, seat] of seats) if (seat.source === 'remote') removePlayer(id);
   screens.netCode = null;
 }
+
+// Closing the tab tells the others right away instead of timing out.
+window.addEventListener('pagehide', () => leaveOnline());
 
 const loop = startLoop({
   isPaused: () => paused,
@@ -621,35 +653,50 @@ const loop = startLoop({
       guestInput(msg);
       return;
     }
-    // Player 2: numpad, plus the gamepad chosen in settings (or the online guest).
-    const online = net?.role === 'host' && net.connected;
-    const msg2 = online ? { type: 'input', playerId: 'p2', held: remote.held, pressed: remote.pressed } : keyboard2.message('p2');
-    if (online) {
-      remote.pressed = 0;
-      keyboard2.message('p2');
-    }
+    // Players 2–4: numpad (P2) and gamepads on this device, or online guests.
+    const numpad = keyboard2.message('p2');
     const p2pad = save.settings.p2pad ?? 1;
-    const pad2 = online ? null : p2pad === 0 ? pad : pads.poll(1);
-    if (!online && p2pad === 0 && pad && (p2Active || pad.pressed)) {
-      msg.held &= ~pad.held;
-      msg.pressed &= ~pad.pressed;
+    const msgs = [['p1', msg]];
+    const canJoin = mode === 'play' && !game.cleared && !game.over;
+    for (const id of SLOTS) {
+      const seat = seats.get(id);
+      if (seat?.source === 'remote') {
+        const m = { type: 'input', playerId: id, held: seat.held, pressed: seat.pressed };
+        seat.pressed = 0;
+        if (seat.cont) {
+          seat.cont = false;
+          m.pressed |= BTN.LIGHT;
+        }
+        msgs.push([id, m]);
+        continue;
+      }
+      const i = padIndexFor(id);
+      const pad_ = i === 0 ? pad : pads.poll(i);
+      const m = { type: 'input', playerId: id, held: pad_?.held ?? 0, pressed: pad_?.pressed ?? 0 };
+      if (id === 'p2') {
+        m.held |= numpad.held;
+        m.pressed |= numpad.pressed;
+      }
+      // P2 on the first pad: that pad stops driving P1.
+      if (i === 0 && pad && (seat || pad.pressed)) {
+        msg.held &= ~pad.held;
+        msg.pressed &= ~pad.pressed;
+      }
+      if (!seat) {
+        if (canJoin && (m.pressed || pad_?.start)) {
+          seats.set(id, { source: 'local' });
+          addPlayer(id, true);
+        }
+        continue;
+      }
+      msgs.push([id, m]);
     }
-    if (pad2) {
-      msg2.held |= pad2.held;
-      msg2.pressed |= pad2.pressed;
-    }
-    if (!online && !game.heroes.has('p2') && mode === 'play' && !game.cleared && !game.over && (msg2.pressed || pad2?.start)) addPlayer2(true);
-    if (online && remote.cont) {
-      remote.cont = false;
-      msg2.pressed |= BTN.LIGHT;
-    }
-    if (game.over && (continueQueued || msg.pressed & BTN.LIGHT || msg2.pressed & BTN.LIGHT)) game.applyInput({ type: 'continue', playerId: 'p1' });
+    if (game.over && (continueQueued || msgs.some(([, m]) => m.pressed & BTN.LIGHT))) game.applyInput({ type: 'continue', playerId: 'p1' });
     continueQueued = false;
-    for (const [id, m] of [['p1', msg], ['p2', msg2]]) {
+    for (const [id, m] of msgs) {
       if (game.heroes.get(id)?.out && m.pressed & BTN.LIGHT) game.applyInput({ type: 'continue', playerId: id });
     }
-    game.applyInput(msg);
-    game.applyInput(msg2);
+    for (const [, m] of msgs) game.applyInput(m);
     game.step(dt);
   },
   render(time, dt) {
@@ -676,7 +723,7 @@ const loop = startLoop({
         moveLabelTimer = 0.9;
       }
     }
-    if (net?.role === 'host' && net.connected) hostSend(dt);
+    if (net?.role === 'host' && remoteCount()) hostSend(dt);
     game.events.length = 0;
     if (game.cleared) onClear();
     touch?.setReady(hero && hero.semangat >= SPECIAL_COST);

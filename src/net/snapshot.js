@@ -19,7 +19,7 @@ function defRef(e) {
     case 'hero':
       return ['h', e.def.id, e.def.maxHp];
     case 'enemy':
-      return ['e', e.def.id, e.def.boss ? 1 : 0, e.def.miniBoss ? 1 : 0];
+      return ['e', e.def.id, e.def.boss ? 1 : 0, e.def.miniBoss ? 1 : 0, e.def.maxHp];
     case 'ally':
       return ['a', e.def.id];
     case 'npc':
@@ -101,7 +101,7 @@ function resolveDef(d, e) {
   if (defCache.has(key)) return defCache.get(key);
   let def;
   if (d[0] === 'h') def = { ...HEROES[d[1]], maxHp: d[2] };
-  else if (d[0] === 'e') def = { ...ENEMIES[d[1]], boss: !!d[2], miniBoss: !!d[3] };
+  else if (d[0] === 'e') def = { ...ENEMIES[d[1]], boss: !!d[2], miniBoss: !!d[3], maxHp: d[4] ?? ENEMIES[d[1]].maxHp };
   else if (d[0] === 'a') def = ALLIES[d[1]];
   else if (d[0] === 'n') def = { look: VILLAGER_LOOK };
   else if (d[0] === 'p') def = PROPS[d[1]];

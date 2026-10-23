@@ -106,7 +106,10 @@ export class Game {
 
   // minion: a boss-type enemy called in as a helper (no boss bar of its own).
   spawnEnemy(type, x, y, { minion = false } = {}) {
-    const def = minion ? { ...ENEMIES[type], boss: false, miniBoss: false } : ENEMIES[type];
+    let def = minion ? { ...ENEMIES[type], boss: false, miniBoss: false } : ENEMIES[type];
+    // 3–4 players: bosses get more health so the fight still lasts.
+    const extra = Math.max(0, this.heroes.size - 2);
+    if (extra && (def.boss || def.miniBoss)) def = { ...def, maxHp: Math.round(def.maxHp * (1 + 0.35 * extra)) };
     const e = createFighter(def, 'enemy', x, y);
     e.facing = -1;
     this.entities.push(e);

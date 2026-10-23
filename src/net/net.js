@@ -64,29 +64,42 @@ function watch(conn, handlers) {
   });
 }
 
-// handlers: { onOpen(), onMessage(msg), onClose(), onError(reason), onStatus(key) }
-// Returns { code, send(msg), close() }.
+// Up to three friends join one host (4 players in all).
+export const MAX_GUESTS = 3;
+
+// Host handlers: { onOpen(guest), onMessage(msg, guest), onClose(guest), onError(reason), onStatus(key) }
+// where guest is a short id for that friend's connection.
+// Returns { code, send(msg) to everyone, sendTo(guest, msg), close() }.
 export async function hostRoom(handlers) {
   const code = newCode();
   if (local()) return localRoom(code, 'host', handlers);
   const Peer = await loadPeer();
   handlers.onStatus?.('netServer');
   const peer = new Peer(PREFIX + code, { config: ICE });
-  let conn = null;
+  const conns = new Map();
+  let next = 1;
   peer.on('open', () => handlers.onStatus?.('netShareCode'));
   peer.on('connection', (c) => {
-    if (conn?.open) {
-      c.close();
+    if (conns.size >= MAX_GUESTS) {
+      // Room is full: tell them, then hang up.
+      c.on('open', () => {
+        c.send({ type: 'full' });
+        setTimeout(() => c.close(), 500);
+      });
       return;
     }
-    conn = c;
+    const guest = 'g' + next++;
+    conns.set(guest, c);
     handlers.onStatus?.('netGuestKnock');
     watch(c, {
-      ...handlers,
+      onOpen: () => handlers.onOpen?.(guest),
+      onMessage: (m) => handlers.onMessage?.(m, guest),
       onClose: () => {
-        conn = null;
-        handlers.onClose?.();
+        conns.delete(guest);
+        handlers.onClose?.(guest);
       },
+      onError: handlers.onError,
+      onStatus: handlers.onStatus,
     });
   });
   // Lost the signalling server (phone slept, Wi-Fi changed): reconnect, same code.
@@ -94,7 +107,13 @@ export async function hostRoom(handlers) {
   peer.on('error', (e) => handlers.onError?.(e.type ?? 'error'));
   return {
     code,
-    send: (m) => conn?.open && conn.send(m),
+    send: (m) => {
+      for (const c of conns.values()) if (c.open) c.send(m);
+    },
+    sendTo: (guest, m) => {
+      const c = conns.get(guest);
+      if (c?.open) c.send(m);
+    },
     close: () => peer.destroy(),
   };
 }
@@ -124,33 +143,59 @@ export async function joinRoom(code, handlers) {
   };
 }
 
+// Test transport (?net=local): tabs of one browser talk over a BroadcastChannel.
+// Guests pick a random id; the host addresses messages to one or to all.
 function localRoom(code, role, handlers) {
   const ch = new BroadcastChannel(PREFIX + code);
+  if (role === 'host') {
+    const guests = new Set();
+    ch.onmessage = ({ data }) => {
+      if (data.from !== 'guest') return;
+      const g = data.gid;
+      if (data.hello) {
+        if (!guests.has(g) && guests.size >= MAX_GUESTS) {
+          ch.postMessage({ from: 'host', to: g, msg: { type: 'full' } });
+          return;
+        }
+        ch.postMessage({ from: 'host', to: g, hello: true });
+        if (!guests.has(g)) {
+          guests.add(g);
+          handlers.onOpen?.(g);
+        }
+      } else if (data.bye) {
+        if (guests.delete(g)) handlers.onClose?.(g);
+      } else if (guests.has(g)) handlers.onMessage?.(data.msg, g);
+    };
+    return {
+      code,
+      send: (msg) => ch.postMessage({ from: 'host', msg }),
+      sendTo: (g, msg) => ch.postMessage({ from: 'host', to: g, msg }),
+      close: () => {
+        ch.postMessage({ from: 'host', bye: true });
+        ch.close();
+      },
+    };
+  }
+  const gid = Math.random().toString(36).slice(2, 8);
   let open = false;
-  const other = role === 'host' ? 'guest' : 'host';
   ch.onmessage = ({ data }) => {
-    if (data.from !== other) return;
+    if (data.from !== 'host' || (data.to && data.to !== gid)) return;
     if (data.hello) {
-      if (role === 'host') ch.postMessage({ from: role, hello: true });
       if (!open) {
         open = true;
         handlers.onOpen?.();
       }
-      return;
-    }
-    if (data.bye) {
+    } else if (data.bye) {
       open = false;
       handlers.onClose?.();
-      return;
-    }
-    handlers.onMessage?.(data.msg);
+    } else handlers.onMessage?.(data.msg);
   };
-  if (role === 'guest') ch.postMessage({ from: role, hello: true });
+  ch.postMessage({ from: 'guest', gid, hello: true });
   return {
     code,
-    send: (msg) => open && ch.postMessage({ from: role, msg }),
+    send: (msg) => open && ch.postMessage({ from: 'guest', gid, msg }),
     close: () => {
-      ch.postMessage({ from: role, bye: true });
+      ch.postMessage({ from: 'guest', gid, bye: true });
       ch.close();
     },
   };

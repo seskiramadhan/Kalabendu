@@ -1,4 +1,5 @@
 import { VIEW_W } from '../core/view.js';
+import { ENEMIES } from '../entities/enemies.js';
 
 // Runs a stage's sections: scroll to a lock point, fight its waves, then
 // show GO and unlock the next part. The last section holds the boss.
@@ -67,7 +68,15 @@ export class Director {
   spawnWave(w) {
     const g = this.game;
     const { floorTop, floorBottom } = g.stage;
-    w.enemies.forEach((spec, i) => {
+    // 3–4 players: one more ordinary enemy per extra player in each wave.
+    const plain = w.enemies.filter((spec) => !spec.ally && !ENEMIES[spec.type]?.boss);
+    const extra = Math.max(0, g.heroes.size - 2);
+    const specs = [...w.enemies];
+    for (let i = 0; i < extra && plain.length; i++) {
+      const copy = plain[i % plain.length];
+      specs.push({ type: copy.type, side: copy.side === 'left' ? 'right' : 'left' });
+    }
+    specs.forEach((spec, i) => {
       const left = spec.side === 'left';
       const x = left ? g.camera.x - 30 - i * 18 : g.camera.x + VIEW_W + 30 + i * 18;
       const y = spec.y ?? floorTop + 12 + g.rand() * (floorBottom - floorTop - 24);

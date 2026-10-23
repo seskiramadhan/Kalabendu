@@ -1,7 +1,9 @@
 import { VIEW_W, VIEW_H } from '../core/view.js';
 import { buildStageArt } from './parallax.js';
 import { Effects } from './effects.js';
-import { Hud } from './hud.js';
+import { Hud, PLAYERS } from './hud.js';
+
+const TAG_COLORS = ['#c8322a', '#3a7ad8', '#2f9a4a', '#e0b252'];
 import { drawFigure } from './sprites/skeleton.js';
 import { poseFor, animState } from './sprites/poses.js';
 import { drawProp, drawItem, drawProjectile, drawHeldWeapon } from './sprites/objects.js';
@@ -303,15 +305,15 @@ export class Renderer {
   }
 
   drawTag(ctx, e, fx, headY) {
-    const p2 = e.playerId === 'p2';
+    const slot = Math.max(0, PLAYERS.indexOf(e.playerId));
     const x = Math.round(fx);
     const y = Math.round(headY - 16);
-    ctx.fillStyle = p2 ? '#3a7ad8' : '#c8322a';
+    ctx.fillStyle = TAG_COLORS[slot];
     ctx.fillRect(x - 6, y - 4, 12, 7);
     ctx.fillRect(x - 1, y + 3, 2, 2);
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = slot === 3 ? '#120c0a' : '#ffffff';
     ctx.font = 'bold 6px monospace';
-    ctx.fillText(p2 ? 'P2' : 'P1', x - 5, y + 2);
+    ctx.fillText(`P${slot + 1}`, x - 5, y + 2);
   }
 
   // "Kebal hukum": a golden bubble while a Makelar Kasus protects the boss.

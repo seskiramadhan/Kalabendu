@@ -3,7 +3,7 @@
 ## How to work in this repo
 - New chat? Read NEXT.md first (what is done, what is left, in order).
 - The game is a pencak silat beat 'em up (since 2026-10-20). The old sandbox version lives on branch `sandbox-v0.3.1`; don't build on it.
-- The game is finished (v0.18.5): all milestones, own gamelan soundtrack, online co-op, controls page. NEXT.md has no pending items; new work comes only from the user.
+- The game is finished (v0.19.0): all milestones, own gamelan soundtrack, up to 4 players (local and online), controls page. NEXT.md has no pending items; new work comes only from the user.
 - Each change must stay playable. After each change: tell the user how to test it, update NEXT.md, commit with a clear message, push.
 - Test before pushing: run a local server and drive the game with Playwright (Chromium at /opt/pw-browsers/chromium; `window.kalabendu.game` exposes the game). Bot playthroughs per stage and screenshots catch most breakage.
 - Keep README.md (English + Indonesian) in step when controls, stages, heroes or eras change. The README must not spoil the endings or name the secret final boss (user's choice).

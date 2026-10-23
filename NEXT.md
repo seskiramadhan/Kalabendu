@@ -1,6 +1,6 @@
 # NEXT — Kalabendu (beat 'em up) plan
 
-Status line: **Finished (v0.18.5). No pending items; wait for the user's next request** (2026-10-21)
+Status line: **Finished (v0.19.0, up to 4 players). No pending items; wait for the user's next request** (2026-10-23)
 
 ## Milestones (each playable before the next)
 | # | Milestone | Status |
@@ -32,6 +32,7 @@ Status line: **Finished (v0.18.5). No pending items; wait for the user's next re
 | — | Online play confirmed (2026-10-21) | User connected two devices; it failed on one network and worked on a different one. v0.18.2 shows each step + reason on failure |
 | — | Controls page (v0.18.3) | src/ui/controls.js, opened from the title menu and the pause menu (Kontrol) |
 | — | Polish (v0.18.4–0.18.5) | Title screen fits sideways phones; bribe lines use {hero} (no 'young man'/'good boy'); README: suitable age 10+, 'Represents' column for heroes, no ending spoilers (small hint only, no Batara Kala name) |
+| — | 4 players (v0.19.0) | main.js seats (SLOTS p2–p4, source local/remote, padIndexFor: pads 2–4, or 1–3 when P2 uses pad 1); net.js host takes up to 3 guests (MAX_GUESTS), sends {type:'seat'} / {type:'full'}; HUD shrinks panels for 3–4 players; game.spawnEnemy boss hp ×(1+0.35·(players−2)); director adds one plain enemy per extra player; hero pick = first unlocked hero nobody plays, else ALT_LOOKS colour swap |
 | — | Language | Bahasa / English chips on the title screen; README opens with a language switch |
 
 ## Pending
